@@ -359,10 +359,6 @@ fn vms() -> Vec<Box<dyn BenchVm>> {
             compilation_mode: wasmi_new::CompilationMode::Lazy,
             validation: Validation::Checked,
         }),
-        Box::new(WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::Lazy,
-            validation: Validation::Unchecked,
-        }),
         Box::new(Tinywasm),
         Box::new(Wasmtime {
             strategy: wasmtime::Strategy::Cranelift,
