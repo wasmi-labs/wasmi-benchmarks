@@ -1,0 +1,24 @@
+[package]
+name = "wasmi-benchmarks"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+
+[dependencies]
+wasmi_old = { package = "wasmi", version = "0.31" }
+wasmi_new = { package = "wasmi", version = "0.32.0-beta.13" }
+tinywasm = "0.6.0"
+wasmer = { version = "4.2.8", default-features = false, features = ["engine", "compiler"] }
+wasmer-compiler-singlepass = "4.2.8"
+wasmtime = { version = "20.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
+# wasm3 = "0.3.1"
+criterion = "0.5"
+wat = "1"
+
+[[bench]]
+name = "wasmi"
+harness = false
+
+[profile.bench]
+lto = "fat"
+codegen-units = 1
