@@ -1,7 +1,10 @@
 #![allow(unused)]
 
+mod utils;
+
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
+use self::utils::wat2wasm;
 
 criterion_group!(
     name = bench_wasmi;
@@ -46,11 +49,6 @@ impl Default for TestFilter {
     fn default() -> Self {
         Self::set_to(true)
     }
-}
-
-/// Converts the `.wat` encoded `bytes` into `.wasm` encoded bytes.
-pub fn wat2wasm(bytes: &[u8]) -> Vec<u8> {
-    wat::parse_bytes(bytes).unwrap().into_owned()
 }
 
 pub trait BenchVm {
