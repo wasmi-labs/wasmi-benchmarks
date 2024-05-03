@@ -10,6 +10,7 @@ criterion_group!(
         .measurement_time(Duration::from_millis(2000))
         .warm_up_time(Duration::from_millis(1000));
     targets =
+        bench_counter,
         bench_fib_recursive,
         bench_fib_iterative,
         bench_fib_tailrec,
@@ -20,6 +21,7 @@ criterion_main!(bench_wasmi);
 
 #[derive(Debug, Copy, Clone)]
 pub struct TestFilter {
+    pub counter: bool,
     pub fib_iterative: bool,
     pub fib_recursive: bool,
     pub fib_tailrec: bool,
@@ -30,6 +32,7 @@ pub struct TestFilter {
 impl TestFilter {
     fn set_to(flag: bool) -> Self {
         Self {
+            counter: flag,
             fib_iterative: flag,
             fib_recursive: flag,
             fib_tailrec: flag,
@@ -373,6 +376,29 @@ fn vms() -> Vec<Box<dyn BenchVm>> {
             compiler: WasmerCompiler::Singlepass,
         }),
     ]
+}
+
+fn run_counter(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
+    if !vm.test_filter().counter {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wat/counter.wat");
+    let name = vm.name();
+    let id = format!("counter/{name}/{input}");
+    c.bench_function(&id, |b| {
+        let wasm = wat2wasm(WASM);
+        let mut runtime = vm.load(&wasm[..]);
+        b.iter(|| {
+            runtime.call(input);
+        });
+    });
+}
+
+fn bench_counter(c: &mut Criterion) {
+    const INPUT: i64 = 1_000_000;
+    for vm in vms() {
+        run_counter(c, &*vm, INPUT);
+    }
 }
 
 fn run_fib_recursive(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
