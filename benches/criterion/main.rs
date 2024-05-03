@@ -172,7 +172,7 @@ fn bench_primes(c: &mut Criterion) {
 }
 
 fn run_matrix_multiply(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().primes {
+    if !vm.test_filter().matrix_multiply {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/matrix-multiplication.wat");
