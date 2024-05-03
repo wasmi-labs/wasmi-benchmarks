@@ -25,14 +25,21 @@ pub struct TestFilter {
     pub primes: bool,
 }
 
+impl TestFilter {
+    fn set_to(flag: bool) -> Self {
+        Self {
+            fib_iterative: flag,
+            fib_recursive: flag,
+            fib_tailrec: flag,
+            primes: flag,
+            matrix_multiply: flag,
+        }
+    }
+}
+
 impl Default for TestFilter {
     fn default() -> Self {
-        Self {
-            fib_iterative: true,
-            fib_recursive: true,
-            fib_tailrec: true,
-            primes: true,
-        }
+        Self::set_to(true)
     }
 }
 
@@ -189,10 +196,8 @@ impl BenchVm for Wasmtime {
             wasmtime::Strategy::Winch => {
                 let winch_works = cfg!(target_arch = "x86_64");
                 TestFilter {
-                    fib_iterative: winch_works,
-                    fib_recursive: winch_works,
                     fib_tailrec: false,
-                    primes: winch_works,
+                    ..TestFilter::set_to(winch_works)
                 }
             }
             unknown => panic!("unknown Wasmtime strategy: {unknown:?}"),
