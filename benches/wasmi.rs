@@ -14,6 +14,7 @@ criterion_group!(
         bench_fib_iterative,
         bench_fib_tailrec,
         bench_primes,
+        bench_matrix_multiply,
 );
 criterion_main!(bench_wasmi);
 
@@ -23,6 +24,7 @@ pub struct TestFilter {
     pub fib_recursive: bool,
     pub fib_tailrec: bool,
     pub primes: bool,
+    pub matrix_multiply: bool,
 }
 
 impl TestFilter {
@@ -466,5 +468,28 @@ fn bench_primes(c: &mut Criterion) {
     const INPUT: i64 = 1_000;
     for vm in vms() {
         run_primes(c, &*vm, INPUT);
+    }
+}
+
+fn run_matrix_multiply(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
+    if !vm.test_filter().primes {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wat/matrix-multiplication.wat");
+    let name = vm.name();
+    let id = format!("matmul/{name}/{input}");
+    c.bench_function(&id, |b| {
+        let wasm = wat2wasm(WASM);
+        let mut runtime = vm.load(&wasm[..]);
+        b.iter(|| {
+            runtime.call(input);
+        });
+    });
+}
+
+fn bench_matrix_multiply(c: &mut Criterion) {
+    const INPUT: i64 = 200;
+    for vm in vms() {
+        run_matrix_multiply(c, &*vm, INPUT);
     }
 }
