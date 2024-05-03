@@ -17,7 +17,7 @@ criterion = "0.5"
 wat = "1"
 
 [[bench]]
-name = "wasmi"
+name = "criterion"
 harness = false
 
 [profile.bench]
