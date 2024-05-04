@@ -35,6 +35,7 @@ criterion_group!(
         compile::bench_bz2,
         compile::bench_pulldown_cmark,
         compile::bench_spidermonkey,
+        compile::bench_ffmpeg,
 );
 
 fn vms() -> Vec<Box<dyn BenchVm>> {
@@ -46,11 +47,15 @@ fn vms() -> Vec<Box<dyn BenchVm>> {
             validation: Validation::Checked,
         }),
         Box::new(vms::WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::Lazy,
+            compilation_mode: wasmi_new::CompilationMode::Eager,
             validation: Validation::Unchecked,
         }),
         Box::new(vms::WasmiNew {
             compilation_mode: wasmi_new::CompilationMode::Lazy,
+            validation: Validation::Checked,
+        }),
+        Box::new(vms::WasmiNew {
+            compilation_mode: wasmi_new::CompilationMode::LazyTranslation,
             validation: Validation::Checked,
         }),
         Box::new(vms::Tinywasm),
