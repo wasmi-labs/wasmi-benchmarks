@@ -37,20 +37,16 @@ impl BenchVm for WasmiNew {
         }
     }
 
+    fn compile(&self, wasm: &[u8]) {
+        let mut store = self.store();
+        self.module(store.engine(), wasm);
+    }
+
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
-        let mut config = wasmi_new::Config::default();
-        config.wasm_tail_call(true);
-        config.compilation_mode(self.compilation_mode);
-        let engine = wasmi_new::Engine::new(&config);
-        let mut store = <wasmi_new::Store<()>>::new(&engine, ());
-        let module = match self.validation {
-            Validation::Checked => wasmi_new::Module::new(&engine, &wasm[..]).unwrap(),
-            Validation::Unchecked => {
-                // SAFETY: We only use properly valid Wasm in our benchmarks.
-                unsafe { wasmi_new::Module::new_unchecked(&engine, &wasm[..]).unwrap() }
-            }
-        };
-        let linker = wasmi_new::Linker::new(&engine);
+        let mut store = self.store();
+        let engine = store.engine();
+        let module = self.module(engine, wasm);
+        let linker = wasmi_new::Linker::new(engine);
         let instance = linker
             .instantiate(&mut store, &module)
             .unwrap()
@@ -62,6 +58,26 @@ impl BenchVm for WasmiNew {
             instance,
             func,
         })
+    }
+}
+
+impl WasmiNew {
+    fn store(&self) -> wasmi_new::Store<()> {
+        let mut config = wasmi_new::Config::default();
+        config.wasm_tail_call(true);
+        config.compilation_mode(self.compilation_mode);
+        let engine = wasmi_new::Engine::new(&config);
+        <wasmi_new::Store<()>>::new(&engine, ())
+    }
+
+    fn module(&self, engine: &wasmi_new::Engine, wasm: &[u8]) -> wasmi_new::Module {
+        match self.validation {
+            Validation::Checked => wasmi_new::Module::new(engine, &wasm[..]).unwrap(),
+            Validation::Unchecked => {
+                // SAFETY: We only use properly valid Wasm in our benchmarks.
+                unsafe { wasmi_new::Module::new_unchecked(engine, &wasm[..]).unwrap() }
+            }
+        }
     }
 }
 

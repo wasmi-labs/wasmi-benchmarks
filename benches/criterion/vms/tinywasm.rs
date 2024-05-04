@@ -21,6 +21,10 @@ impl BenchVm for Tinywasm {
         }
     }
 
+    fn compile(&self, wasm: &[u8]) {
+        tinywasm::Module::parse_bytes(&wasm[..]).unwrap();
+    }
+
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = tinywasm::Store::new();
         let module = tinywasm::Module::parse_bytes(&wasm[..]).unwrap();

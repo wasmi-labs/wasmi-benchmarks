@@ -13,13 +13,16 @@ impl BenchVm for WasmiOld {
         "wasmi-v0.31"
     }
 
+    fn compile(&self, wasm: &[u8]) {
+        let mut store = self.store();
+        wasmi_old::Module::new(store.engine(), &wasm[..]).unwrap();
+    }
+
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
-        let mut config = wasmi_old::Config::default();
-        config.wasm_tail_call(true);
-        let engine = wasmi_old::Engine::new(&config);
-        let mut store = <wasmi_old::Store<()>>::new(&engine, ());
-        let module = wasmi_old::Module::new(&engine, &wasm[..]).unwrap();
-        let linker = wasmi_old::Linker::new(&engine);
+        let mut store = self.store();
+        let engine = store.engine();
+        let module = wasmi_old::Module::new(engine, &wasm[..]).unwrap();
+        let linker = wasmi_old::Linker::new(engine);
         let instance = linker
             .instantiate(&mut store, &module)
             .unwrap()
@@ -31,6 +34,15 @@ impl BenchVm for WasmiOld {
             instance,
             func,
         })
+    }
+}
+
+impl WasmiOld {
+    fn store(&self) -> wasmi_old::Store<()> {
+        let mut config = wasmi_old::Config::default();
+        config.wasm_tail_call(true);
+        let engine = wasmi_old::Engine::new(&config);
+        <wasmi_old::Store<()>>::new(&engine, ())
     }
 }
 

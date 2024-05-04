@@ -34,14 +34,16 @@ impl BenchVm for Wasmtime {
         }
     }
 
+    fn compile(&self, wasm: &[u8]) {
+        let mut store = self.store();
+        wasmtime::Module::new(store.engine(), &wasm[..]).unwrap();
+    }
+
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
-        let mut config = wasmtime::Config::default();
-        config.wasm_tail_call(true);
-        config.strategy(self.strategy);
-        let engine = wasmtime::Engine::new(&config).unwrap();
-        let mut store = <wasmtime::Store<()>>::new(&engine, ());
-        let module = wasmtime::Module::new(&engine, &wasm[..]).unwrap();
-        let linker = wasmtime::Linker::new(&engine);
+        let mut store = self.store();
+        let engine = store.engine();
+        let module = wasmtime::Module::new(engine, &wasm[..]).unwrap();
+        let linker = wasmtime::Linker::new(engine);
         let instance = linker.instantiate(&mut store, &module).unwrap();
         let func = instance
             .get_typed_func::<i64, i64>(&mut store, "run")
@@ -51,6 +53,16 @@ impl BenchVm for Wasmtime {
             instance,
             func,
         })
+    }
+}
+
+impl Wasmtime {
+    fn store(&self) -> wasmtime::Store<()> {
+        let mut config = wasmtime::Config::default();
+        config.wasm_tail_call(true);
+        config.strategy(self.strategy);
+        let engine = wasmtime::Engine::new(&config).unwrap();
+        <wasmtime::Store<()>>::new(&engine, ())
     }
 }
 

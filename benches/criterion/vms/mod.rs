@@ -16,6 +16,7 @@ pub trait BenchVm {
     fn test_filter(&self) -> TestFilter {
         TestFilter::default()
     }
+    fn compile(&self, wasm: &[u8]);
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime>;
 }
 

@@ -37,20 +37,13 @@ impl BenchVm for Wasmer {
         }
     }
 
+    fn compile(&self, wasm: &[u8]) {
+        let mut store = self.store();
+        wasmer::Module::new(&store, &wasm[..]).unwrap();
+    }
+
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
-        let mut store = match self.compiler {
-            WasmerCompiler::Cranelift => {
-                let mut builder =
-                    wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
-                let mut features = wasmer::sys::Features::new();
-                features.tail_call(true);
-                let engine = builder.set_features(Some(features)).engine();
-                wasmer::Store::new(engine)
-            }
-            WasmerCompiler::Singlepass => {
-                wasmer::Store::new(wasmer_compiler_singlepass::Singlepass::new())
-            }
-        };
+        let mut store = self.store();
         let module = wasmer::Module::new(&store, &wasm[..]).unwrap();
         let import_object = wasmer::imports! {};
         let instance = wasmer::Instance::new(&mut store, &module, &import_object).unwrap();
@@ -63,6 +56,24 @@ impl BenchVm for Wasmer {
             instance,
             func,
         })
+    }
+}
+
+impl Wasmer {
+    fn store(&self) -> wasmer::Store {
+        match self.compiler {
+            WasmerCompiler::Cranelift => {
+                let mut builder =
+                    wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
+                let mut features = wasmer::sys::Features::new();
+                features.tail_call(true);
+                let engine = builder.set_features(Some(features)).engine();
+                wasmer::Store::new(engine)
+            }
+            WasmerCompiler::Singlepass => {
+                wasmer::Store::new(wasmer_compiler_singlepass::Singlepass::new())
+            }
+        }
     }
 }
 
