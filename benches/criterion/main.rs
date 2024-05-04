@@ -9,6 +9,7 @@ use self::vms::{BenchRuntime, BenchVm};
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
 
+criterion_main!(bench_wasmi);
 criterion_group!(
     name = bench_wasmi;
     config = Criterion::default()
@@ -23,7 +24,6 @@ criterion_group!(
         execute::bench_primes,
         execute::bench_matrix_multiply,
 );
-criterion_main!(bench_wasmi);
 
 fn vms() -> Vec<Box<dyn BenchVm>> {
     use vms::wasmi_new::Validation;
