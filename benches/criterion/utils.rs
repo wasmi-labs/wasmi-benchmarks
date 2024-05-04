@@ -11,6 +11,9 @@ pub struct TestFilter {
     pub fib_tailrec: bool,
     pub primes: bool,
     pub matrix_multiply: bool,
+    pub compile_bz2: bool,
+    pub compile_pulldown_cmark: bool,
+    pub compile_spidermonkey: bool,
 }
 
 impl TestFilter {
@@ -22,6 +25,9 @@ impl TestFilter {
             fib_tailrec: flag,
             primes: flag,
             matrix_multiply: flag,
+            compile_bz2: flag,
+            compile_pulldown_cmark: flag,
+            compile_spidermonkey: flag,
         }
     }
 }

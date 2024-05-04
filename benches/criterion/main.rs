@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+mod compile;
 mod execute;
 mod utils;
 mod vms;
@@ -9,7 +10,7 @@ use self::vms::{BenchRuntime, BenchVm};
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
 
-criterion_main!(bench_execute);
+criterion_main!(bench_execute, bench_compile,);
 criterion_group!(
     name = bench_execute;
     config = Criterion::default()
@@ -23,6 +24,17 @@ criterion_group!(
         execute::bench_fib_tailrec,
         execute::bench_primes,
         execute::bench_matrix_multiply,
+);
+criterion_group!(
+    name = bench_compile;
+    config = Criterion::default()
+        .sample_size(10)
+        .measurement_time(Duration::from_millis(2000))
+        .warm_up_time(Duration::from_millis(1000));
+    targets =
+        compile::bench_bz2,
+        compile::bench_pulldown_cmark,
+        compile::bench_spidermonkey,
 );
 
 fn vms() -> Vec<Box<dyn BenchVm>> {
