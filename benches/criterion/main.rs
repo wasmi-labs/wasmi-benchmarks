@@ -62,7 +62,7 @@ fn run_counter(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/counter.wat");
     let name = vm.name();
-    let id = format!("counter/{name}/{input}");
+    let id = format!("execute/counter/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
@@ -85,7 +85,7 @@ fn run_fib_recursive(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.recursive.wat");
     let name = vm.name();
-    let id = format!("fib/recursive/{name}/{input}");
+    let id = format!("execute/fib/recursive/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
@@ -108,7 +108,7 @@ fn run_fib_iterative(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.iterative.wat");
     let name = vm.name();
-    let id = format!("fib/iterative/{name}/{input}");
+    let id = format!("execute/fib/iterative/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
@@ -131,7 +131,7 @@ fn run_fib_tailrec(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.tailrec.wat");
     let name = vm.name();
-    let id = format!("fib/tailrec/{name}/{input}");
+    let id = format!("execute/fib/tailrec/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
@@ -154,7 +154,7 @@ fn run_primes(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/primes.wat");
     let name = vm.name();
-    let id = format!("primes/{name}/{input}");
+    let id = format!("execute/primes/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
@@ -177,7 +177,7 @@ fn run_matrix_multiply(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
     }
     static WASM: &[u8] = include_bytes!("../res/wat/matrix-multiplication.wat");
     let name = vm.name();
-    let id = format!("matmul/{name}/{input}");
+    let id = format!("execute/matmul/{name}/{input}");
     c.bench_function(&id, |b| {
         let wasm = wat2wasm(WASM);
         let mut runtime = vm.load(&wasm[..]);
