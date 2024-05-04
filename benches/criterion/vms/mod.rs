@@ -1,10 +1,12 @@
 pub mod tinywasm;
+pub mod wasm3;
 pub mod wasmer;
 pub mod wasmi_new;
 pub mod wasmi_old;
 pub mod wasmtime;
 
 pub use self::tinywasm::Tinywasm;
+pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
 pub use self::wasmi_new::WasmiNew;
 pub use self::wasmi_old::WasmiOld;

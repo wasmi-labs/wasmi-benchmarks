@@ -59,6 +59,7 @@ fn vms() -> Vec<Box<dyn BenchVm>> {
             validation: Validation::Checked,
         }),
         Box::new(vms::Tinywasm),
+        Box::new(vms::Wasm3),
         Box::new(vms::Wasmtime {
             strategy: wasmtime::Strategy::Cranelift,
         }),

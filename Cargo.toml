@@ -12,9 +12,13 @@ wasmer = { version = "4.2.8", default-features = false, features = ["engine", "c
 wasmer-compiler-singlepass = "4.2.8"
 wasmer-compiler-cranelift = "4.2.8"
 wasmtime = { version = "20.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
-# wasm3 = "0.3.1"
 criterion = "0.5"
 wat = "1"
+
+[dependencies.wasm3]
+git = "https://github.com/robbepop/wasm3-rs.git"
+branch = "rf-fix-wasm3-rs"
+features = ["build-bindgen"]
 
 [[bench]]
 name = "criterion"
