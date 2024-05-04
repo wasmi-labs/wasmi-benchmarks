@@ -9,9 +9,9 @@ use self::vms::{BenchRuntime, BenchVm};
 use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
 
-criterion_main!(bench_wasmi);
+criterion_main!(bench_execute);
 criterion_group!(
-    name = bench_wasmi;
+    name = bench_execute;
     config = Criterion::default()
         .sample_size(10)
         .measurement_time(Duration::from_millis(2000))
