@@ -74,7 +74,7 @@
                     (i32.rem_s (local.get $x) (local.get $prime))
                     (i32.const 0)
                 )
-                (return (i32.const 0))
+                (then (return (i32.const 0)))
             )
             (local.set $i (i32.add (local.get $i) (i32.const 1)))
             (br $continue)
