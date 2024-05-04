@@ -3,7 +3,7 @@ use crate::utils::TestFilter;
 
 pub struct Tinywasm;
 
-pub struct TinywasmRuntime {
+struct TinywasmRuntime {
     store: tinywasm::Store,
     instance: tinywasm::ModuleInstance,
     func: tinywasm::FuncHandleTyped<i64, i64>,

@@ -10,7 +10,7 @@ pub enum WasmerCompiler {
     Singlepass,
 }
 
-pub struct WasmerRuntime {
+struct WasmerRuntime {
     store: wasmer::Store,
     instance: wasmer::Instance,
     func: wasmer::TypedFunction<i64, i64>,

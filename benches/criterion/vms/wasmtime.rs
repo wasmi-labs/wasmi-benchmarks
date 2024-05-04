@@ -5,7 +5,7 @@ pub struct Wasmtime {
     pub strategy: wasmtime::Strategy,
 }
 
-pub struct WasmtimeRuntime {
+struct WasmtimeRuntime {
     store: wasmtime::Store<()>,
     instance: wasmtime::Instance,
     func: wasmtime::TypedFunc<i64, i64>,

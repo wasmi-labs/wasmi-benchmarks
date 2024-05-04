@@ -2,7 +2,7 @@ use super::{BenchRuntime, BenchVm};
 
 pub struct WasmiOld;
 
-pub struct WasmiOldRuntime {
+struct WasmiOldRuntime {
     store: wasmi_old::Store<()>,
     instance: wasmi_old::Instance,
     func: wasmi_old::TypedFunc<i64, i64>,

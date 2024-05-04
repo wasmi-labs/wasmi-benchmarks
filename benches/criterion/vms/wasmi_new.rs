@@ -11,7 +11,7 @@ pub enum Validation {
     Unchecked,
 }
 
-pub struct WasmiNewRuntime {
+struct WasmiNewRuntime {
     store: wasmi_new::Store<()>,
     instance: wasmi_new::Instance,
     func: wasmi_new::TypedFunc<i64, i64>,

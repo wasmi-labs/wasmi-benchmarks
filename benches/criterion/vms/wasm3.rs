@@ -4,7 +4,7 @@ use super::{BenchRuntime, BenchVm};
 
 pub struct Wasm3;
 
-pub struct Wasm3Runtime {
+struct Wasm3Runtime {
     runtime: wasm3::Runtime,
 }
 
