@@ -22,7 +22,12 @@ impl BenchVm for Wasmtime {
 
     fn test_filter(&self) -> TestFilter {
         match self.strategy {
-            wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift => TestFilter::default(),
+            wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift => {
+                TestFilter {
+                    compile_ffmpeg: false, // takes too long to compile
+                    ..TestFilter::default()
+                }
+            }
             wasmtime::Strategy::Winch => {
                 let winch_works = cfg!(target_arch = "x86_64");
                 TestFilter {

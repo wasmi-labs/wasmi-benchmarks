@@ -14,6 +14,7 @@ pub struct TestFilter {
     pub compile_bz2: bool,
     pub compile_pulldown_cmark: bool,
     pub compile_spidermonkey: bool,
+    pub compile_ffmpeg: bool,
 }
 
 impl TestFilter {
@@ -28,6 +29,7 @@ impl TestFilter {
             compile_bz2: flag,
             compile_pulldown_cmark: flag,
             compile_spidermonkey: flag,
+            compile_ffmpeg: flag,
         }
     }
 }

@@ -63,3 +63,23 @@ pub fn bench_spidermonkey(c: &mut Criterion) {
         run_spidermonkey(c, &*vm);
     }
 }
+
+fn run_ffmpeg(c: &mut Criterion, vm: &dyn BenchVm) {
+    if !vm.test_filter().compile_ffmpeg {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wasm/ffmpeg.wasm");
+    let name = vm.name();
+    let id = format!("compile/ffmpeg/{name}");
+    c.bench_function(&id, |b| {
+        b.iter(|| {
+            vm.compile(&WASM[..]);
+        });
+    });
+}
+
+pub fn bench_ffmpeg(c: &mut Criterion) {
+    for vm in vms() {
+        run_ffmpeg(c, &*vm);
+    }
+}
