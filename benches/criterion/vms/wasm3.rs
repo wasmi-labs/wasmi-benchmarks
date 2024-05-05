@@ -1,6 +1,5 @@
-use crate::utils::TestFilter;
-
 use super::{BenchRuntime, BenchVm};
+use crate::utils::{ExecuteTestFilter, TestFilter};
 
 pub struct Wasm3;
 
@@ -15,7 +14,10 @@ impl BenchVm for Wasm3 {
 
     fn test_filter(&self) -> TestFilter {
         TestFilter {
-            fib_tailrec: false,
+            execute: ExecuteTestFilter {
+                fib_tailrec: false,
+                ..Default::default()
+            },
             ..Default::default()
         }
     }

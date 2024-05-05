@@ -1,5 +1,5 @@
 use super::{BenchRuntime, BenchVm};
-use crate::utils::TestFilter;
+use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
 
 pub struct Wasmtime {
     pub strategy: wasmtime::Strategy,
@@ -24,14 +24,20 @@ impl BenchVm for Wasmtime {
         match self.strategy {
             wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift => {
                 TestFilter {
-                    compile_ffmpeg: false, // takes too long to compile
-                    ..TestFilter::default()
+                    compile: CompileTestFilter {
+                        ffmpeg: false, // takes too long to compile
+                        ..Default::default()
+                    },
+                    ..Default::default()
                 }
             }
             wasmtime::Strategy::Winch => {
                 let winch_works = cfg!(target_arch = "x86_64");
                 TestFilter {
-                    fib_tailrec: false,
+                    execute: ExecuteTestFilter {
+                        fib_tailrec: false,
+                        ..Default::default()
+                    },
                     ..TestFilter::set_to(winch_works)
                 }
             }

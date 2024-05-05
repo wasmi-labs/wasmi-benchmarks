@@ -1,5 +1,5 @@
 use super::{BenchRuntime, BenchVm};
-use crate::utils::TestFilter;
+use crate::utils::{ExecuteTestFilter, TestFilter};
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -27,11 +27,17 @@ impl BenchVm for Wasmer {
     fn test_filter(&self) -> TestFilter {
         match self.compiler {
             WasmerCompiler::Cranelift => TestFilter {
-                fib_tailrec: false,
+                execute: ExecuteTestFilter {
+                    fib_tailrec: false,
+                    ..Default::default()
+                },
                 ..Default::default()
             },
             WasmerCompiler::Singlepass => TestFilter {
-                fib_tailrec: false,
+                execute: ExecuteTestFilter {
+                    fib_tailrec: false,
+                    ..Default::default()
+                },
                 ..Default::default()
             },
         }

@@ -1,5 +1,5 @@
 use super::{BenchRuntime, BenchVm};
-use crate::utils::TestFilter;
+use crate::utils::{ExecuteTestFilter, TestFilter};
 
 pub struct Tinywasm;
 
@@ -16,7 +16,10 @@ impl BenchVm for Tinywasm {
 
     fn test_filter(&self) -> TestFilter {
         TestFilter {
-            fib_tailrec: false,
+            execute: ExecuteTestFilter {
+                fib_tailrec: false,
+                ..Default::default()
+            },
             ..Default::default()
         }
     }

@@ -5,19 +5,36 @@ pub fn wat2wasm(bytes: &[u8]) -> Vec<u8> {
 
 #[derive(Debug, Copy, Clone)]
 pub struct TestFilter {
+    pub execute: ExecuteTestFilter,
+    pub compile: CompileTestFilter,
+}
+
+impl TestFilter {
+    pub fn set_to(flag: bool) -> Self {
+        Self {
+            execute: ExecuteTestFilter::set_to(flag),
+            compile: CompileTestFilter::set_to(flag),
+        }
+    }
+}
+
+impl Default for TestFilter {
+    fn default() -> Self {
+        Self::set_to(true)
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct ExecuteTestFilter {
     pub counter: bool,
     pub fib_iterative: bool,
     pub fib_recursive: bool,
     pub fib_tailrec: bool,
     pub primes: bool,
     pub matrix_multiply: bool,
-    pub compile_bz2: bool,
-    pub compile_pulldown_cmark: bool,
-    pub compile_spidermonkey: bool,
-    pub compile_ffmpeg: bool,
 }
 
-impl TestFilter {
+impl ExecuteTestFilter {
     pub fn set_to(flag: bool) -> Self {
         Self {
             counter: flag,
@@ -26,15 +43,36 @@ impl TestFilter {
             fib_tailrec: flag,
             primes: flag,
             matrix_multiply: flag,
-            compile_bz2: flag,
-            compile_pulldown_cmark: flag,
-            compile_spidermonkey: flag,
-            compile_ffmpeg: flag,
         }
     }
 }
 
-impl Default for TestFilter {
+impl Default for ExecuteTestFilter {
+    fn default() -> Self {
+        Self::set_to(true)
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct CompileTestFilter {
+    pub bz2: bool,
+    pub pulldown_cmark: bool,
+    pub spidermonkey: bool,
+    pub ffmpeg: bool,
+}
+
+impl CompileTestFilter {
+    pub fn set_to(flag: bool) -> Self {
+        Self {
+            bz2: flag,
+            pulldown_cmark: flag,
+            spidermonkey: flag,
+            ffmpeg: flag,
+        }
+    }
+}
+
+impl Default for CompileTestFilter {
     fn default() -> Self {
         Self::set_to(true)
     }

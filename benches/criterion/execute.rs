@@ -5,7 +5,7 @@ use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
 
 fn run_counter(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().counter {
+    if !vm.test_filter().execute.counter {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/counter.wat");
@@ -28,7 +28,7 @@ pub fn bench_counter(c: &mut Criterion) {
 }
 
 fn run_fib_recursive(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().fib_recursive {
+    if !vm.test_filter().execute.fib_recursive {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.recursive.wat");
@@ -51,7 +51,7 @@ pub fn bench_fib_recursive(c: &mut Criterion) {
 }
 
 fn run_fib_iterative(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().fib_iterative {
+    if !vm.test_filter().execute.fib_iterative {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.iterative.wat");
@@ -74,7 +74,7 @@ pub fn bench_fib_iterative(c: &mut Criterion) {
 }
 
 fn run_fib_tailrec(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().fib_tailrec {
+    if !vm.test_filter().execute.fib_tailrec {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/fib.tailrec.wat");
@@ -97,7 +97,7 @@ pub fn bench_fib_tailrec(c: &mut Criterion) {
 }
 
 fn run_primes(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().primes {
+    if !vm.test_filter().execute.primes {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/primes.wat");
@@ -120,7 +120,7 @@ pub fn bench_primes(c: &mut Criterion) {
 }
 
 fn run_matrix_multiply(c: &mut Criterion, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().matrix_multiply {
+    if !vm.test_filter().execute.matrix_multiply {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wat/matrix-multiplication.wat");

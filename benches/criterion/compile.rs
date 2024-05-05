@@ -5,7 +5,7 @@ use criterion::{criterion_group, criterion_main, Bencher, Criterion};
 use std::time::Duration;
 
 fn run_bz2(c: &mut Criterion, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile_bz2 {
+    if !vm.test_filter().compile.bz2 {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/bz2.wasm");
@@ -25,7 +25,7 @@ pub fn bench_bz2(c: &mut Criterion) {
 }
 
 fn run_pulldown_cmark(c: &mut Criterion, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile_pulldown_cmark {
+    if !vm.test_filter().compile.pulldown_cmark {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/pulldown-cmark.wasm");
@@ -45,7 +45,7 @@ pub fn bench_pulldown_cmark(c: &mut Criterion) {
 }
 
 fn run_spidermonkey(c: &mut Criterion, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile_pulldown_cmark {
+    if !vm.test_filter().compile.pulldown_cmark {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/spidermonkey.wasm");
@@ -65,7 +65,7 @@ pub fn bench_spidermonkey(c: &mut Criterion) {
 }
 
 fn run_ffmpeg(c: &mut Criterion, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile_ffmpeg {
+    if !vm.test_filter().compile.ffmpeg {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/ffmpeg.wasm");
