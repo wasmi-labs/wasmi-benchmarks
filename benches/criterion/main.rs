@@ -36,6 +36,7 @@ criterion_group!(
         compile::bench_pulldown_cmark,
         compile::bench_spidermonkey,
         compile::bench_ffmpeg,
+        compile::bench_coremark_minimal,
 );
 
 fn vms() -> Vec<Box<dyn BenchVm>> {

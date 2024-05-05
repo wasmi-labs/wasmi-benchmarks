@@ -83,3 +83,23 @@ pub fn bench_ffmpeg(c: &mut Criterion) {
         run_ffmpeg(c, &*vm);
     }
 }
+
+fn run_coremark_minimal(c: &mut Criterion, vm: &dyn BenchVm) {
+    if !vm.test_filter().compile.coremark_minimal {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wasm/coremark-minimal.wasm");
+    let name = vm.name();
+    let id = format!("compile/coremark-minimal/{name}");
+    c.bench_function(&id, |b| {
+        b.iter(|| {
+            vm.compile(&WASM[..]);
+        });
+    });
+}
+
+pub fn bench_coremark_minimal(c: &mut Criterion) {
+    for vm in vms() {
+        run_coremark_minimal(c, &*vm);
+    }
+}
