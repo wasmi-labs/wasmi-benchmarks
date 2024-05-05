@@ -1907,7 +1907,7 @@ dependencies = [
 [[package]]
 name = "wasm3"
 version = "0.5.0"
-source = "git+https://github.com/robbepop/wasm3-rs.git?branch=rf-fix-wasm3-rs#61a2272cb92462485034a103d2a9ec8b9ac04adc"
+source = "git+https://github.com/robbepop/wasm3-rs.git?branch=rf-fix-wasm3-rs#96299e429da1ee0a36bed19a0a8bc1183e687ed3"
 dependencies = [
  "cty",
  "wasm3-sys",
@@ -1916,7 +1916,7 @@ dependencies = [
 [[package]]
 name = "wasm3-sys"
 version = "0.5.0"
-source = "git+https://github.com/robbepop/wasm3-rs.git?branch=rf-fix-wasm3-rs#61a2272cb92462485034a103d2a9ec8b9ac04adc"
+source = "git+https://github.com/robbepop/wasm3-rs.git?branch=rf-fix-wasm3-rs#96299e429da1ee0a36bed19a0a8bc1183e687ed3"
 dependencies = [
  "bindgen",
  "cc",
@@ -2579,18 +2579,18 @@ dependencies = [
 
 [[package]]
 name = "zerocopy"
-version = "0.7.32"
+version = "0.7.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74d4d3961e53fa4c9a25a8637fc2bfaf2595b3d3ae34875568a5cf64787716be"
+checksum = "087eca3c1eaf8c47b94d02790dd086cd594b912d2043d4de4bfdd466b3befb7c"
 dependencies = [
  "zerocopy-derive",
 ]
 
 [[package]]
 name = "zerocopy-derive"
-version = "0.7.32"
+version = "0.7.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ce1b18ccd8e73a9321186f97e46f9f04b778851177567b1975109d26a08d2a6"
+checksum = "6f4b6c273f496d8fd4eaf18853e6b448760225dc030ff2c485a786859aea6393"
 dependencies = [
  "proc-macro2",
  "quote",
