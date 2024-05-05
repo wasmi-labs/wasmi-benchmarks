@@ -59,6 +59,7 @@ pub struct CompileTestFilter {
     pub pulldown_cmark: bool,
     pub spidermonkey: bool,
     pub ffmpeg: bool,
+    pub coremark_minimal: bool,
 }
 
 impl CompileTestFilter {
@@ -68,6 +69,7 @@ impl CompileTestFilter {
             pulldown_cmark: flag,
             spidermonkey: flag,
             ffmpeg: flag,
+            coremark_minimal: flag,
         }
     }
 }
