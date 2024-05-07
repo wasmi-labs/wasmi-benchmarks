@@ -2,7 +2,9 @@ use crate::utils::{wat2wasm, TestFilter};
 use crate::vms;
 use crate::vms::{BenchRuntime, BenchVm};
 use criterion::measurement::WallTime;
-use criterion::{criterion_group, criterion_main, Bencher, BenchmarkGroup, Criterion, PlotConfiguration};
+use criterion::{
+    criterion_group, criterion_main, Bencher, BenchmarkGroup, Criterion, PlotConfiguration,
+};
 use std::time::Duration;
 
 fn run_counter(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
