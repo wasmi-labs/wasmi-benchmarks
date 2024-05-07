@@ -7,7 +7,7 @@ This includes execution and compilation benchmarks for the Wasmi interpreter and
 The following Wasm runtimes and configurations are included.
 
 | Runtime | ID | Configurations | Note |
-|:-------:|:---------------|:-----|
+|:-------:|:---------------|:-----|:---|
 | Wasmi v0.31 | `wasmi-v0.31` | default | |
 | Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy-translation` | |
 | Tinywasm | `tinywasm` | | Included because it was kinda simple. |
