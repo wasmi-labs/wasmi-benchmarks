@@ -46,3 +46,23 @@ Run all Wasm3 test cases with its eager compilation configuration:
 ```
 cargo bench wasm3.eager
 ```
+
+## Test Cases
+
+The Wasmi benchmarking test suite provides the following test cases:
+
+| Mode | Test Case | Notes |
+|:----:|:---------:|:------|
+| `execute` | | |
+| | `counter` | Simple loop that counts a single local up to some number. |
+| | `fib.recursive` | Recursive fibonacci calculation. Call-intense workload. |
+| | `fib.iterative` | Iterative fibonacci calculation. Compute intense workload. |
+| | `fib.tailrec` | Tail-call based fibonacci calculation. |
+| | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
+| | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
+| `compile` | | |
+| | `bz2` | Medium-sized compression library with huge function bodies. |
+| | `pulldown-cmark` | Medium-sized markdown renderer. |
+| | `spidermonkey` | The firefox Javascript execution engine. (large) |
+| | `ffmpeg` | Huge multimedia library. |
+| | `coremark` | CoreMark benchmarking compilation. (kinda small) |
