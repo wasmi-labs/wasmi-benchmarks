@@ -25,6 +25,8 @@ The following Wasm runtimes and configurations are included.
 - `wasmtime.winch`: Wasmtime's JIT optimized for fast start-up times.
 - `wasmer.singlepass`: Wasmer's JIT optimized for fast start-up times.
 
+**Note:** by default runtimes compile and validate function bodies eagerly.
+
 ## Usage
 
 Run all benchmarks via:
