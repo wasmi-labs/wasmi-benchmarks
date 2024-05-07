@@ -1,5 +1,6 @@
 use super::{BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
+use wasmi_new::{core::ValType, ModuleImportsIter};
 
 pub struct Wasm3 {
     pub compilation_mode: CompilationMode,
@@ -33,7 +34,7 @@ impl BenchVm for Wasm3 {
         }
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], imports: ModuleImportsIter) {
         let env = wasm3::Environment::new().unwrap();
         match self.compilation_mode {
             CompilationMode::Lazy => {
@@ -68,7 +69,6 @@ impl BenchVm for Wasm3 {
 }
 
 impl Wasm3 {
-    fn link_wasi_stubs(module: &mut wasm3::Module) -> Result<(), wasm3::error::Error> {
         Self::link_stub::<(), ()>(module, "bench", "start").unwrap();
         Self::link_stub::<(), ()>(module, "bench", "end").unwrap();
 
@@ -107,7 +107,6 @@ impl Wasm3 {
 
     fn link_wasi_stub<Args, Ret>(
         module: &mut wasm3::Module,
-        function_name: &str,
     ) -> Result<(), wasm3::error::Error>
     where
         Args: wasm3::WasmArgs + 'static,
@@ -125,7 +124,6 @@ impl Wasm3 {
         Args: wasm3::WasmArgs + 'static,
         Ret: wasm3::WasmType + 'static,
     {
-        // fn noop<Args, Ret>(
         //     _call_ctx: wasm3::CallContext,
         //     _args: Args,
         // ) -> Result<Ret, wasm3::error::Trap> {

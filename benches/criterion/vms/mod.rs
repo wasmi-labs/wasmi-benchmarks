@@ -12,13 +12,14 @@ pub use self::wasmi_new::WasmiNew;
 pub use self::wasmi_old::WasmiOld;
 pub use self::wasmtime::Wasmtime;
 use crate::utils::TestFilter;
+use ::wasmi_new::ModuleImportsIter;
 
 pub trait BenchVm {
     fn name(&self) -> &'static str;
     fn test_filter(&self) -> TestFilter {
         TestFilter::default()
     }
-    fn compile(&self, wasm: &[u8]);
+    fn compile(&self, wasm: &[u8], imports: ModuleImportsIter);
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime>;
 }
 
