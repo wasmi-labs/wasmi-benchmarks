@@ -15,6 +15,16 @@ The following Wasm runtimes and configurations are included.
 | Wasmtime | `wasmtime` | `cranelift`, `winch` | Winch only works on `x86` platforms. |
 | Wasmer | `wasmer` | `cranelift`, `singlepass` | |
 
+### Configuration Explanation
+
+- `eager`: All function bodies are compiled immediately.
+- `eager.unchecked`: Function bodies are compiled eagerly but not validated.
+- `lazy`: Function bodies are only compiled on their first actual use.
+- `lazy-translation`: Function bodies are lazily compiled but eagerly validated.
+- `cranelift`: The runtime uses the Cranelift code generator.
+- `wasmtime.winch`: Wasmtime's JIT optimized for fast start-up times.
+- `wasmer.singlepass`: Wasmer's JIT optimized for fast start-up times.
+
 ## Usage
 
 Run all benchmarks via:
