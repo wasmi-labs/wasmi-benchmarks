@@ -43,15 +43,7 @@ impl BenchVm for Wasm3 {
             CompilationMode::Eager => {
                 let runtime = wasm3::Runtime::new(&env, 1_000).unwrap();
                 let mut module = runtime.parse_and_load_module(wasm).unwrap();
-                // Self::link_wasi_stubs(&mut module).unwrap();
-                // module
-                //     .link_closure::<(), i32, _>(
-                //         "env",
-                //         "clock_ms",
-                //         |_call_ctx, _args| -> Result<i32, wasm3::error::Trap> { todo!() },
-                //     )
-                //     .unwrap();
-                module.link_wasi().unwrap();
+                Self::link_stubs(&mut module, imports).unwrap();
                 module.compile().unwrap();
             }
         }
@@ -69,50 +61,141 @@ impl BenchVm for Wasm3 {
 }
 
 impl Wasm3 {
-        Self::link_stub::<(), ()>(module, "bench", "start").unwrap();
-        Self::link_stub::<(), ()>(module, "bench", "end").unwrap();
-
-        Self::link_wasi_stub::<i32, ()>(module, "proc_exit").unwrap();
-
-        Self::link_wasi_stub::<(i32, i32, i32, i32), i32>(module, "fd_read").unwrap();
-        Self::link_wasi_stub::<(i32, i32), i32>(module, "fd_prestat_get").unwrap();
-        Self::link_wasi_stub::<(i32, i32, i32), i32>(module, "fd_prestat_dir_name").unwrap();
-        Self::link_wasi_stub::<(i32, i32), i32>(module, "fd_fdstat_get").unwrap();
-        // Self::link_wasi_stub::<(i32, i32), i32>(module, "fd_fdstat_set_flags").unwrap();
-        Self::link_wasi_stub::<(i32, i64, i32, i32), i32>(module, "fd_seek").unwrap();
-        Self::link_wasi_stub::<(i32, i32, i32, i32), i32>(module, "fd_write").unwrap();
-        Self::link_wasi_stub::<i32, i32>(module, "fd_close").unwrap();
-
-        Self::link_wasi_stub::<(i32, i32, i32, i32, i32, i64, i64, i32, i32), i32>(
-            module,
-            "path_open",
-        )
-        .unwrap();
-        Self::link_wasi_stub::<(i32, i32, i32, i32, i32), i32>(module, "path_filestat_get")
-            .unwrap();
-        // Self::link_wasi_stub::<(i32, i32, i32), i32>(module, "path_remove_directory").unwrap();
-        // Self::link_wasi_stub::<(i32, i32, i32), i32>(module, "path_unlink_file").unwrap();
-
-        Self::link_wasi_stub::<(i32, i32), i32>(module, "args_sizes_get").unwrap();
-        Self::link_wasi_stub::<(i32, i32), i32>(module, "args_get").unwrap();
-
-        // Self::link_wasi_stub::<(i32, i32), i32>(module, "environ_get").unwrap();
-        // Self::link_wasi_stub::<(i32, i32), i32>(module, "environ_sizes_get").unwrap();
-
-        // Self::link_wasi_stub::<(i32, i32), i32>(module, "clock_res_get").unwrap();
-        // Self::link_wasi_stub::<(i32, i64, i32), i32>(module, "clock_time_get").unwrap();
-
-        Ok(())
-    }
-
-    fn link_wasi_stub<Args, Ret>(
+    fn link_stubs(
         module: &mut wasm3::Module,
-    ) -> Result<(), wasm3::error::Error>
-    where
-        Args: wasm3::WasmArgs + 'static,
-        Ret: wasm3::WasmType + 'static,
-    {
-        Self::link_stub::<Args, Ret>(module, "wasi_snapshot_preview1", function_name)
+        imports: ModuleImportsIter,
+    ) -> Result<(), wasm3::error::Error> {
+        // Note: unfortunately the Wasm3 interpreter requires upfront bindings of all imported
+        // functions but does not provide a way to query over Wasm module imports, thus
+        // we need to provide this information via the benchmarking tool for Wasm3 to use.
+        for import in imports {
+            let module_name = import.module();
+            let field_name = import.name();
+            let func_type = match import.ty() {
+                wasmi_new::ExternType::Global(ty) => {
+                    unimplemented!("cannot stub link imported global variables but found: {ty:?}")
+                }
+                wasmi_new::ExternType::Table(ty) => {
+                    unimplemented!("cannot stub link imported tables but found: {ty:?}")
+                }
+                wasmi_new::ExternType::Memory(ty) => {
+                    unimplemented!("cannot stub link imported linear memories but found: {ty:?}")
+                }
+                wasmi_new::ExternType::Func(ty) => ty,
+            };
+            use ValType as Ty;
+            // Note: unfortunately the Rust Wasm3 bindings do not allow to bind functions
+            // with a dynamic (at runtime) type information, thus we need this ugly match.
+            match (func_type.params(), func_type.results()) {
+                // Without return type:
+                ([], []) => Self::link_stub::<(), ()>(module, module_name, field_name)?,
+                ([Ty::I32], []) => Self::link_stub::<i32, ()>(module, module_name, field_name)?,
+                ([Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32), ()>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32), ()>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32, i32), ()>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32), ()>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32, i32), ()>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), ()>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32, i32), ()>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                // With return type:
+                ([], [Ty::I32]) => Self::link_stub::<(), i32>(module, module_name, field_name)?,
+                ([Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<i32, i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32), i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32), i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32, i32), i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32), i32>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32, i32), i32>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), i32>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                (
+                    [Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32],
+                    [Ty::I32],
+                ) => Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32, i32), i32>(
+                    module,
+                    module_name,
+                    field_name,
+                )?,
+                // Custom selected signatures:
+                ([Ty::I32, Ty::I64, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i64, i32), i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I64, Ty::I32, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i64, i32, i32), i32>(module, module_name, field_name)?
+                }
+                ([Ty::I32, Ty::I32, Ty::I32, Ty::I64, Ty::I32], [Ty::I32]) => {
+                    Self::link_stub::<(i32, i32, i32, i64, i32), i32>(
+                        module,
+                        module_name,
+                        field_name,
+                    )?
+                }
+                (
+                    [Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I64, Ty::I64, Ty::I32, Ty::I32],
+                    [Ty::I32],
+                ) => Self::link_stub::<(i32, i32, i32, i32, i32, i64, i64, i32, i32), i32>(
+                    module,
+                    module_name,
+                    field_name,
+                )?,
+                _ => unimplemented!("found imported function with unsupported type: {func_type:?}"),
+            }
+        }
+        Ok(())
     }
 
     fn link_stub<Args, Ret>(
@@ -124,13 +207,6 @@ impl Wasm3 {
         Args: wasm3::WasmArgs + 'static,
         Ret: wasm3::WasmType + 'static,
     {
-        //     _call_ctx: wasm3::CallContext,
-        //     _args: Args,
-        // ) -> Result<Ret, wasm3::error::Trap> {
-        //     unimplemented!()
-        // }
-
-        // module.link_closure::<Args, Ret, _>(module_name, function_name, noop::<Args, Ret>)
         module.link_closure::<Args, Ret, _>(
             module_name,
             function_name,
