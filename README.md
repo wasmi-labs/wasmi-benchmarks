@@ -23,6 +23,8 @@ Run all benchmarks via:
 cargo bench
 ```
 
+**Note:** compilation might take some minutes since we are compiling a lot of Wasm runtimes with very high optimization settings.
+
 Filter benchmarks via
 
 - `compile`: for compilation benchmarks.
