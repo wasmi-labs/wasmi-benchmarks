@@ -36,7 +36,7 @@ impl BenchVm for Wasmtime {
                 TestFilter {
                     execute: ExecuteTestFilter {
                         fib_tailrec: false,
-                        ..Default::default()
+                        ..ExecuteTestFilter::set_to(winch_works)
                     },
                     ..TestFilter::set_to(winch_works)
                 }
