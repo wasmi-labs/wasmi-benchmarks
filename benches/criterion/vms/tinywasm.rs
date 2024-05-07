@@ -1,5 +1,6 @@
 use super::{BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
+use wasmi_new::ModuleImportsIter;
 
 pub struct Tinywasm;
 
@@ -24,7 +25,7 @@ impl BenchVm for Tinywasm {
         }
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         tinywasm::Module::parse_bytes(&wasm[..]).unwrap();
     }
 

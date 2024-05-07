@@ -1,4 +1,5 @@
 use super::{BenchRuntime, BenchVm};
+use wasmi_new::ModuleImportsIter;
 
 pub struct WasmiNew {
     pub compilation_mode: wasmi_new::CompilationMode,
@@ -37,7 +38,7 @@ impl BenchVm for WasmiNew {
         }
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let mut store = self.store();
         self.module(store.engine(), wasm);
     }

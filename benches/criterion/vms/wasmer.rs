@@ -1,5 +1,6 @@
 use super::{BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
+use wasmi_new::ModuleImportsIter;
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -43,7 +44,7 @@ impl BenchVm for Wasmer {
         }
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let mut store = self.store();
         wasmer::Module::new(&store, &wasm[..]).unwrap();
     }

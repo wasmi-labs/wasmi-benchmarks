@@ -1,5 +1,6 @@
 use super::{BenchRuntime, BenchVm};
 use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
+use wasmi_new::ModuleImportsIter;
 
 pub struct Wasmtime {
     pub strategy: wasmtime::Strategy,
@@ -45,7 +46,7 @@ impl BenchVm for Wasmtime {
         }
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let mut store = self.store();
         wasmtime::Module::new(store.engine(), &wasm[..]).unwrap();
     }

@@ -1,4 +1,5 @@
 use super::{BenchRuntime, BenchVm};
+use wasmi_new::ModuleImportsIter;
 
 pub struct WasmiOld;
 
@@ -13,7 +14,7 @@ impl BenchVm for WasmiOld {
         "wasmi-v0.31"
     }
 
-    fn compile(&self, wasm: &[u8]) {
+    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let mut store = self.store();
         wasmi_old::Module::new(store.engine(), &wasm[..]).unwrap();
     }
