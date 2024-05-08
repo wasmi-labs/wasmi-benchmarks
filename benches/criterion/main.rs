@@ -1,13 +1,9 @@
-#![allow(unused)]
+// #![allow(unused)]
 
 mod compile;
 mod execute;
-mod utils;
-mod vms;
 
-use self::utils::{wat2wasm, TestFilter};
-use self::vms::{BenchRuntime, BenchVm};
-use criterion::{criterion_group, criterion_main, Bencher, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::time::Duration;
 
 criterion_main!(bench_execute, bench_compile,);
@@ -38,45 +34,3 @@ criterion_group!(
         compile::bench_ffmpeg,
         compile::bench_coremark_minimal,
 );
-
-fn vms() -> Vec<Box<dyn BenchVm>> {
-    use vms::wasmi_new::Validation;
-    vec![
-        Box::new(vms::WasmiOld),
-        Box::new(vms::WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::Eager,
-            validation: Validation::Checked,
-        }),
-        Box::new(vms::WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::Eager,
-            validation: Validation::Unchecked,
-        }),
-        Box::new(vms::WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::Lazy,
-            validation: Validation::Checked,
-        }),
-        Box::new(vms::WasmiNew {
-            compilation_mode: wasmi_new::CompilationMode::LazyTranslation,
-            validation: Validation::Checked,
-        }),
-        Box::new(vms::Tinywasm),
-        Box::new(vms::Wasm3 {
-            compilation_mode: vms::wasm3::CompilationMode::Eager,
-        }),
-        Box::new(vms::Wasm3 {
-            compilation_mode: vms::wasm3::CompilationMode::Lazy,
-        }),
-        Box::new(vms::Wasmtime {
-            strategy: wasmtime::Strategy::Cranelift,
-        }),
-        Box::new(vms::Wasmtime {
-            strategy: wasmtime::Strategy::Winch,
-        }),
-        Box::new(vms::Wasmer {
-            compiler: vms::wasmer::WasmerCompiler::Cranelift,
-        }),
-        Box::new(vms::Wasmer {
-            compiler: vms::wasmer::WasmerCompiler::Singlepass,
-        }),
-    ]
-}

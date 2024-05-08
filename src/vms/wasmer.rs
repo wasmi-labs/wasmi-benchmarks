@@ -13,7 +13,7 @@ pub enum WasmerCompiler {
 
 struct WasmerRuntime {
     store: wasmer::Store,
-    instance: wasmer::Instance,
+    _instance: wasmer::Instance,
     func: wasmer::TypedFunction<i64, i64>,
 }
 
@@ -45,22 +45,22 @@ impl BenchVm for Wasmer {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        let mut store = self.store();
-        wasmer::Module::new(&store, &wasm[..]).unwrap();
+        let store = self.store();
+        wasmer::Module::new(&store, wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = self.store();
-        let module = wasmer::Module::new(&store, &wasm[..]).unwrap();
+        let module = wasmer::Module::new(&store, wasm).unwrap();
         let import_object = wasmer::imports! {};
         let instance = wasmer::Instance::new(&mut store, &module, &import_object).unwrap();
         let func = instance
             .exports
-            .get_typed_function::<i64, i64>(&mut store, "run")
+            .get_typed_function::<i64, i64>(&store, "run")
             .unwrap();
         Box::new(WasmerRuntime {
             store,
-            instance,
+            _instance: instance,
             func,
         })
     }
@@ -70,7 +70,7 @@ impl Wasmer {
     fn store(&self) -> wasmer::Store {
         match self.compiler {
             WasmerCompiler::Cranelift => {
-                let mut builder =
+                let builder =
                     wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
                 let mut features = wasmer::sys::Features::new();
                 features.tail_call(true);

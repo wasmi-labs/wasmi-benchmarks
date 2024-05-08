@@ -8,7 +8,7 @@ pub struct Wasmtime {
 
 struct WasmtimeRuntime {
     store: wasmtime::Store<()>,
-    instance: wasmtime::Instance,
+    _instance: wasmtime::Instance,
     func: wasmtime::TypedFunc<i64, i64>,
 }
 
@@ -47,14 +47,14 @@ impl BenchVm for Wasmtime {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        let mut store = self.store();
-        wasmtime::Module::new(store.engine(), &wasm[..]).unwrap();
+        let store = self.store();
+        wasmtime::Module::new(store.engine(), wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = self.store();
         let engine = store.engine();
-        let module = wasmtime::Module::new(engine, &wasm[..]).unwrap();
+        let module = wasmtime::Module::new(engine, wasm).unwrap();
         let linker = wasmtime::Linker::new(engine);
         let instance = linker.instantiate(&mut store, &module).unwrap();
         let func = instance
@@ -62,7 +62,7 @@ impl BenchVm for Wasmtime {
             .unwrap();
         Box::new(WasmtimeRuntime {
             store,
-            instance,
+            _instance: instance,
             func,
         })
     }

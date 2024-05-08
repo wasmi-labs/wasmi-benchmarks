@@ -6,7 +6,7 @@ pub struct Tinywasm;
 
 struct TinywasmRuntime {
     store: tinywasm::Store,
-    instance: tinywasm::ModuleInstance,
+    _instance: tinywasm::ModuleInstance,
     func: tinywasm::FuncHandleTyped<i64, i64>,
 }
 
@@ -26,19 +26,17 @@ impl BenchVm for Tinywasm {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        tinywasm::Module::parse_bytes(&wasm[..]).unwrap();
+        tinywasm::Module::parse_bytes(wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = tinywasm::Store::new();
-        let module = tinywasm::Module::parse_bytes(&wasm[..]).unwrap();
+        let module = tinywasm::Module::parse_bytes(wasm).unwrap();
         let instance = module.instantiate(&mut store, None).unwrap();
-        let func = instance
-            .exported_func::<i64, i64>(&mut store, "run")
-            .unwrap();
+        let func = instance.exported_func::<i64, i64>(&store, "run").unwrap();
         Box::new(TinywasmRuntime {
             store,
-            instance,
+            _instance: instance,
             func,
         })
     }

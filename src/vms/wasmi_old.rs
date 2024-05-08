@@ -5,7 +5,7 @@ pub struct WasmiOld;
 
 struct WasmiOldRuntime {
     store: wasmi_old::Store<()>,
-    instance: wasmi_old::Instance,
+    _instance: wasmi_old::Instance,
     func: wasmi_old::TypedFunc<i64, i64>,
 }
 
@@ -15,14 +15,14 @@ impl BenchVm for WasmiOld {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        let mut store = self.store();
-        wasmi_old::Module::new(store.engine(), &wasm[..]).unwrap();
+        let store = self.store();
+        wasmi_old::Module::new(store.engine(), wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = self.store();
         let engine = store.engine();
-        let module = wasmi_old::Module::new(engine, &wasm[..]).unwrap();
+        let module = wasmi_old::Module::new(engine, wasm).unwrap();
         let linker = wasmi_old::Linker::new(engine);
         let instance = linker
             .instantiate(&mut store, &module)
@@ -32,7 +32,7 @@ impl BenchVm for WasmiOld {
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiOldRuntime {
             store,
-            instance,
+            _instance: instance,
             func,
         })
     }

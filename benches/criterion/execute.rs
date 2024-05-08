@@ -1,11 +1,6 @@
-use crate::utils::{wat2wasm, TestFilter};
-use crate::vms;
-use crate::vms::{BenchRuntime, BenchVm};
 use criterion::measurement::WallTime;
-use criterion::{
-    criterion_group, criterion_main, Bencher, BenchmarkGroup, Criterion, PlotConfiguration,
-};
-use std::time::Duration;
+use criterion::{BenchmarkGroup, Criterion};
+use wasmi_benchmarks::{vms_under_test, wat2wasm, BenchVm};
 
 fn run_counter(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
     if !vm.test_filter().execute.counter {
@@ -26,7 +21,7 @@ fn run_counter(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
 pub fn bench_counter(c: &mut Criterion) {
     const INPUT: i64 = 1_000_000;
     let mut g = c.benchmark_group("execute/counter");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_counter(&mut g, &*vm, INPUT);
     }
 }
@@ -50,7 +45,7 @@ fn run_fib_recursive(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: 
 pub fn bench_fib_recursive(c: &mut Criterion) {
     const INPUT: i64 = 30;
     let mut g = c.benchmark_group("execute/fib/recursive");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_fib_recursive(&mut g, &*vm, INPUT);
     }
 }
@@ -74,7 +69,7 @@ fn run_fib_iterative(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: 
 pub fn bench_fib_iterative(c: &mut Criterion) {
     const INPUT: i64 = 2_000_000;
     let mut g = c.benchmark_group("execute/fib/iterative");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_fib_iterative(&mut g, &*vm, INPUT);
     }
 }
@@ -98,7 +93,7 @@ fn run_fib_tailrec(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i6
 pub fn bench_fib_tailrec(c: &mut Criterion) {
     const INPUT: i64 = 1_000_000;
     let mut g = c.benchmark_group("execute/fib/tailrec");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_fib_tailrec(&mut g, &*vm, INPUT);
     }
 }
@@ -122,7 +117,7 @@ fn run_primes(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
 pub fn bench_primes(c: &mut Criterion) {
     const INPUT: i64 = 1_000;
     let mut g = c.benchmark_group("execute/primes");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_primes(&mut g, &*vm, INPUT);
     }
 }
@@ -146,7 +141,7 @@ fn run_matrix_multiply(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input
 pub fn bench_matrix_multiply(c: &mut Criterion) {
     const INPUT: i64 = 200;
     let mut g = c.benchmark_group("execute/matmul");
-    for vm in vms() {
+    for vm in vms_under_test() {
         run_matrix_multiply(&mut g, &*vm, INPUT);
     }
 }

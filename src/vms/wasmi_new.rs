@@ -14,7 +14,7 @@ pub enum Validation {
 
 struct WasmiNewRuntime {
     store: wasmi_new::Store<()>,
-    instance: wasmi_new::Instance,
+    _instance: wasmi_new::Instance,
     func: wasmi_new::TypedFunc<i64, i64>,
 }
 
@@ -39,7 +39,7 @@ impl BenchVm for WasmiNew {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        let mut store = self.store();
+        let store = self.store();
         self.module(store.engine(), wasm);
     }
 
@@ -56,7 +56,7 @@ impl BenchVm for WasmiNew {
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiNewRuntime {
             store,
-            instance,
+            _instance: instance,
             func,
         })
     }
@@ -73,10 +73,10 @@ impl WasmiNew {
 
     fn module(&self, engine: &wasmi_new::Engine, wasm: &[u8]) -> wasmi_new::Module {
         match self.validation {
-            Validation::Checked => wasmi_new::Module::new(engine, &wasm[..]).unwrap(),
+            Validation::Checked => wasmi_new::Module::new(engine, wasm).unwrap(),
             Validation::Unchecked => {
                 // SAFETY: We only use properly valid Wasm in our benchmarks.
-                unsafe { wasmi_new::Module::new_unchecked(engine, &wasm[..]).unwrap() }
+                unsafe { wasmi_new::Module::new_unchecked(engine, wasm).unwrap() }
             }
         }
     }
