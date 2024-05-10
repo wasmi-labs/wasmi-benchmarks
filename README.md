@@ -9,7 +9,7 @@ The following Wasm runtimes and configurations are included.
 | Runtime | ID | Configurations | Note |
 |:-------:|:---------------|:-----|:---|
 | Wasmi v0.31 | `wasmi-v0.31` | | |
-| Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy-translation` | |
+| Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | |
 | Tinywasm | `tinywasm` | | Included because it was kinda simple. |
 | Wasm3 | `wasm3` | `eager`, `lazy` | Generally accepted to be the fastest Wasm interpreter. |
 | Wasmtime | `wasmtime` | `cranelift`, `winch` | Winch only works on `x86` platforms. |
@@ -18,8 +18,9 @@ The following Wasm runtimes and configurations are included.
 ### Configuration Explanation
 
 - `eager`: All function bodies are compiled immediately.
-- `eager.unchecked`: Function bodies are compiled eagerly but not validated.
-- `lazy`: Function bodies are only compiled on their first actual use.
+- `eager.unchecked`: Function bodies are compiled eagerly but Wasm validation is skipped.
+- `lazy`: Function bodies are only compiled upon first use.
+- `lazy.unchecked`: Function bodies are only compiled upon first use and Wasm validation is skipped.
 - `lazy-translation`: Function bodies are lazily compiled but eagerly validated.
 - `cranelift`: The runtime uses the Cranelift code generator.
 - `wasmtime.winch`: Wasmtime's JIT optimized for fast start-up times.
