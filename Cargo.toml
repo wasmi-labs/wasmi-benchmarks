@@ -6,7 +6,7 @@ resolver = "2"
 
 [dependencies]
 wasmi_old = { package = "wasmi", version = "0.31" }
-wasmi_new = { package = "wasmi", version = "0.32.0-beta.14" }
+wasmi_new = { package = "wasmi", version = "0.32.0-beta.14", features = ["no-hash-maps"] }
 tinywasm = "0.6.0"
 wasmer = { version = "4.2.8", default-features = false, features = ["engine", "compiler"] }
 wasmer-compiler-singlepass = "4.2.8"
