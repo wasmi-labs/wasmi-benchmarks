@@ -32,6 +32,7 @@ pub struct ExecuteTestFilter {
     pub fib_tailrec: bool,
     pub primes: bool,
     pub matrix_multiply: bool,
+    pub argon2: bool,
 }
 
 impl ExecuteTestFilter {
@@ -43,6 +44,7 @@ impl ExecuteTestFilter {
             fib_tailrec: flag,
             primes: flag,
             matrix_multiply: flag,
+            argon2: flag,
         }
     }
 }
@@ -60,6 +62,7 @@ pub struct CompileTestFilter {
     pub spidermonkey: bool,
     pub ffmpeg: bool,
     pub coremark_minimal: bool,
+    pub argon2: bool,
 }
 
 impl CompileTestFilter {
@@ -70,6 +73,7 @@ impl CompileTestFilter {
             spidermonkey: flag,
             ffmpeg: flag,
             coremark_minimal: flag,
+            argon2: flag,
         }
     }
 }
