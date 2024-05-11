@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 resolver = "2"
 
+[workspace]
+members = [
+    "benches/res/rust/*"
+]
+
 [dependencies]
 wasmi_old = { package = "wasmi", version = "0.31" }
 wasmi_new = { package = "wasmi", version = "0.32.0-beta.14", features = ["no-hash-maps"] }
@@ -25,5 +30,13 @@ name = "criterion"
 harness = false
 
 [profile.bench]
+# debug = true
 lto = "fat"
 codegen-units = 1
+
+[profile.wasm]
+inherits = "release"
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"

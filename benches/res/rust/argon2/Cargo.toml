@@ -1,0 +1,13 @@
+[package]
+name = "testcase-argon2"
+edition = "2021"
+publish = false
+
+[lib]
+path = "lib.rs"
+crate-type = ["cdylib"]
+bench = false
+
+[dependencies]
+argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
+wee_alloc = "0.4.5"

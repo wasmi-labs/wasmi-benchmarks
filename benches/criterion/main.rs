@@ -20,6 +20,7 @@ criterion_group!(
         execute::bench_fib_tailrec,
         execute::bench_primes,
         execute::bench_matrix_multiply,
+        execute::bench_argon2,
 );
 criterion_group!(
     name = bench_compile;
@@ -33,4 +34,5 @@ criterion_group!(
         compile::bench_spidermonkey,
         compile::bench_ffmpeg,
         compile::bench_coremark_minimal,
+        compile::bench_argon2,
 );

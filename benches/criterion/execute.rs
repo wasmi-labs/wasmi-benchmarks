@@ -145,3 +145,26 @@ pub fn bench_matrix_multiply(c: &mut Criterion) {
         run_matrix_multiply(&mut g, &*vm, INPUT);
     }
 }
+
+fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
+    if !vm.test_filter().execute.matrix_multiply {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");
+    let name = vm.name();
+    let id = format!("{name}/{input}");
+    g.bench_function(&id, |b| {
+        let mut runtime = vm.load(WASM);
+        b.iter(|| {
+            runtime.call(input);
+        });
+    });
+}
+
+pub fn bench_argon2(c: &mut Criterion) {
+    const INPUT: i64 = 1;
+    let mut g = c.benchmark_group("execute/argon2");
+    for vm in vms_under_test() {
+        run_argon2(&mut g, &*vm, INPUT);
+    }
+}

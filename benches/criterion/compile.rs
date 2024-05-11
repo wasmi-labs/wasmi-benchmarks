@@ -125,3 +125,25 @@ pub fn bench_coremark_minimal(c: &mut Criterion) {
         run_coremark_minimal(&mut g, &*vm);
     }
 }
+
+fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
+    if !vm.test_filter().compile.coremark_minimal {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");
+    let name = vm.name();
+    let id = format!("{name}");
+    let module = parse_module(WASM);
+    g.bench_function(&id, |b| {
+        b.iter(|| {
+            vm.compile(&WASM[..], module.imports());
+        });
+    });
+}
+
+pub fn bench_argon2(c: &mut Criterion) {
+    let mut g = c.benchmark_group("compile/argon2");
+    for vm in vms_under_test() {
+        run_argon2(&mut g, &*vm);
+    }
+}
