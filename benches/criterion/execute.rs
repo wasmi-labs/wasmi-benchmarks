@@ -147,7 +147,7 @@ pub fn bench_matrix_multiply(c: &mut Criterion) {
 }
 
 fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.matrix_multiply {
+    if !vm.test_filter().execute.argon2 {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");

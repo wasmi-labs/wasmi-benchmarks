@@ -127,7 +127,6 @@ pub fn bench_coremark_minimal(c: &mut Criterion) {
 }
 
 fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.coremark_minimal {
         return;
     }
     static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");
