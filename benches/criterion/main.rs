@@ -21,6 +21,7 @@ criterion_group!(
         execute::bench_primes,
         execute::bench_matrix_multiply,
         execute::bench_argon2,
+        execute::bench_bulk_ops,
 );
 criterion_group!(
     name = bench_compile;

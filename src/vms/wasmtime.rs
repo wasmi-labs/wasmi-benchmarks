@@ -38,6 +38,7 @@ impl BenchVm for Wasmtime {
                     execute: ExecuteTestFilter {
                         fib_tailrec: false,
                         argon2: false,
+                        bulk_ops: false,
                         ..ExecuteTestFilter::set_to(winch_works)
                     },
                     compile: CompileTestFilter {

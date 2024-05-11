@@ -168,3 +168,27 @@ pub fn bench_argon2(c: &mut Criterion) {
         run_argon2(&mut g, &*vm, INPUT);
     }
 }
+
+fn run_bulk_ops(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
+    if !vm.test_filter().execute.bulk_ops {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wat/bulk-ops.wat");
+    let name = vm.name();
+    let id = format!("{name}/{input}");
+    g.bench_function(&id, |b| {
+        let wasm = wat2wasm(WASM);
+        let mut runtime = vm.load(&wasm[..]);
+        b.iter(|| {
+            runtime.call(input);
+        });
+    });
+}
+
+pub fn bench_bulk_ops(c: &mut Criterion) {
+    const INPUT: i64 = 10_000;
+    let mut g = c.benchmark_group("execute/bulk-ops");
+    for vm in vms_under_test() {
+        run_bulk_ops(&mut g, &*vm, INPUT);
+    }
+}
