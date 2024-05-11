@@ -27,7 +27,6 @@ pub extern "C" fn run(input: i64) -> i64 {
     let mut hash = [0u8; 32];
     argon.hash_password_into(password, salt, &mut hash).unwrap();
     i64::from_be_bytes(
-        <[u8; 8]>::try_from(&hash[..8])
-            .expect("array and slice have the same length")
+        <[u8; 8]>::try_from(&hash[..8]).expect("array and slice have the same length"),
     )
 }
