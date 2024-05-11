@@ -147,3 +147,25 @@ pub fn bench_argon2(c: &mut Criterion) {
         run_argon2(&mut g, &*vm);
     }
 }
+
+fn run_erc20(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
+    if !vm.test_filter().compile.coremark_minimal {
+        return;
+    }
+    static WASM: &[u8] = include_bytes!("../res/wasm/erc20.wasm");
+    let name = vm.name();
+    let id = format!("{name}");
+    let module = parse_module(WASM);
+    g.bench_function(&id, |b| {
+        b.iter(|| {
+            vm.compile(&WASM[..], module.imports());
+        });
+    });
+}
+
+pub fn bench_erc20(c: &mut Criterion) {
+    let mut g = c.benchmark_group("compile/erc20");
+    for vm in vms_under_test() {
+        run_erc20(&mut g, &*vm);
+    }
+}

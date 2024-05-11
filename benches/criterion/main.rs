@@ -35,4 +35,5 @@ criterion_group!(
         compile::bench_ffmpeg,
         compile::bench_coremark_minimal,
         compile::bench_argon2,
+        compile::bench_erc20,
 );
