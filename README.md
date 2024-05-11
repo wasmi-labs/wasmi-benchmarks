@@ -74,10 +74,12 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `fib.tailrec` | Tail-call based fibonacci calculation. |
 | | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
 | | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
+| | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | | | |
 | `compile` | | |
-| | `bz2` | Medium-sized compression library with huge function bodies. |
-| | `pulldown-cmark` | Medium-sized markdown renderer. |
-| | `spidermonkey` | The firefox Javascript execution engine. (large) |
-| | `ffmpeg` | Huge multimedia library. |
-| | `coremark` | CoreMark benchmarking compilation. (kinda small) |
+| | `bz2` | Medium-sized compression library with huge function bodies. (WASI required) |
+| | `pulldown-cmark` | Medium-sized markdown renderer. (WASI required) |
+| | `spidermonkey` | The firefox Javascript execution engine. (large, WASI required) |
+| | `ffmpeg` | Huge multimedia library. (WASI required) |
+| | `coremark` | CoreMark benchmarking compilation. (kinda small, no WASI) |
+| | `argon2` | Password hashing library. (small, no WASI) |
