@@ -83,3 +83,4 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `ffmpeg` | Huge multimedia library. (WASI required) |
 | | `coremark` | CoreMark benchmarking compilation. (kinda small, no WASI) |
 | | `argon2` | Password hashing library. (small, no WASI) |
+| | `erc20` | ink! based ERC-20 implementation. (tiny, no WASI) |
