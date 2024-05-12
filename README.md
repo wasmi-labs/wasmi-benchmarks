@@ -75,6 +75,7 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
 | | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | | `argon2` | Password hashing library. Compute- and memory intense workload. |
+| | `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
 | | | |
 | `compile` | | |
 | | `bz2` | Medium-sized compression library with huge function bodies. (WASI required) |
@@ -84,3 +85,5 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `coremark` | CoreMark benchmarking compilation. (kinda small, no WASI) |
 | | `argon2` | Password hashing library. (small, no WASI) |
 | | `erc20` | ink! based ERC-20 implementation. (tiny, no WASI) |
+
+[`bulk-memory-operations`]: https://github.com/WebAssembly/bulk-memory-operations
