@@ -6,6 +6,11 @@ This includes execution and compilation benchmarks for the Wasmi interpreter and
 
 The following Wasm runtimes and configurations are included.
 
+Ideally we had more Wasm runtimes, e.g. [WAMR] and [`wain`] but those had no proper Rust bindings or sufficiently flexible APIs respectively.
+
+[WAMR]: https://github.com/bytecodealliance/wasm-micro-runtime
+[`wain`]: https://github.com/rhysd/wain
+
 | Runtime | ID | Configurations | Note |
 |:-------:|:---------------|:-----|:---|
 | Wasmi v0.31 | `wasmi-v0.31` | | |
