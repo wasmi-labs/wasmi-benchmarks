@@ -22,9 +22,9 @@ Ideally we had more Wasm runtimes, e.g. [WAMR] and [`wain`] but those had no pro
 
 ### Configuration Explanation
 
-- `eager`: All function bodies are compiled immediately.
+- `eager`: All function bodies are compiled and validated immediately.
 - `eager.unchecked`: Function bodies are compiled eagerly but Wasm validation is skipped.
-- `lazy`: Function bodies are only compiled upon first use.
+- `lazy`: Function bodies are only compiled and validated upon first use.
 - `lazy.unchecked`: Function bodies are only compiled upon first use and Wasm validation is skipped.
 - `lazy-translation`: Function bodies are lazily compiled but eagerly validated.
 - `cranelift`: The runtime uses the Cranelift code generator.
