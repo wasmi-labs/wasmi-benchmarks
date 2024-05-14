@@ -1,194 +1,78 @@
-use criterion::measurement::WallTime;
-use criterion::{BenchmarkGroup, Criterion};
-use wasmi_benchmarks::{vms_under_test, wat2wasm, BenchVm};
+use criterion::Criterion;
+use wasmi_benchmarks::{read_benchmark_file, vms_under_test, wat2wasm, InputEncoding, TestFilter};
 
-fn run_counter(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.counter {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/counter.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
+fn execute_benchmark(
+    c: &mut Criterion,
+    name: &str,
+    input: i64,
+    encoding: InputEncoding,
+    filter: impl Fn(&TestFilter) -> bool,
+) {
+    let wasm = read_benchmark_file(encoding, name);
+    let mut g = c.benchmark_group(format!("execute/{name}"));
+    for vm in vms_under_test() {
+        if !filter(&vm.test_filter()) {
+            continue;
+        }
+        let id = format!("{}/{}", vm.name(), input);
+        g.bench_function(&id, |b| {
+            let wasm = wat2wasm(&wasm[..]);
+            let mut runtime = vm.load(&wasm[..]);
+            b.iter(|| {
+                runtime.call(input);
+            });
         });
-    });
+    }
 }
 
 pub fn bench_counter(c: &mut Criterion) {
-    const INPUT: i64 = 1_000_000;
-    let mut g = c.benchmark_group("execute/counter");
-    for vm in vms_under_test() {
-        run_counter(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_fib_recursive(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.fib_recursive {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/fib.recursive.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "counter", 1_000_000, InputEncoding::Wat, |filter| {
+        filter.execute.counter
+    })
 }
 
 pub fn bench_fib_recursive(c: &mut Criterion) {
-    const INPUT: i64 = 30;
-    let mut g = c.benchmark_group("execute/fib/recursive");
-    for vm in vms_under_test() {
-        run_fib_recursive(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_fib_iterative(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.fib_iterative {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/fib.iterative.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "fib.recursive", 30, InputEncoding::Wat, |filter| {
+        filter.execute.fib_recursive
+    })
 }
 
 pub fn bench_fib_iterative(c: &mut Criterion) {
-    const INPUT: i64 = 2_000_000;
-    let mut g = c.benchmark_group("execute/fib/iterative");
-    for vm in vms_under_test() {
-        run_fib_iterative(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_fib_tailrec(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.fib_tailrec {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/fib.tailrec.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(
+        c,
+        "fib.iterative",
+        2_000_000,
+        InputEncoding::Wat,
+        |filter| filter.execute.fib_iterative,
+    )
 }
 
 pub fn bench_fib_tailrec(c: &mut Criterion) {
-    const INPUT: i64 = 1_000_000;
-    let mut g = c.benchmark_group("execute/fib/tailrec");
-    for vm in vms_under_test() {
-        run_fib_tailrec(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_primes(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.primes {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/primes.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "fib.tailrec", 1_000_000, InputEncoding::Wat, |filter| {
+        filter.execute.fib_tailrec
+    })
 }
 
 pub fn bench_primes(c: &mut Criterion) {
-    const INPUT: i64 = 1_000;
-    let mut g = c.benchmark_group("execute/primes");
-    for vm in vms_under_test() {
-        run_primes(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_matrix_multiply(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.matrix_multiply {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/matrix-multiplication.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "primes", 1_000, InputEncoding::Wat, |filter| {
+        filter.execute.primes
+    })
 }
 
 pub fn bench_matrix_multiply(c: &mut Criterion) {
-    const INPUT: i64 = 200;
-    let mut g = c.benchmark_group("execute/matmul");
-    for vm in vms_under_test() {
-        run_matrix_multiply(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.argon2 {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let mut runtime = vm.load(WASM);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "matmul", 200, InputEncoding::Wat, |filter| {
+        filter.execute.matrix_multiply
+    })
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    const INPUT: i64 = 1;
-    let mut g = c.benchmark_group("execute/argon2");
-    for vm in vms_under_test() {
-        run_argon2(&mut g, &*vm, INPUT);
-    }
-}
-
-fn run_bulk_ops(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm, input: i64) {
-    if !vm.test_filter().execute.bulk_ops {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wat/bulk-ops.wat");
-    let name = vm.name();
-    let id = format!("{name}/{input}");
-    g.bench_function(&id, |b| {
-        let wasm = wat2wasm(WASM);
-        let mut runtime = vm.load(&wasm[..]);
-        b.iter(|| {
-            runtime.call(input);
-        });
-    });
+    execute_benchmark(c, "argon2", 1, InputEncoding::Wasm, |filter| {
+        filter.execute.argon2
+    })
 }
 
 pub fn bench_bulk_ops(c: &mut Criterion) {
-    const INPUT: i64 = 10_000;
-    let mut g = c.benchmark_group("execute/bulk-ops");
-    for vm in vms_under_test() {
-        run_bulk_ops(&mut g, &*vm, INPUT);
-    }
+    execute_benchmark(c, "bulk-ops", 5_000, InputEncoding::Wat, |filter| {
+        filter.execute.bulk_ops
+    })
 }
