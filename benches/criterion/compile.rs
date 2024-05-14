@@ -1,6 +1,6 @@
-use criterion::measurement::WallTime;
-use criterion::{BenchmarkGroup, Criterion};
-use wasmi_benchmarks::{vms_under_test, BenchVm};
+use criterion::Criterion;
+use std::fmt;
+use wasmi_benchmarks::{vms_under_test, TestFilter};
 
 /// Parses the `wasm` bytes and returns a Wasmi [`Module`].
 ///
@@ -10,162 +10,91 @@ use wasmi_benchmarks::{vms_under_test, BenchVm};
 /// [`Module`]: wasmi_new::Module
 fn parse_module(wasm: &[u8]) -> wasmi_new::Module {
     let mut config = wasmi_new::Config::default();
-    config.wasm_tail_call(true);
     config.compilation_mode(wasmi_new::CompilationMode::Lazy);
     let engine = wasmi_new::Engine::new(&config);
     wasmi_new::Module::new(&engine, wasm).unwrap()
 }
 
-fn run_bz2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.bz2 {
-        return;
+/// The encoded format of the input.
+#[derive(Debug, Copy, Clone)]
+pub enum InputEncoding {
+    /// The input is encoded as `.wat` text format.
+    #[allow(unused)]
+    Wat,
+    /// The input is encoded as `.wasm` binary.
+    Wasm,
+}
+
+impl fmt::Display for InputEncoding {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InputEncoding::Wat => "wat".fmt(f),
+            InputEncoding::Wasm => "wasm".fmt(f),
+        }
     }
-    static WASM: &[u8] = include_bytes!("../res/wasm/bz2.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
+}
+
+fn compile_benchmark(
+    c: &mut Criterion,
+    name: &str,
+    encoding: InputEncoding,
+    filter: impl Fn(&TestFilter) -> bool,
+) {
+    let mut wasm = std::fs::read(format!("benches/res/{encoding}/{name}.{encoding}")).unwrap();
+    if matches!(encoding, InputEncoding::Wat) {
+        wasm = wat::parse_bytes(&wasm[..]).unwrap().to_vec();
+    }
+    let module = parse_module(&wasm[..]);
+    let mut g = c.benchmark_group(format!("compile/{name}"));
+    for vm in vms_under_test() {
+        if !filter(&vm.test_filter()) {
+            continue;
+        }
+        let id = format!("{}", vm.name());
+        g.bench_function(&id, |b| {
+            b.iter(|| {
+                vm.compile(&wasm[..], module.imports());
+            });
         });
-    });
+    }
 }
 
 pub fn bench_bz2(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/bz2");
-    for vm in vms_under_test() {
-        run_bz2(&mut g, &*vm);
-    }
-}
-
-fn run_pulldown_cmark(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.pulldown_cmark {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/pulldown-cmark.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "bz2", InputEncoding::Wasm, |filter| filter.compile.bz2)
 }
 
 pub fn bench_pulldown_cmark(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/pulldown-cmark");
-    for vm in vms_under_test() {
-        run_pulldown_cmark(&mut g, &*vm);
-    }
-}
-
-fn run_spidermonkey(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.pulldown_cmark {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/spidermonkey.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "pulldown-cmark", InputEncoding::Wasm, |filter| {
+        filter.compile.pulldown_cmark
+    })
 }
 
 pub fn bench_spidermonkey(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/spidermonkey");
-    for vm in vms_under_test() {
-        run_spidermonkey(&mut g, &*vm);
-    }
-}
-
-fn run_ffmpeg(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.ffmpeg {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/ffmpeg.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "spidermonkey", InputEncoding::Wasm, |filter| {
+        filter.compile.spidermonkey
+    })
 }
 
 pub fn bench_ffmpeg(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/ffmpeg");
-    for vm in vms_under_test() {
-        run_ffmpeg(&mut g, &*vm);
-    }
-}
-
-fn run_coremark_minimal(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.coremark_minimal {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/coremark-minimal.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "ffmpeg", InputEncoding::Wasm, |filter| {
+        filter.compile.ffmpeg
+    })
 }
 
 pub fn bench_coremark_minimal(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/coremark-minimal");
-    for vm in vms_under_test() {
-        run_coremark_minimal(&mut g, &*vm);
-    }
-}
-
-fn run_argon2(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.argon2 {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/argon2.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "coremark-minimal", InputEncoding::Wasm, |filter| {
+        filter.compile.coremark_minimal
+    })
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/argon2");
-    for vm in vms_under_test() {
-        run_argon2(&mut g, &*vm);
-    }
-}
-
-fn run_erc20(g: &mut BenchmarkGroup<WallTime>, vm: &dyn BenchVm) {
-    if !vm.test_filter().compile.coremark_minimal {
-        return;
-    }
-    static WASM: &[u8] = include_bytes!("../res/wasm/erc20.wasm");
-    let name = vm.name();
-    let id = format!("{name}");
-    let module = parse_module(WASM);
-    g.bench_function(&id, |b| {
-        b.iter(|| {
-            vm.compile(&WASM[..], module.imports());
-        });
-    });
+    compile_benchmark(c, "argon2", InputEncoding::Wasm, |filter| {
+        filter.compile.argon2
+    })
 }
 
 pub fn bench_erc20(c: &mut Criterion) {
-    let mut g = c.benchmark_group("compile/erc20");
-    for vm in vms_under_test() {
-        run_erc20(&mut g, &*vm);
-    }
+    compile_benchmark(c, "erc20", InputEncoding::Wasm, |filter| {
+        filter.compile.coremark_minimal
+    })
 }
