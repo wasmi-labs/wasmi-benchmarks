@@ -12,7 +12,7 @@ static GLOBAL: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[no_mangle]
 pub extern "C" fn run(input: i64) -> i64 {
-    if input < 0 || input > 10 {
+    if !(0..=10).contains(&input) {
         panic!("invalid input: {input}")
     }
     let password = b"some random password";
@@ -21,7 +21,7 @@ pub extern "C" fn run(input: i64) -> i64 {
     let t_cost = argon2::Params::DEFAULT_T_COST;
     let p_cost = argon2::Params::DEFAULT_P_COST;
 
-    let params = argon2::Params::new(m_cost as u32, t_cost as u32, p_cost as u32, None).unwrap();
+    let params = argon2::Params::new(m_cost, t_cost, p_cost, None).unwrap();
     let argon = argon2::Argon2::new(argon2::Algorithm::Argon2id, argon2::Version::V0x13, params);
 
     let mut hash = [0u8; 32];
