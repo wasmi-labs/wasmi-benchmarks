@@ -78,7 +78,7 @@ impl BenchVm for Wasm3 {
 impl Wasm3 {
     fn setup_runtime(&self) -> wasm3::Runtime {
         let env = wasm3::Environment::new().unwrap();
-        wasm3::Runtime::new(&env, 4096).unwrap()
+        wasm3::Runtime::new(&env, 8192).unwrap()
     }
 
     fn link_stubs(
