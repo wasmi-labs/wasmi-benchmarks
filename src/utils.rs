@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Converts the `.wat` encoded `bytes` into `.wasm` encoded bytes.
 pub fn wat2wasm(bytes: &[u8]) -> Vec<u8> {
     wat::parse_bytes(bytes).unwrap().into_owned()
@@ -83,5 +85,23 @@ impl CompileTestFilter {
 impl Default for CompileTestFilter {
     fn default() -> Self {
         Self::set_to(true)
+    }
+}
+
+/// The encoded format of the input.
+#[derive(Debug, Copy, Clone)]
+pub enum InputEncoding {
+    /// The input is encoded as `.wat` text format.
+    Wat,
+    /// The input is encoded as `.wasm` binary.
+    Wasm,
+}
+
+impl fmt::Display for InputEncoding {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InputEncoding::Wat => "wat".fmt(f),
+            InputEncoding::Wasm => "wasm".fmt(f),
+        }
     }
 }

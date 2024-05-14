@@ -1,6 +1,5 @@
 use criterion::Criterion;
-use std::fmt;
-use wasmi_benchmarks::{vms_under_test, TestFilter};
+use wasmi_benchmarks::{vms_under_test, InputEncoding, TestFilter};
 
 /// Parses the `wasm` bytes and returns a Wasmi [`Module`].
 ///
@@ -13,25 +12,6 @@ fn parse_module(wasm: &[u8]) -> wasmi_new::Module {
     config.compilation_mode(wasmi_new::CompilationMode::Lazy);
     let engine = wasmi_new::Engine::new(&config);
     wasmi_new::Module::new(&engine, wasm).unwrap()
-}
-
-/// The encoded format of the input.
-#[derive(Debug, Copy, Clone)]
-pub enum InputEncoding {
-    /// The input is encoded as `.wat` text format.
-    #[allow(unused)]
-    Wat,
-    /// The input is encoded as `.wasm` binary.
-    Wasm,
-}
-
-impl fmt::Display for InputEncoding {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            InputEncoding::Wat => "wat".fmt(f),
-            InputEncoding::Wasm => "wasm".fmt(f),
-        }
-    }
 }
 
 fn compile_benchmark(
