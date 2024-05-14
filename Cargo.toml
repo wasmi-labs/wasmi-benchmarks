@@ -35,8 +35,18 @@ lto = "fat"
 codegen-units = 1
 
 [profile.wasm]
+# The profile used to build Rust based benchmark inputs to WebAssembly.
 inherits = "release"
 opt-level = 3
 lto = "fat"
 codegen-units = 1
 panic = "abort"
+
+[profile.ci]
+# The profile with which we compile the criterion
+# benchmark runner and subsequently all Wasm runtimes
+# when running them in the GitHub Actions CI.
+inherits = "release"
+opt-level = 3
+lto = "thin"
+codegen-units = 2
