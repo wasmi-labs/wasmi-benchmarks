@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, io::Write};
+use std::collections::BTreeMap;
 use wasmi_benchmarks::{read_benchmark_file, vms_under_test, InputEncoding};
 
 fn main() {
@@ -6,12 +6,16 @@ fn main() {
     let mut scores = <BTreeMap<String, f32>>::new();
     for vm in vms_under_test() {
         let name = vm.name();
-        print!("Running Coremark 1.0\n\tusing {name} ");
-        std::io::stdout().flush().unwrap();
+        println!(
+            "\
+            Running Coremark 1.0\n\
+            \tusing {name} ...\
+        "
+        );
         let score = vm.coremark(&coremark_wasm[..]);
         scores.insert(name.into(), score);
-        println!("\n\tscore = {score}\n");
+        println!("\tscore = {score}\n");
     }
-    let json = serde_json::to_string(&scores).unwrap();
-    std::fs::write("coremark-scores.json", json).unwrap();
+    let json = serde_json::to_value(&scores).unwrap();
+    println!("Scores Summary (JSON):\n{json:#}\n");
 }

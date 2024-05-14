@@ -90,11 +90,8 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
 }
 
 fn elapsed_ms() -> u32 {
-    use std::io::Write;
     use std::time::Instant;
     static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
     let elapsed = STARTED.get_or_init(Instant::now).elapsed();
-    std::print!(".");
-    std::io::stdout().flush().unwrap();
     elapsed.as_millis() as u32
 }
