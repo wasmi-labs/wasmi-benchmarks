@@ -1,5 +1,5 @@
 use criterion::Criterion;
-use wasmi_benchmarks::{vms_under_test, InputEncoding, TestFilter};
+use wasmi_benchmarks::{read_benchmark_file, vms_under_test, InputEncoding, TestFilter};
 
 /// Parses the `wasm` bytes and returns a Wasmi [`Module`].
 ///
@@ -20,10 +20,7 @@ fn compile_benchmark(
     encoding: InputEncoding,
     filter: impl Fn(&TestFilter) -> bool,
 ) {
-    let mut wasm = std::fs::read(format!("benches/res/{encoding}/{name}.{encoding}")).unwrap();
-    if matches!(encoding, InputEncoding::Wat) {
-        wasm = wat::parse_bytes(&wasm[..]).unwrap().to_vec();
-    }
+    let wasm = read_benchmark_file(encoding, name);
     let module = parse_module(&wasm[..]);
     let mut g = c.benchmark_group(format!("compile/{name}"));
     for vm in vms_under_test() {

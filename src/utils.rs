@@ -105,3 +105,24 @@ impl fmt::Display for InputEncoding {
         }
     }
 }
+
+/// Returns the bytes of the named benchmark file with the given `encoding`.
+///
+/// # Panics
+///
+/// - If the file cannot be found at the associated path.
+/// - If the file contents cannot be decoded as either `.wat` or `.wasm`.
+/// - If the `.wat` file format cannot be encoded into the `.wasm` format.
+pub fn read_benchmark_file(encoding: InputEncoding, name: &str) -> Vec<u8> {
+    let path = format!("benches/res/{encoding}/{name}.{encoding}");
+    let wasm_or_wat = std::fs::read(&path).unwrap_or_else(|error| {
+        panic!("failed to read benchmark input:\n\tpath = {path}\n\terror = {error}")
+    });
+    let wasm = match encoding {
+        InputEncoding::Wasm => wasm_or_wat,
+        InputEncoding::Wat => wat::parse_bytes(&wasm_or_wat[..])
+            .unwrap_or_else(|error| panic!("failed to convert `.wat` to `.wasm`: {error}"))
+            .to_vec(),
+    };
+    wasm
+}
