@@ -1,10 +1,7 @@
 (module
     (memory 8 8)
 
-    ;; How many iterations to perform.
-    (global $LIMIT i32 (i32.const 5000))
-
-    ;; How many iterations to perform.
+    ;; The maximum amount of bytes to process per iteration.
     (global $MAX_N i64 (i64.const 250000))
 
     (func (export "run") (param $N i64) (result i64)
@@ -17,9 +14,9 @@
         (local.set $n (i32.wrap_i64 (local.get $N)))
         (block $break
             (loop $continue
-                ;; if i >= 100: break
+                ;; if i >= N: break
                 (br_if $break
-                    (i32.ge_u (local.get $i) (global.get $LIMIT))
+                    (i32.ge_u (local.get $i) (local.get $n))
                 )
                 ;; mem[0..n].fill(i)
                 (memory.fill
