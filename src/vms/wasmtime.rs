@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm};
+use super::{elapsed_ms, BenchRuntime, BenchVm};
 use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
@@ -70,6 +70,23 @@ impl BenchVm for Wasmtime {
             _instance: instance,
             func,
         })
+    }
+
+    fn coremark(&self, wasm: &[u8]) -> f32 {
+        let mut store = <wasmtime::Store<()>>::default();
+        let mut linker = wasmtime::Linker::new(store.engine());
+        linker
+            .func_wrap("env", "clock_ms", elapsed_ms)
+            .expect("Wasmtime: failed to define `clock_ms` host function");
+        let module = wasmtime::Module::new(store.engine(), wasm)
+            .expect("Wasmtime: failed to compile and validate coremark Wasm binary");
+        linker
+            .instantiate(&mut store, &module)
+            .expect("Wasmtime: failed to instantiate coremark Wasm module")
+            .get_typed_func::<(), f32>(&mut store, "run")
+            .expect("Wasmtime: could not find \"run\" function export")
+            .call(&mut store, ())
+            .expect("Wasmtime: failed to execute \"run\" function")
     }
 }
 
