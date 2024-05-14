@@ -62,8 +62,8 @@ jobs:
                   ~/.cargo/registry/cache/
                   ~/.cargo/git/db/
                   ~/target/
-                  key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
-                  restore-keys: ${{ runner.os }}-${{ github.job }}-
+                key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
+                restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: Check Docs
               env:
                 RUSTDOCFLAGS: "-D warnings"
@@ -87,10 +87,9 @@ jobs:
                   ~/.cargo/registry/cache/
                   ~/.cargo/git/db/
                   ~/target/
-                  key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
-                  restore-keys: ${{ runner.os }}-${{ github.job }}-
+                key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
+                restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: Checkout Submodules
               run: git submodule update --init --recursive
             - name: Clippy (all features)
               run: cargo clippy --workspace --all-features -- -D warnings
-    
