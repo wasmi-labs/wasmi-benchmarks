@@ -45,7 +45,6 @@ impl BenchVm for Wasmtime {
                         argon2: false,
                         ..CompileTestFilter::set_to(winch_works)
                     },
-                    ..TestFilter::set_to(winch_works)
                 }
             }
             unknown => panic!("unknown Wasmtime strategy: {unknown:?}"),
