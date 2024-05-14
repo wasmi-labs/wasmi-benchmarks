@@ -51,6 +51,10 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
+            - name: System Information
+              run: lscpu
+            - name: Compile (--profile ci)
+              run: cargo build --benches --profile ci
             - name: Run Compilation Benches (--profile ci)
               run: cargo bench compile/ --profile ci
 
@@ -72,6 +76,10 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
+            - name: System Information
+              run: lscpu
+            - name: Compile (--profile ci)
+              run: cargo build --benches --profile ci
             - name: Run Execution Benches (--profile ci)
               run: cargo bench execute/ --profile ci
 
@@ -93,8 +101,12 @@ jobs:
                 ~/target/
               key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
               restore-keys: ${{ runner.os }}-${{ github.job }}-
+          - name: System Information
+            run: lscpu
+          - name: Compile (--profile ci)
+            run: cargo build --bin coremark --profile ci
           - name: Run Coremark (--profile ci)
-            run: cargo run --profile ci
+            run: cargo run --bin coremark --profile ci
 
     fmt:
         name: Formatting
