@@ -64,9 +64,7 @@ impl BenchVm for WasmiNew {
     fn coremark(&self, wasm: &[u8]) -> f32 {
         let mut store = <wasmi_new::Store<()>>::default();
         let mut linker = wasmi_new::Linker::new(store.engine());
-        linker
-            .func_wrap("env", "clock_ms", elapsed_ms)
-            .unwrap();
+        linker.func_wrap("env", "clock_ms", elapsed_ms).unwrap();
         let module = wasmi_new::Module::new(store.engine(), wasm).unwrap();
         linker
             .instantiate(&mut store, &module)

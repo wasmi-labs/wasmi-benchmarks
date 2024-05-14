@@ -54,11 +54,10 @@ impl BenchVm for Tinywasm {
                         params: Box::from([]),
                         results: Box::from([tinywasm::types::ValType::I32]),
                     },
-                    |_ctx, _args| {
-                        Ok(vec![tinywasm::types::WasmValue::I32(elapsed_ms() as i32)])
-                    }
-                )
-            ).unwrap();
+                    |_ctx, _args| Ok(vec![tinywasm::types::WasmValue::I32(elapsed_ms() as i32)]),
+                ),
+            )
+            .unwrap();
         let instance = module.instantiate(&mut store, Some(imports)).unwrap();
         let func = instance.exported_func::<(), f32>(&store, "run").unwrap();
         func.call(&mut store, ()).unwrap()
