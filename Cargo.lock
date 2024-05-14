@@ -2684,6 +2684,7 @@ name = "wasmi-benchmarks"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "serde_json",
  "tinywasm",
  "wasm3",
  "wasmer",

@@ -24,6 +24,7 @@ wasmer-compiler-cranelift = "4.3"
 wasmtime = { version = "20.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
 criterion = "0.5"
 wat = "1"
+serde_json = "1.0.117"
 
 [dependencies.wasm3]
 git = "https://github.com/robbepop/wasm3-rs.git"
