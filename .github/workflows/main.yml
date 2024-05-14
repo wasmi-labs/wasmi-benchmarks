@@ -56,14 +56,14 @@ jobs:
               uses: actions/cache@v4
               continue-on-error: false
               with:
-                  path: |
-                    ~/.cargo/bin/
-                    ~/.cargo/registry/index/
-                    ~/.cargo/registry/cache/
-                    ~/.cargo/git/db/
-                    ~/target/
-                    key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
-                    restore-keys: ${{ runner.os }}-${{ github.job }}-
+                path: |
+                  ~/.cargo/bin/
+                  ~/.cargo/registry/index/
+                  ~/.cargo/registry/cache/
+                  ~/.cargo/git/db/
+                  ~/target/
+                  key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
+                  restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: Check Docs
               env:
                 RUSTDOCFLAGS: "-D warnings"
@@ -81,14 +81,14 @@ jobs:
               uses: actions/cache@v4
               continue-on-error: false
               with:
-                  path: |
-                    ~/.cargo/bin/
-                    ~/.cargo/registry/index/
-                    ~/.cargo/registry/cache/
-                    ~/.cargo/git/db/
-                    ~/target/
-                    key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
-                    restore-keys: ${{ runner.os }}-${{ github.job }}-
+                path: |
+                  ~/.cargo/bin/
+                  ~/.cargo/registry/index/
+                  ~/.cargo/registry/cache/
+                  ~/.cargo/git/db/
+                  ~/target/
+                  key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
+                  restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: Checkout Submodules
               run: git submodule update --init --recursive
             - name: Clippy (all features)
