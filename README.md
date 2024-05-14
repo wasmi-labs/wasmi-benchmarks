@@ -92,3 +92,14 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `erc20` | ink! based ERC-20 implementation. (tiny, no WASI) |
 
 [`bulk-memory-operations`]: https://github.com/WebAssembly/bulk-memory-operations
+
+## Coremark
+
+This benchmark suite also contains a Coremark test which can be run via
+
+```
+cargo run --profile bench
+```
+
+This will run Coremark using all available Wasm VMs and print their 
+Coremark scores to the console. Higher scores are better.

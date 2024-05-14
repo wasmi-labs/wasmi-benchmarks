@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm};
+use super::{elapsed_ms, BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
@@ -63,6 +63,23 @@ impl BenchVm for Wasmer {
             _instance: instance,
             func,
         })
+    }
+
+    fn coremark(&self, wasm: &[u8]) -> f32 {
+        let mut store = self.store();
+        let module = wasmer::Module::new(&store, wasm).unwrap();
+        let import_object = wasmer::imports! {
+            "env" => {
+                "clock_ms" => wasmer::Function::new_typed(&mut store, elapsed_ms),
+            }
+        };
+        let instance = wasmer::Instance::new(&mut store, &module, &import_object).unwrap();
+        instance
+            .exports
+            .get_typed_function::<(), f32>(&store, "run")
+            .unwrap()
+            .call(&mut store)
+            .unwrap()
     }
 }
 

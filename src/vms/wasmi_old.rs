@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm};
+use super::{elapsed_ms, BenchRuntime, BenchVm};
 use wasmi_new::ModuleImportsIter;
 
 pub struct WasmiOld;
@@ -35,6 +35,26 @@ impl BenchVm for WasmiOld {
             _instance: instance,
             func,
         })
+    }
+
+    fn coremark(&self, wasm: &[u8]) -> f32 {
+        let engine = wasmi_old::Engine::default();
+        let mut store = <wasmi_old::Store<()>>::new(&engine, ());
+        let mut linker = wasmi_old::Linker::new(store.engine());
+        linker
+            .func_wrap("env", "clock_ms", || elapsed_ms() as i32)
+            .unwrap();
+        let module = wasmi_old::Module::new(store.engine(), wasm).unwrap();
+        let result = linker
+            .instantiate(&mut store, &module)
+            .unwrap()
+            .ensure_no_start(&mut store)
+            .unwrap()
+            .get_typed_func::<(), wasmi_old::core::F32>(&mut store, "run")
+            .unwrap()
+            .call(&mut store, ())
+            .unwrap();
+        result.into()
     }
 }
 

@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm};
+use super::{elapsed_ms, BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
@@ -39,6 +39,28 @@ impl BenchVm for Tinywasm {
             _instance: instance,
             func,
         })
+    }
+
+    fn coremark(&self, wasm: &[u8]) -> f32 {
+        let mut store = tinywasm::Store::new();
+        let module = tinywasm::Module::parse_bytes(wasm).unwrap();
+        let mut imports = tinywasm::Imports::new();
+        imports
+            .define(
+                "env",
+                "clock_ms",
+                tinywasm::Extern::func(
+                    &tinywasm::types::FuncType {
+                        params: Box::from([]),
+                        results: Box::from([tinywasm::types::ValType::I32]),
+                    },
+                    |_ctx, _args| Ok(vec![tinywasm::types::WasmValue::I32(elapsed_ms() as i32)]),
+                ),
+            )
+            .unwrap();
+        let instance = module.instantiate(&mut store, Some(imports)).unwrap();
+        let func = instance.exported_func::<(), f32>(&store, "run").unwrap();
+        func.call(&mut store, ()).unwrap()
     }
 }
 

@@ -31,6 +31,9 @@ pub trait BenchVm {
     ///
     /// The returned Wasm module instance can then be used to issue calls.
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime>;
+
+    /// Runs the given Coremark Wasm test and returns the result.
+    fn coremark(&self, wasm: &[u8]) -> f32;
 }
 
 /// The module instance of a Wasm runtime that is capable of being benchmarked.
@@ -84,4 +87,11 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
             compiler: wasmer::WasmerCompiler::Singlepass,
         }),
     ]
+}
+
+fn elapsed_ms() -> u32 {
+    use std::time::Instant;
+    static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+    let elapsed = STARTED.get_or_init(Instant::now).elapsed();
+    elapsed.as_millis() as u32
 }

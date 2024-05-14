@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm};
+use super::{elapsed_ms, BenchRuntime, BenchVm};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::{core::ValType, ModuleImportsIter};
 
@@ -50,17 +50,37 @@ impl BenchVm for Wasm3 {
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
-        let env = wasm3::Environment::new().unwrap();
-        let runtime = wasm3::Runtime::new(&env, 100_000).unwrap();
+        let runtime = self.setup_runtime();
         let mut module = runtime.parse_and_load_module(wasm).unwrap();
         if matches!(self.compilation_mode, CompilationMode::Eager) {
             module.compile().unwrap();
         }
         Box::new(Wasm3Runtime { runtime })
     }
+
+    fn coremark(&self, wasm: &[u8]) -> f32 {
+        let runtime = self.setup_runtime();
+        let mut module = runtime.parse_and_load_module(wasm).unwrap();
+        module
+            .link_closure::<(), u32, _>("env", "clock_ms", |_ctx, _args| Ok(elapsed_ms()))
+            .unwrap();
+        if matches!(self.compilation_mode, CompilationMode::Eager) {
+            module.compile().unwrap();
+        }
+        module
+            .find_function::<(), f32>("run")
+            .unwrap()
+            .call()
+            .unwrap()
+    }
 }
 
 impl Wasm3 {
+    fn setup_runtime(&self) -> wasm3::Runtime {
+        let env = wasm3::Environment::new().unwrap();
+        wasm3::Runtime::new(&env, 8192).unwrap()
+    }
+
     fn link_stubs(
         module: &mut wasm3::Module,
         imports: ModuleImportsIter,
