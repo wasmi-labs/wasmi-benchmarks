@@ -1363,6 +1363,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "makepad-stitch"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa7ba762e43513e765ad4d15adfbc5e7456f3e59d357fb0a36fe3efa6e560159"
+
+[[package]]
 name = "memchr"
 version = "2.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2684,6 +2690,7 @@ name = "wasmi-benchmarks"
 version = "0.1.0"
 dependencies = [
  "criterion",
+ "makepad-stitch",
  "serde_json",
  "tinywasm",
  "wasm3",
