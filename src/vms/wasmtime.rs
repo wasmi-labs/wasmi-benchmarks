@@ -73,7 +73,7 @@ impl BenchVm for Wasmtime {
     }
 
     fn coremark(&self, wasm: &[u8]) -> f32 {
-        let mut store = <wasmtime::Store<()>>::default();
+        let mut store = self.store();
         let mut linker = wasmtime::Linker::new(store.engine());
         linker
             .func_wrap("env", "clock_ms", elapsed_ms)
