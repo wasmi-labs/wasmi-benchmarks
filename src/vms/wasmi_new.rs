@@ -1,5 +1,6 @@
+use crate::{ExecuteTestFilter, TestFilter};
 use super::{elapsed_ms, BenchRuntime, BenchVm};
-use wasmi_new::ModuleImportsIter;
+use wasmi_new::{CompilationMode, ModuleImportsIter};
 
 pub struct WasmiNew {
     pub compilation_mode: wasmi_new::CompilationMode,
@@ -35,6 +36,21 @@ impl BenchVm for WasmiNew {
             (wasmi_new::CompilationMode::Lazy, Validation::Unchecked) => {
                 "wasmi-v0.32.lazy.unchecked"
             }
+        }
+    }
+
+    fn test_filter(&self) -> TestFilter {
+        // We are not interested in `unchecked` or `lazy-translation` execution benchmarks
+        // since we do not expect them to have significantly different behavior compared to
+        // `eager.checked` and `lazy.checked`.
+        let execute = matches!(self.validation, Validation::Checked)
+            && matches!(
+                self.compilation_mode,
+                CompilationMode::Eager | CompilationMode::Lazy
+            );
+        TestFilter {
+            execute: ExecuteTestFilter::set_to(execute),
+            ..TestFilter::set_to(true)
         }
     }
 
