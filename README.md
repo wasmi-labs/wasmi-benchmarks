@@ -13,12 +13,13 @@ Ideally we had more Wasm runtimes, e.g. [WAMR] and [`wain`] but those had no pro
 
 | Runtime | ID | Configurations | Note |
 |:-------:|:---------------|:-----|:---|
-| Wasmi v0.31 | `wasmi-v0.31` | | |
-| Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | |
-| Tinywasm | `tinywasm` | | Included because it was kinda simple. |
+| Wasmi v0.31 | `wasmi-v0.31` | | The old version of the Wasmi Wasm interpreter. |
+| Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | New Wasmi Wasm interpreter version with major updates. |
+| Tinywasm | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
 | Wasm3 | `wasm3` | `eager`, `lazy` | Generally accepted to be the fastest Wasm interpreter. |
-| Wasmtime | `wasmtime` | `cranelift`, `winch` | Winch only works on `x86` platforms. |
-| Wasmer | `wasmer` | `cranelift`, `singlepass` | |
+| Wasmtime | `wasmtime` | `cranelift`, `winch` | Well established Wasm JIT runtime with cutting edge Wasm features. Winch only works on `x86` platforms. |
+| Wasmer | `wasmer` | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
+| Stitch | `stitch` | | New experimental and very fast zero-dependencies Wasm interpreter. |
 
 ### Configuration Explanation
 
