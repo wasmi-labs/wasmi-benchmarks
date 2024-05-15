@@ -27,7 +27,6 @@ impl BenchVm for Stitch {
             },
             compile: CompileTestFilter {
                 ffmpeg: false, // function body too large for stitch
-                // argon2: false, // stitch currently seems to have a bug while executing
                 ..CompileTestFilter::default()
             },
         }
