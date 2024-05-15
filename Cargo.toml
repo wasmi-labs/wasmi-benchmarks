@@ -22,6 +22,7 @@ wasmer = { version = "4.3", default-features = false, features = ["engine", "com
 wasmer-compiler-singlepass = "4.3"
 wasmer-compiler-cranelift = "4.3"
 wasmtime = { version = "20.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
+makepad-stitch = "0.1.0"
 criterion = "0.5"
 wat = "1"
 serde_json = "1.0.117"
@@ -39,6 +40,9 @@ harness = false
 # debug = true
 lto = "fat"
 codegen-units = 1
+
+[profile.dev]
+opt-level = 1 # required for the stitch Wasm runtime's LLVM's sibling calls optimization
 
 [profile.wasm]
 # The profile used to build Rust based benchmark inputs to WebAssembly.

@@ -1,3 +1,4 @@
+pub use self::stitch::Stitch;
 pub use self::tinywasm::Tinywasm;
 pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
@@ -7,6 +8,7 @@ pub use self::wasmtime::Wasmtime;
 use crate::utils::TestFilter;
 use ::wasmi_new::ModuleImportsIter;
 
+mod stitch;
 mod tinywasm;
 mod wasm3;
 mod wasmer;
@@ -74,6 +76,7 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
         Box::new(Wasm3 {
             compilation_mode: wasm3::CompilationMode::Lazy,
         }),
+        Box::new(Stitch),
         Box::new(Wasmtime {
             strategy: ::wasmtime::Strategy::Cranelift,
         }),
