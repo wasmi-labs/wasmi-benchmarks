@@ -49,10 +49,11 @@ codegen-units = 1
 panic = "abort"
 
 [profile.ci]
-# The profile with which we compile the criterion
-# benchmark runner and subsequently all Wasm runtimes
-# when running them in the GitHub Actions CI.
+# This profile is optimized for build speed of relatively
+# optimized builds for the virtual hardware used by GitHub
+# hosted Actions CI runners:
+# https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
 inherits = "release"
 opt-level = 3
 lto = "thin"
-codegen-units = 2
+codegen-units = 4
