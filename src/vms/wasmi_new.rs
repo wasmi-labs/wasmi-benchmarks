@@ -1,5 +1,5 @@
-use crate::{ExecuteTestFilter, TestFilter};
 use super::{elapsed_ms, BenchRuntime, BenchVm};
+use crate::{ExecuteTestFilter, TestFilter};
 use wasmi_new::{CompilationMode, ModuleImportsIter};
 
 pub struct WasmiNew {
