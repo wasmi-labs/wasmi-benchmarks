@@ -19,15 +19,19 @@ impl BenchVm for Stitch {
     }
 
     fn test_filter(&self) -> TestFilter {
+        // Due to its reliance on LLVM's sibling calls optimization
+        // stitch only works on 64-bit platforms where this optimization
+        // is "guaranteed" to be applied.
+        let stitch_works = cfg!(target_pointer_width = "64");
         TestFilter {
             execute: ExecuteTestFilter {
                 fib_tailrec: false, // stich does not yet support tail calls
                 argon2: false,      // stitch currently seems to have a bug while executing
-                ..ExecuteTestFilter::default()
+                ..ExecuteTestFilter::set_to(stitch_works)
             },
             compile: CompileTestFilter {
                 ffmpeg: false, // function body too large for stitch
-                ..CompileTestFilter::default()
+                ..CompileTestFilter::set_to(stitch_works)
             },
         }
     }
