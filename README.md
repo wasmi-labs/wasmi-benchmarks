@@ -16,7 +16,7 @@ Ideally we had more Wasm runtimes, e.g. [WAMR] and [`wain`] but those had no pro
 | Wasmi v0.31 | `wasmi-v0.31` | | The old version of the Wasmi Wasm interpreter. |
 | Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | New Wasmi Wasm interpreter version with major updates. |
 | Tinywasm | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
-| Wasm3 | `wasm3` | `eager`, `lazy` | Generally accepted to be the fastest Wasm interpreter. |
+| Wasm3 | `wasm3` | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
 | Wasmtime | `wasmtime` | `cranelift`, `winch` | Well established Wasm JIT runtime with cutting edge Wasm features. Winch only works on `x86` platforms. |
 | Wasmer | `wasmer` | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
 | Stitch | `stitch` | | New experimental and very fast zero-dependencies Wasm interpreter. |
