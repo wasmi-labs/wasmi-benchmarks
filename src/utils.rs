@@ -36,6 +36,7 @@ pub struct ExecuteTestFilter {
     pub matrix_multiply: bool,
     pub argon2: bool,
     pub bulk_ops: bool,
+    pub coremark: bool,
 }
 
 impl ExecuteTestFilter {
@@ -49,6 +50,7 @@ impl ExecuteTestFilter {
             matrix_multiply: flag,
             argon2: flag,
             bulk_ops: flag,
+            coremark: flag,
         }
     }
 }

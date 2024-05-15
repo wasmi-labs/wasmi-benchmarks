@@ -5,6 +5,9 @@ fn main() {
     let coremark_wasm = read_benchmark_file(InputEncoding::Wasm, "coremark-minimal");
     let mut scores = <BTreeMap<String, f32>>::new();
     for vm in vms_under_test() {
+        if !vm.test_filter().execute.coremark {
+            continue;
+        }
         let name = vm.name();
         println!(
             "\
