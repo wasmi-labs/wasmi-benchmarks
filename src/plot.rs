@@ -158,14 +158,6 @@ fn plot_for_data(test_id: &str, data: &[(&str, f32)]) -> Result<(), Box<dyn std:
         .y_labels(data.len())
         .draw()?;
 
-    // chart.plotting_area().draw(
-    //     &Text::new(
-    //         test_id,
-    //         (0.0, SegmentValue::Last),
-    //         TextStyle::from(("monospace", 50)).pos(Pos::new(HPos::Left, VPos::Center)),
-    //     )
-    // )?;
-
     chart.draw_series(
         Histogram::horizontal(&chart)
             .style_func(|x, _bar_height| match x {
