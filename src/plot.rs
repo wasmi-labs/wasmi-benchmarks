@@ -1,6 +1,10 @@
 use plotters::prelude::*;
 use plotters::style::colors::full_palette as color;
 use plotters::style::text_anchor::{HPos, Pos, VPos};
+use std::collections::BTreeMap;
+use std::error::Error;
+use std::fmt::{self, Display};
+use std::str::FromStr;
 
 /// VM under test and its configuration.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -60,25 +64,26 @@ impl VmAndConfig {
     }
 }
 
-impl VmAndConfig {
-    /// Decode a [`WasmRuntimeKind`] from a `&str`.
-    fn decode_str(part: &str) -> Option<Self> {
-        match part {
-            "wasmi-old" => Some(Self::WasmiOld),
-            "wasmi-new.eager" => Some(Self::WasmiNew),
-            "wasmi-new.eager.unchecked" => Some(Self::WasmiNewUnchecked),
-            "wasmi-new.lazy" => Some(Self::WasmiNewLazy),
-            "wasmi-new.lazy.unchecked" => Some(Self::WasmiNewLazyUnchecked),
-            "wasmi-new.lazy-translation" => Some(Self::WasmiNewLazyTranslation),
-            "wasm3.eager" => Some(Self::Wasm3),
-            "wasm3.lazy" => Some(Self::Wasm3Lazy),
-            "tinywasm" => Some(Self::Tinywasm),
-            "wasmtime.cranelift" => Some(Self::WasmtimeCranelift),
-            "wasmtime.winch" => Some(Self::WasmtimeWinch),
-            "wasmer.cranelift" => Some(Self::WasmerCranelift),
-            "wasmer.singlepass" => Some(Self::WasmerSinglepass),
-            "stitch" => Some(Self::Stitch),
-            _ => None,
+impl FromStr for VmAndConfig {
+    type Err = FromStrError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input {
+            "wasmi-old" => Ok(Self::WasmiOld),
+            "wasmi-new.eager.checked" => Ok(Self::WasmiNew),
+            "wasmi-new.eager.unchecked" => Ok(Self::WasmiNewUnchecked),
+            "wasmi-new.lazy.checked" => Ok(Self::WasmiNewLazy),
+            "wasmi-new.lazy.unchecked" => Ok(Self::WasmiNewLazyUnchecked),
+            "wasmi-new.lazy-translation.checked" => Ok(Self::WasmiNewLazyTranslation),
+            "wasm3.eager" => Ok(Self::Wasm3),
+            "wasm3.lazy" => Ok(Self::Wasm3Lazy),
+            "tinywasm" => Ok(Self::Tinywasm),
+            "wasmtime.cranelift" => Ok(Self::WasmtimeCranelift),
+            "wasmtime.winch" => Ok(Self::WasmtimeWinch),
+            "wasmer.cranelift" => Ok(Self::WasmerCranelift),
+            "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
+            "stitch" => Ok(Self::Stitch),
+            _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         }
     }
 }
@@ -86,45 +91,46 @@ impl VmAndConfig {
 #[derive(Debug, Copy, Clone)]
 pub struct BenchEntry {
     pub vm: VmAndConfig,
-    pub time: f32,
+    pub time: f64,
 }
 
 impl BenchEntry {
-    pub fn result(&self, min: f32) -> f32 {
+    pub fn result(&self, min: f64) -> f64 {
         self.time / min
     }
 }
 
-fn plot_for_data(test_id: &str, data: &[(&str, f32)]) -> Result<(), Box<dyn std::error::Error>> {
-    let min = data
+fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
+    let min = bench_group
+        .results
         .iter()
-        .map(|(_id, score)| score)
-        .copied()
+        .map(|(_id, &BenchResult { estimate, unit: _ })| estimate)
         .min_by(|a, b| a.total_cmp(b))
         .unwrap_or(1.0);
-    let max = data
+    let max = bench_group
+        .results
         .iter()
-        .map(|(_id, score)| score)
-        .copied()
+        .map(|(_id, &BenchResult { estimate, unit: _ })| estimate)
         .max_by(|a, b| a.total_cmp(b))
         .unwrap_or(1.0);
-    let max_diff = core::cmp::max_by(10.0, max / min, f32::total_cmp);
-    let mut data: Vec<_> = data
+    let max_diff = core::cmp::max_by(10.0, max / min, f64::total_cmp);
+    let mut data: Vec<_> = bench_group
+        .results
         .iter()
-        .map(|&(label, time)| {
-            let vm = VmAndConfig::decode_str(label).unwrap();
-            BenchEntry { vm, time }
-        })
+        .map(|(&vm, &BenchResult { estimate, unit: _ })| BenchEntry { vm, time: estimate })
         .collect();
     data.sort_by(|lhs, rhs| lhs.vm.cmp(&rhs.vm));
     data.reverse();
 
-    let path = format!("target/wasmi-benchmarks/{test_id}.svg");
+    let category = bench_group.category;
+    let name = &bench_group.name;
+    let test_id = format!("{category}/{name}");
+    let path = format!("target/wasmi-benchmarks/{category}/{name}.svg");
     let _ = std::fs::create_dir_all(&path);
     let _ = std::fs::remove_dir(&path);
     let root = SVGBackend::new(&path, (1280, 960)).into_drawing_area();
     let root = root.margin(5, 5, 5, 5).titled(
-        test_id,
+        &test_id,
         TextStyle::from(("monospace", 50)).pos(Pos::new(HPos::Center, VPos::Center)),
     )?;
     root.fill(&color::WHITE)?;
@@ -134,7 +140,7 @@ fn plot_for_data(test_id: &str, data: &[(&str, f32)]) -> Result<(), Box<dyn std:
         .margin_right(200)
         .margin_top(25)
         .build_cartesian_2d(
-            (0.5_f32..max_diff * 1.05).log_scale(),
+            (0.5_f64..max_diff * 1.05).log_scale(),
             (0usize..data.len() - 1).into_segmented(),
         )?;
     chart
@@ -188,37 +194,157 @@ fn plot_for_data(test_id: &str, data: &[(&str, f32)]) -> Result<(), Box<dyn std:
     Ok(())
 }
 
-fn main() {
-    let execute_data: Vec<(&str, f32)> = vec![
-        ("wasmi-old", 12.0),
-        ("wasmi-new.eager", 4.5),
-        ("wasmi-new.lazy", 4.55),
-        ("tinywasm", 17.25),
-        ("wasm3.eager", 2.3),
-        ("wasm3.lazy", 2.35),
-        ("stitch", 1.9),
-        ("wasmtime.cranelift", 0.25),
-        ("wasmtime.winch", 0.35),
-        ("wasmer.cranelift", 0.3),
-        ("wasmer.singlepass", 0.75),
-    ];
-    plot_for_data("execute/counter", &execute_data).unwrap();
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum BenchCategory {
+    Execute,
+    Compile,
+}
 
-    let compile_data: Vec<(&str, f32)> = vec![
-        ("wasmi-old", 250.0),
-        ("wasmi-new.eager", 280.5),
-        ("wasmi-new.eager.unchecked", 260.25),
-        ("wasmi-new.lazy", 46.55),
-        ("wasmi-new.lazy.unchecked", 35.32),
-        ("wasmi-new.lazy-translation", 129.81),
-        ("tinywasm", 244.15),
-        ("wasm3.eager", 408.02),
-        ("wasm3.lazy", 54.51),
-        ("stitch", 147.44),
-        ("wasmtime.cranelift", 32756.15),
-        ("wasmtime.winch", 3140.78),
-        ("wasmer.cranelift", 5102.30),
-        ("wasmer.singlepass", 976.73),
-    ];
-    plot_for_data("compile/pulldown-cmark", &compile_data).unwrap();
+#[derive(Debug)]
+pub struct FromStrError {
+    message: String,
+}
+
+impl Error for FromStrError {}
+
+impl<S> From<S> for FromStrError
+where
+    S: Into<String>,
+{
+    fn from(message: S) -> Self {
+        FromStrError {
+            message: message.into(),
+        }
+    }
+}
+
+impl Display for FromStrError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.message.fmt(f)
+    }
+}
+
+impl FromStr for BenchCategory {
+    type Err = FromStrError;
+
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        match input {
+            "execute" => Ok(Self::Execute),
+            "compile" => Ok(Self::Compile),
+            _ => Err(FromStrError::from(format!(
+                "invalid BenchCategory: {input}"
+            ))),
+        }
+    }
+}
+
+impl fmt::Display for BenchCategory {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BenchCategory::Execute => "execute".fmt(f),
+            BenchCategory::Compile => "compile".fmt(f),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct BenchGroup {
+    pub category: BenchCategory,
+    pub name: String,
+    pub results: BTreeMap<VmAndConfig, BenchResult>,
+    pub input: Option<i64>,
+}
+
+#[derive(Debug)]
+pub struct BenchResult {
+    pub estimate: f64,
+    pub unit: String,
+}
+
+fn decode_stdin() -> Result<(), Box<dyn Error>> {
+    use serde_json as json;
+    use std::io::{self, BufRead};
+
+    // Create a buffer to read input
+    let stdin = io::stdin();
+    let handle = stdin.lock();
+
+    let mut bench_group: Option<BenchGroup> = None;
+
+    // Iterate over lines from stdin and collect data:
+    for line in handle.lines() {
+        let line = line?;
+
+        let json: json::Value = json::from_str(&line)?;
+        let json::Value::Object(map) = &json else {
+            panic!("malformed JSON input: {json:?}")
+        };
+        match map.get("reason").and_then(json::Value::as_str) {
+            Some("benchmark-complete") => {
+                // Important message properties:
+                //
+                // reason: benchmark-complete
+                //     - id: {exec-or-compile} / {test-case} / {wasm-runtime} / {input}
+                //     - typical: { "estimate": f32, "unit": ["ns", "us", "ms", "s"] }
+                let Some(id) = map.get("id").and_then(json::Value::as_str) else {
+                    panic!("malformed `id` value: {json:?}")
+                };
+                let mut parts = id.split('/');
+                let category = BenchCategory::from_str(parts.next().unwrap())?;
+                let name = String::from(parts.next().unwrap());
+                let vm_and_config = VmAndConfig::from_str(parts.next().unwrap())?;
+                let input = parts.next().map(|s| s.parse::<i64>()).transpose()?;
+                let Some(typical) = map.get("typical").and_then(json::Value::as_object) else {
+                    panic!("malformed `typical` value: {json:#?}")
+                };
+                let Some(estimate) = typical
+                    .get("estimate")
+                    .and_then(json::Value::as_number)
+                    .and_then(json::Number::as_f64)
+                else {
+                    panic!("malformed `typical.estimate` value: {json:#?}")
+                };
+                let Some(unit) = typical
+                    .get("unit")
+                    .and_then(json::Value::as_str)
+                    .map(String::from)
+                else {
+                    panic!("malformed `typical.unit` value: {json:#?}")
+                };
+                let result = BenchResult { estimate, unit };
+                match &mut bench_group {
+                    Some(bench_group) => {
+                        assert_eq!(&bench_group.category, &category);
+                        assert_eq!(&bench_group.name, &name);
+                        assert_eq!(&bench_group.input, &input);
+                        assert!(bench_group.results.insert(vm_and_config, result).is_none());
+                    }
+                    None => {
+                        let g = bench_group.insert(BenchGroup {
+                            category,
+                            name,
+                            input,
+                            results: BTreeMap::new(),
+                        });
+                        g.results.insert(vm_and_config, result);
+                    }
+                };
+            }
+            Some("group-complete") => {
+                // Important message properties:
+                //
+                // reason: group-complete
+                //     - group_name: "{exec-or-compile} / {test-case}"
+                if let Some(bench_group) = bench_group.take() {
+                    plot_for_data(&bench_group)?;
+                }
+            }
+            _ => panic!("malformed JSON input: {json:?}"),
+        };
+    }
+    Ok(())
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    decode_stdin()
 }
