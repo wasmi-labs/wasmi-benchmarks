@@ -11,7 +11,7 @@ struct WasmiOldRuntime {
 
 impl BenchVm for WasmiOld {
     fn name(&self) -> &'static str {
-        "wasmi-v0.31"
+        "wasmi-old"
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {

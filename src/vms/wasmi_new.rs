@@ -22,20 +22,18 @@ struct WasmiNewRuntime {
 impl BenchVm for WasmiNew {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
-            (wasmi_new::CompilationMode::Eager, Validation::Checked) => "wasmi-v0.32.eager.checked",
+            (wasmi_new::CompilationMode::Eager, Validation::Checked) => "wasmi-new.eager.checked",
             (wasmi_new::CompilationMode::Eager, Validation::Unchecked) => {
-                "wasmi-v0.32.eager.unchecked"
+                "wasmi-new.eager.unchecked"
             }
             (wasmi_new::CompilationMode::LazyTranslation, Validation::Checked) => {
-                "wasmi-v0.32.lazy-translation.checked"
+                "wasmi-new.lazy-translation.checked"
             }
             (wasmi_new::CompilationMode::LazyTranslation, Validation::Unchecked) => {
-                "wasmi-v0.32.lazy-translation.unchecked"
+                "wasmi-new.lazy-translation.unchecked"
             }
-            (wasmi_new::CompilationMode::Lazy, Validation::Checked) => "wasmi-v0.32.lazy.checked",
-            (wasmi_new::CompilationMode::Lazy, Validation::Unchecked) => {
-                "wasmi-v0.32.lazy.unchecked"
-            }
+            (wasmi_new::CompilationMode::Lazy, Validation::Checked) => "wasmi-new.lazy.checked",
+            (wasmi_new::CompilationMode::Lazy, Validation::Unchecked) => "wasmi-new.lazy.unchecked",
         }
     }
 
