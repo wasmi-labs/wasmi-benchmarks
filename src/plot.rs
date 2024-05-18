@@ -128,7 +128,8 @@ fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
     let path = format!("target/wasmi-benchmarks/{category}/{name}.svg");
     let _ = std::fs::create_dir_all(&path);
     let _ = std::fs::remove_dir(&path);
-    let root = SVGBackend::new(&path, (1280, 960)).into_drawing_area();
+    let height = 50 + 75 + 25 + 5 + bench_group.results.len() as u32 * 50;
+    let root = SVGBackend::new(&path, (1280, height)).into_drawing_area();
     let root = root.margin(5, 5, 5, 5).titled(
         &test_id,
         TextStyle::from(("monospace", 50)).pos(Pos::new(HPos::Center, VPos::Center)),
@@ -161,6 +162,7 @@ fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
         .x_label_style(("sans-serif", 20))
         .y_label_style(("sans-serif", 30))
         .axis_desc_style(("sans-serif", 35))
+        .x_labels(3)
         .y_labels(data.len())
         .draw()?;
 
@@ -171,7 +173,7 @@ fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
                 SegmentValue::CenterOf(_n) => unreachable!(),
                 SegmentValue::Last => unreachable!(),
             })
-            .margin(20)
+            .margin(15)
             .baseline(0.5)
             .data(
                 data.iter()
