@@ -104,3 +104,13 @@ cargo run --profile bench
 
 This will run Coremark using all available Wasm VMs and print their 
 Coremark scores to the console. Higher scores are better.
+
+## Plotting
+
+In order to run the benchmarks and simultaneously plot diagrams of their results use the following command:
+
+```
+cargo criterion --bench criterion --message-format=json | cargo run --bin plot
+```
+
+This generates plots in the `target/wasmi-benchmarks` folder for all the benchmark groups.
