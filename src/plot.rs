@@ -38,11 +38,11 @@ impl VmAndConfig {
             VmAndConfig::Tinywasm => "Tinywasm",
             VmAndConfig::Wasm3 => "Wasm3",
             VmAndConfig::Wasm3Lazy => "Wasm3 (lazy)",
+            VmAndConfig::Stitch => "Stitch (lazy)",
             VmAndConfig::WasmtimeCranelift => "Wasmtime (Cranelift)",
             VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
             VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
             VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
-            VmAndConfig::Stitch => "Stitch (lazy)",
         }
     }
 
@@ -55,11 +55,11 @@ impl VmAndConfig {
             | Self::WasmiNewLazy
             | Self::WasmiNewLazyUnchecked
             | Self::WasmiNewLazyTranslation => RGBColor(200, 200, 70),
-            Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Tinywasm => RGBColor(108, 140, 108),
+            Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
+            Self::Stitch => RGBColor(220, 175, 180),
             Self::WasmtimeCranelift | Self::WasmtimeWinch => RGBColor(140, 120, 160),
             Self::WasmerCranelift | Self::WasmerSinglepass => RGBColor(95, 140, 175),
-            Self::Stitch => RGBColor(220, 175, 180),
         }
     }
 }
@@ -75,14 +75,14 @@ impl FromStr for VmAndConfig {
             "wasmi-new.lazy.checked" => Ok(Self::WasmiNewLazy),
             "wasmi-new.lazy.unchecked" => Ok(Self::WasmiNewLazyUnchecked),
             "wasmi-new.lazy-translation.checked" => Ok(Self::WasmiNewLazyTranslation),
+            "tinywasm" => Ok(Self::Tinywasm),
             "wasm3.eager" => Ok(Self::Wasm3),
             "wasm3.lazy" => Ok(Self::Wasm3Lazy),
-            "tinywasm" => Ok(Self::Tinywasm),
+            "stitch" => Ok(Self::Stitch),
             "wasmtime.cranelift" => Ok(Self::WasmtimeCranelift),
             "wasmtime.winch" => Ok(Self::WasmtimeWinch),
             "wasmer.cranelift" => Ok(Self::WasmerCranelift),
             "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
-            "stitch" => Ok(Self::Stitch),
             _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         }
     }
