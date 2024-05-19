@@ -53,10 +53,14 @@ jobs:
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: System Information
               run: lscpu
-            - name: Compile (--profile ci)
-              run: cargo build --benches --profile ci
-            - name: Run Compilation Benches (--profile ci)
-              run: cargo bench compile/ --profile ci
+            - name: Install Cargo Criterion (tool)
+              run: cargo install cargo-criterion
+            - name: Compile (--profile bench)
+              run: cargo build --benches --profile bench
+            - name: Run Compilation Benches (--profile bench)
+              run: cargo criterion --bench criterion --message-format=json compile/ > out.json
+            - name: Print JSON Output
+              run: cat out.json
 
     bench-execute:
         name: Run Execution Benchmarks
@@ -78,10 +82,14 @@ jobs:
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
             - name: System Information
               run: lscpu
-            - name: Compile (--profile ci)
-              run: cargo build --benches --profile ci
-            - name: Run Execution Benches (--profile ci)
-              run: cargo bench execute/ --profile ci
+            - name: Install Cargo Criterion (tool)
+              run: cargo install cargo-criterion
+            - name: Compile (--profile bench)
+              run: cargo build --benches --profile bench
+            - name: Run Execution Benches (--profile bench)
+              run: cargo criterion --bench criterion --message-format=json execute/ > out.json
+            - name: Print JSON Output
+              run: cat out.json
 
     coremark:
       name: Run Coremark
