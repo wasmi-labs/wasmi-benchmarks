@@ -36,7 +36,7 @@ impl VmAndConfig {
             VmAndConfig::WasmiNewLazyUnchecked => "Wasmi v0.32 (lazy, unchecked)",
             VmAndConfig::WasmiNewLazyTranslation => "Wasmi v0.32 (lazy-translation)",
             VmAndConfig::Tinywasm => "Tinywasm",
-            VmAndConfig::Wasm3 => "Wasm3",
+            VmAndConfig::Wasm3 => "Wasm3 (eager)",
             VmAndConfig::Wasm3Lazy => "Wasm3 (lazy)",
             VmAndConfig::Stitch => "Stitch (lazy)",
             VmAndConfig::WasmtimeCranelift => "Wasmtime (Cranelift)",
