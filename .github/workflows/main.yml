@@ -111,10 +111,10 @@ jobs:
               restore-keys: ${{ runner.os }}-${{ github.job }}-
           - name: System Information
             run: lscpu
-          - name: Compile (--profile ci)
-            run: cargo build --bin coremark --profile ci
-          - name: Run Coremark (--profile ci)
-            run: cargo run --bin coremark --profile ci
+          - name: Compile (--profile bench)
+            run: cargo build --bin coremark --profile bench
+          - name: Run Coremark (--profile bench)
+            run: cargo run --bin coremark --profile bench
 
     fmt:
         name: Formatting
