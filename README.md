@@ -6,21 +6,28 @@ This includes execution and compilation benchmarks for the Wasmi interpreter and
 
 The following Wasm runtimes and configurations are included.
 
+| Runtime | ID | Configurations | Note |
+|:-------:|:---------------|:-----|:---|
+| [Wasmi v0.31] | `wasmi-v0.31` | | The old version of the Wasmi Wasm interpreter. |
+| [Wasmi v0.32] | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | New Wasmi Wasm interpreter version with major updates. |
+| [Tinywasm] | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
+| [Wasm3] | `wasm3` | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
+| [Wasmtime] | `wasmtime` | `cranelift`, `winch` | Well established Wasm JIT runtime with cutting edge Wasm features. Winch only works on `x86` platforms. |
+| [Wasmer] | `wasmer` | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
+| [Stitch] | `stitch` | | New experimental and very fast zero-dependencies Wasm interpreter. |
+
 Ideally we had more Wasm runtimes, e.g. [WAMR], [Toywasm] and [Wain] but those had no proper Rust bindings or sufficiently flexible APIs respectively.
 
+[Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
+[Wasmi v0.32]: https://github.com/wasmi-labs/wasmi
 [WAMR]: https://github.com/bytecodealliance/wasm-micro-runtime
 [Toywasm]: https://github.com/yamt/toywasm
 [Wain]: https://github.com/rhysd/wain
-
-| Runtime | ID | Configurations | Note |
-|:-------:|:---------------|:-----|:---|
-| Wasmi v0.31 | `wasmi-v0.31` | | The old version of the Wasmi Wasm interpreter. |
-| Wasmi v0.32 | `wasmi-v0.32` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | New Wasmi Wasm interpreter version with major updates. |
-| Tinywasm | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
-| Wasm3 | `wasm3` | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
-| Wasmtime | `wasmtime` | `cranelift`, `winch` | Well established Wasm JIT runtime with cutting edge Wasm features. Winch only works on `x86` platforms. |
-| Wasmer | `wasmer` | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
-| Stitch | `stitch` | | New experimental and very fast zero-dependencies Wasm interpreter. |
+[Tinywasm]: https://github.com/explodingcamera/tinywasm
+[Wasm3]: https://github.com/wasm3/wasm3
+[Wasmtime]: https://github.com/bytecodealliance/wasmtime
+[Wasmer]: https://github.com/wasmerio/wasmer
+[Stitch]: https://github.com/makepad/stitch
 
 ### Configuration Explanation
 
