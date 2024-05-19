@@ -115,3 +115,11 @@ cargo criterion --bench criterion --message-format=json | cargo run --bin plot
 
 This generates plots in the `target/wasmi-benchmarks` folder for all the benchmark groups.
 In order to use this you may need to install `cargo-criterion` via `cargo install cargo-criterion`.
+
+In case you want to collect data first and plot the data later you can also instead store
+the benchmark results into a file and use the file to plot the data later:
+
+```
+cargo criterion --bench criterion --message-format=json > results.json
+cat results.json | cargo run --bin plot
+```
