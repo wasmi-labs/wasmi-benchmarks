@@ -42,7 +42,7 @@ impl VmAndConfig {
             VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
             VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
             VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
-            VmAndConfig::Stitch => "Stitch",
+            VmAndConfig::Stitch => "Stitch (lazy)",
         }
     }
 
