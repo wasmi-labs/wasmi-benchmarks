@@ -54,7 +54,7 @@ jobs:
             - name: System Information
               run: lscpu
             - name: Install Cargo Criterion (tool)
-              run: cargo install cargo-criterion
+              run: cargo install cargo-criterion || true
             - name: Compile (--profile bench)
               run: cargo build --benches --profile bench
             - name: Run Compilation Benches (--profile bench)
@@ -83,7 +83,7 @@ jobs:
             - name: System Information
               run: lscpu
             - name: Install Cargo Criterion (tool)
-              run: cargo install cargo-criterion
+              run: cargo install cargo-criterion || true
             - name: Compile (--profile bench)
               run: cargo build --benches --profile bench
             - name: Run Execution Benches (--profile bench)
