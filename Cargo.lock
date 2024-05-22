@@ -3045,8 +3045,9 @@ dependencies = [
 
 [[package]]
 name = "wasmi"
-version = "0.32.0-beta.16"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-refactor-executor#e5395ee5ab1a9eba11db8b8c8b6905d60cf5fe9b"
+version = "0.32.0-beta.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e95733b20d84b86116a0e52e430d0f58f848c510664e581a3e2730acba841516"
 dependencies = [
  "arrayvec",
  "multi-stash",
@@ -3055,7 +3056,7 @@ dependencies = [
  "smallvec",
  "spin",
  "wasmi_collections",
- "wasmi_core 0.32.0-beta.16",
+ "wasmi_core 0.32.0-beta.17",
  "wasmparser-nostd",
 ]
 
@@ -3073,7 +3074,7 @@ dependencies = [
  "wasmer-compiler-cranelift",
  "wasmer-compiler-singlepass",
  "wasmi 0.31.2",
- "wasmi 0.32.0-beta.16",
+ "wasmi 0.32.0-beta.17",
  "wasmtime",
  "wat",
 ]
@@ -3086,8 +3087,9 @@ checksum = "104a7f73be44570cac297b3035d76b169d6599637631cf37a1703326a0727073"
 
 [[package]]
 name = "wasmi_collections"
-version = "0.32.0-beta.16"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-refactor-executor#e5395ee5ab1a9eba11db8b8c8b6905d60cf5fe9b"
+version = "0.32.0-beta.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1374b05c71a1078ff514fe72f2c5c5eacffa2cc21baae3fefa3364bc551d9572"
 dependencies = [
  "ahash 0.8.11",
  "hashbrown 0.14.5",
@@ -3108,8 +3110,9 @@ dependencies = [
 
 [[package]]
 name = "wasmi_core"
-version = "0.32.0-beta.16"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-refactor-executor#e5395ee5ab1a9eba11db8b8c8b6905d60cf5fe9b"
+version = "0.32.0-beta.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5ddf119e300d3e211ffaa0fb6091f3901855c667c9a262fe630b0ed84756cfc5"
 dependencies = [
  "downcast-rs",
  "libm",
@@ -3365,9 +3368,9 @@ dependencies = [
 
 [[package]]
 name = "webc"
-version = "6.0.0-alpha8"
+version = "6.0.0-alpha9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbf53893f8df356f1305446c1bc59c4082cb592f39ffcae0a2f10bd8ed100bb9"
+checksum = "9e1b4e8dd987046eede4348d660404ff990412631b7d493f9e547adcf2862cd5"
 dependencies = [
  "anyhow",
  "base64",
