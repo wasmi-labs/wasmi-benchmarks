@@ -130,11 +130,11 @@ fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
     let _ = std::fs::remove_dir(&path);
     let height = 50 + 75 + 25 + 5 + bench_group.results.len() as u32 * 50;
     let root = SVGBackend::new(&path, (1280, height)).into_drawing_area();
+    root.fill(&color::WHITE)?;
     let root = root.margin(5, 5, 5, 5).titled(
         &test_id,
         TextStyle::from(("monospace", 50)).pos(Pos::new(HPos::Center, VPos::Center)),
     )?;
-    root.fill(&color::WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(75)
         .y_label_area_size(400)
