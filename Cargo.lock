@@ -3046,7 +3046,7 @@ dependencies = [
 [[package]]
 name = "wasmi"
 version = "0.32.3"
-source = "git+https://www.github.com/wasmi-labs/wasmi?rev=56a15dab604eaf666cc23f6df564e27318b43c4a#56a15dab604eaf666cc23f6df564e27318b43c4a"
+source = "git+https://www.github.com/wasmi-labs/wasmi?rev=82d96f3d1b3fa155b5f59802266e84cd227abfab#82d96f3d1b3fa155b5f59802266e84cd227abfab"
 dependencies = [
  "arrayvec",
  "multi-stash",
@@ -3087,7 +3087,7 @@ checksum = "104a7f73be44570cac297b3035d76b169d6599637631cf37a1703326a0727073"
 [[package]]
 name = "wasmi_collections"
 version = "0.32.3"
-source = "git+https://www.github.com/wasmi-labs/wasmi?rev=56a15dab604eaf666cc23f6df564e27318b43c4a#56a15dab604eaf666cc23f6df564e27318b43c4a"
+source = "git+https://www.github.com/wasmi-labs/wasmi?rev=82d96f3d1b3fa155b5f59802266e84cd227abfab#82d96f3d1b3fa155b5f59802266e84cd227abfab"
 dependencies = [
  "ahash 0.8.11",
  "hashbrown 0.14.5",
@@ -3109,7 +3109,7 @@ dependencies = [
 [[package]]
 name = "wasmi_core"
 version = "0.32.3"
-source = "git+https://www.github.com/wasmi-labs/wasmi?rev=56a15dab604eaf666cc23f6df564e27318b43c4a#56a15dab604eaf666cc23f6df564e27318b43c4a"
+source = "git+https://www.github.com/wasmi-labs/wasmi?rev=82d96f3d1b3fa155b5f59802266e84cd227abfab#82d96f3d1b3fa155b5f59802266e84cd227abfab"
 dependencies = [
  "downcast-rs",
  "libm",
