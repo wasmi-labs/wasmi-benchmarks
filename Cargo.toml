@@ -20,7 +20,7 @@ path = "src/plot.rs"
 
 [dependencies]
 wasmi_old = { package = "wasmi", version = "0.31" }
-wasmi_new = { package = "wasmi", version = "0.32.3", features = ["no-hash-maps"], git = "https://www.github.com/wasmi-labs/wasmi", rev = "56a15dab604eaf666cc23f6df564e27318b43c4a" }
+wasmi_new = { package = "wasmi", version = "0.32.3", features = ["no-hash-maps"], git = "https://www.github.com/wasmi-labs/wasmi", rev = "82d96f3d1b3fa155b5f59802266e84cd227abfab" }
 tinywasm = "0.7.0"
 wasmer = { version = "4.3", default-features = false, features = ["engine", "compiler"] }
 wasmer-compiler-singlepass = "4.3"
