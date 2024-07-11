@@ -100,7 +100,7 @@ impl BenchEntry {
     }
 }
 
-fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
+fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
     let min = bench_group
         .results
         .iter()
@@ -125,16 +125,20 @@ fn plot_for_data(bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
     let category = bench_group.category;
     let name = &bench_group.name;
     let test_id = format!("{category}/{name}");
+    let test_title = match ext_title {
+        Some(ext_title) => format!("{test_id} - {ext_title}"),
+        None => test_id,
+    };
     let path = format!("target/wasmi-benchmarks/{category}/{name}.svg");
     let _ = std::fs::create_dir_all(&path);
     let _ = std::fs::remove_dir(&path);
     let height = 50 + 75 + 25 + 5 + bench_group.results.len() as u32 * 50;
     let root = SVGBackend::new(&path, (1280, height)).into_drawing_area();
-    let root = root.margin(5, 5, 5, 5).titled(
-        &test_id,
-        TextStyle::from(("monospace", 50)).pos(Pos::new(HPos::Center, VPos::Center)),
-    )?;
     root.fill(&color::WHITE)?;
+    let root = root.margin(5, 5, 5, 5).titled(
+        &test_title,
+        TextStyle::from(("monospace", 45)).pos(Pos::new(HPos::Center, VPos::Center)),
+    )?;
     let mut chart = ChartBuilder::on(&root)
         .x_label_area_size(75)
         .y_label_area_size(400)
@@ -267,6 +271,9 @@ fn decode_stdin() -> Result<(), Box<dyn Error>> {
     use serde_json as json;
     use std::io::{self, BufRead};
 
+    let args: Vec<String> = std::env::args().collect();
+    let ext_title = args.get(1).cloned();
+
     // Create a buffer to read input
     let stdin = io::stdin();
     let handle = stdin.lock();
@@ -338,7 +345,7 @@ fn decode_stdin() -> Result<(), Box<dyn Error>> {
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(&bench_group)?;
+                    plot_for_data(ext_title.as_deref(), &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
