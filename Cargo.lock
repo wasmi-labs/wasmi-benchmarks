@@ -1666,17 +1666,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "num-derive"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed3955f1a9c7c0c15e092f9c887db08b1fc683305fdf6eb6684f22555355e202"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.70",
-]
-
-[[package]]
 name = "num-traits"
 version = "0.2.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3011,18 +3000,17 @@ dependencies = [
 
 [[package]]
 name = "wasmi"
-version = "0.34.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dae81666d9dc76cb125fe16fa3e2f0fe08d15cd7b2ad9a5013cadf31826edee5"
+checksum = "b07e84e3bcdab2f4301827623260ada2557596ca462f7470b60f5182a25270b1"
 dependencies = [
  "arrayvec",
  "multi-stash",
- "num-derive",
- "num-traits",
  "smallvec",
  "spin",
  "wasmi_collections",
- "wasmi_core 0.34.0",
+ "wasmi_core 0.38.0",
+ "wasmi_ir",
  "wasmparser-nostd",
 ]
 
@@ -3040,7 +3028,7 @@ dependencies = [
  "wasmer-compiler-cranelift",
  "wasmer-compiler-singlepass",
  "wasmi 0.31.2",
- "wasmi 0.34.0",
+ "wasmi 0.38.0",
  "wasmtime",
  "wat",
 ]
@@ -3053,9 +3041,9 @@ checksum = "104a7f73be44570cac297b3035d76b169d6599637631cf37a1703326a0727073"
 
 [[package]]
 name = "wasmi_collections"
-version = "0.34.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b422568fe52d13bc889033799e548c43032ee71836c6e9bb7261c1fc039327b9"
+checksum = "0d0fd5f4f2c4fe0c98554bb7293108ed2b1d0c124dce0974f999de7d517d37bc"
 dependencies = [
  "ahash 0.8.11",
  "hashbrown 0.14.5",
@@ -3076,14 +3064,23 @@ dependencies = [
 
 [[package]]
 name = "wasmi_core"
-version = "0.34.0"
+version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fa2efecce566705221bc05f518b124ceb7d94b78f4e9035cb0572d9f369982e"
+checksum = "76a5f7bbd933a0fb3bac6c541f8bd90c0c8adcd91bb3ac088a2088995325b3d9"
 dependencies = [
  "downcast-rs",
  "libm",
  "num-traits",
  "paste",
+]
+
+[[package]]
+name = "wasmi_ir"
+version = "0.38.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a3345445247388df2b5b35250a30c9209c27c8d2c6db1bf4c89b65636264bf9"
+dependencies = [
+ "wasmi_core 0.38.0",
 ]
 
 [[package]]
