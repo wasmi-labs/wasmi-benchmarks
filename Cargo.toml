@@ -25,7 +25,7 @@ tinywasm = "0.7.0"
 wasmer = { version = "4.3", default-features = false, features = ["engine", "compiler"] }
 wasmer-compiler-singlepass = "4.3"
 wasmer-compiler-cranelift = "4.3"
-wasmtime = { version = "22.0.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
+wasmtime = { version = "26.0.0", default-features = false, features = ["winch", "cranelift", "runtime"] }
 makepad-stitch = "0.1.0"
 criterion = "0.5"
 wat = "1"
