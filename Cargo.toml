@@ -30,7 +30,7 @@ makepad-stitch = "0.1.0"
 criterion = "0.5"
 wat = "1"
 serde_json = "1.0.117"
-plotters = "0.3.6"
+plotters = "0.3.7"
 
 [dependencies.wasm3]
 git = "https://github.com/robbepop/wasm3-rs.git"
