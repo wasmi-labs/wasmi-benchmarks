@@ -2514,9 +2514,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tinywasm"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb17fb757014cb29b31df0c7adc59a00d78cbeb1479e90dad7521dc379c379f7"
+checksum = "b1a7e7ad5b05ca08236dde1fb2af95a30af146ac834ee79c1d07d38101293bdc"
 dependencies = [
  "libm",
  "log",
@@ -2526,20 +2526,20 @@ dependencies = [
 
 [[package]]
 name = "tinywasm-parser"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b57836fdb313f731e8f27af86ac1f731c0c25d845c0b98c4510a1b3bcdba47ad"
+checksum = "1d597943c961ca8a80ad1b7448afbf05b38cfe1532f5d3af7927eecfdbb65f18"
 dependencies = [
  "log",
  "tinywasm-types",
- "wasmparser 0.207.0",
+ "wasmparser 0.216.0",
 ]
 
 [[package]]
 name = "tinywasm-types"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5bd86161724f7497e45124c52ed6f889aee571d10e33295b19a16fa26854190"
+checksum = "f7b9c7822f388596a7cdcaf382ba6711b57b4a1ff48d9977463c6a455f99b376"
 dependencies = [
  "bytecheck 0.7.0",
  "log",
@@ -3099,9 +3099,9 @@ dependencies = [
 
 [[package]]
 name = "wasmparser"
-version = "0.207.0"
+version = "0.216.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e19bb9f8ab07616da582ef8adb24c54f1424c7ec876720b7da9db8ec0626c92c"
+checksum = "bcdee6bea3619d311fb4b299721e89a986c3470f804b6d534340e412589028e3"
 dependencies = [
  "ahash 0.8.11",
  "bitflags 2.6.0",
