@@ -52,7 +52,16 @@ impl BenchVm for Wasmer {
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let mut store = self.store();
         let module = wasmer::Module::new(&store, wasm).unwrap();
-        let import_object = wasmer::imports! {};
+        let import_object = wasmer::imports! {
+             "fluentbase_v1preview" => {
+                "_write" => wasmer::Function::new_typed(&mut store, |offset: u32, length: u32,| {
+
+                         }),
+                "_exit" => wasmer::Function::new_typed(&mut store, |exit_code: i32| {
+
+                         }),
+            }
+        };
         let instance = wasmer::Instance::new(&mut store, &module, &import_object).unwrap();
         let func = instance
             .exports

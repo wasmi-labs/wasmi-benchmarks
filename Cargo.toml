@@ -31,6 +31,11 @@ criterion = "0.5"
 wat = "1"
 serde_json = "1.0.117"
 plotters = "0.3.6"
+rwasm = { git = "https://github.com/fluentlabs-xyz/rwasm", branch = "devel", default-features = false }
+#rwasm = { path = "../rwasm/rwasm" }
+fluentbase-runtime = { git = "https://github.com/fluentlabs-xyz/fluentbase.git", branch = "devel", default-features = false }
+fluentbase-types = { git = "https://github.com/fluentlabs-xyz/fluentbase.git", branch = "devel", default-features = false }
+fluentbase-codec = { git = "https://github.com/fluentlabs-xyz/fluentbase.git", branch = "devel", default-features = false }
 
 [dependencies.wasm3]
 git = "https://github.com/robbepop/wasm3-rs.git"

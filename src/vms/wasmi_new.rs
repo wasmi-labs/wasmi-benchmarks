@@ -61,7 +61,18 @@ impl BenchVm for WasmiNew {
         let mut store = self.store();
         let engine = store.engine();
         let module = self.module(engine, wasm);
-        let linker = wasmi_new::Linker::new(engine);
+        let mut linker = wasmi_new::Linker::new(engine);
+        linker.func_wrap("fluentbase_v1preview", "_write",
+                         |offset: u32, length: u32,| {
+
+                         }
+        ).unwrap();
+        linker.func_wrap("fluentbase_v1preview", "_exit",
+                         |exit_code: i32| {
+
+                         }
+        ).unwrap();
+
         let instance = linker
             .instantiate(&mut store, &module)
             .unwrap()

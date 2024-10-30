@@ -7,6 +7,8 @@ pub use self::wasmi_old::WasmiOld;
 pub use self::wasmtime::Wasmtime;
 use crate::utils::TestFilter;
 use ::wasmi_new::ModuleImportsIter;
+use crate::vms::rwasm::Rwasm;
+use crate::vms::rwasm_runtime::RwasmRm;
 
 mod stitch;
 mod tinywasm;
@@ -15,6 +17,8 @@ mod wasmer;
 mod wasmi_new;
 mod wasmi_old;
 mod wasmtime;
+mod rwasm;
+mod rwasm_runtime;
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchVm {
@@ -53,42 +57,44 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
             compilation_mode: ::wasmi_new::CompilationMode::Eager,
             validation: Validation::Checked,
         }),
-        Box::new(WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Eager,
-            validation: Validation::Unchecked,
-        }),
+        // Box::new(WasmiNew {
+        //     compilation_mode: ::wasmi_new::CompilationMode::Eager,
+        //     validation: Validation::Unchecked,
+        // }),
         Box::new(WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Lazy,
             validation: Validation::Checked,
         }),
-        Box::new(WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Lazy,
-            validation: Validation::Unchecked,
-        }),
-        Box::new(WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::LazyTranslation,
-            validation: Validation::Checked,
-        }),
-        Box::new(Tinywasm),
-        Box::new(Wasm3 {
-            compilation_mode: wasm3::CompilationMode::Eager,
-        }),
-        Box::new(Wasm3 {
-            compilation_mode: wasm3::CompilationMode::Lazy,
-        }),
-        Box::new(Stitch),
-        Box::new(Wasmtime {
-            strategy: ::wasmtime::Strategy::Cranelift,
-        }),
-        Box::new(Wasmtime {
-            strategy: ::wasmtime::Strategy::Winch,
-        }),
+        // Box::new(WasmiNew {
+        //     compilation_mode: ::wasmi_new::CompilationMode::Lazy,
+        //     validation: Validation::Unchecked,
+        // }),
+        // Box::new(WasmiNew {
+        //     compilation_mode: ::wasmi_new::CompilationMode::LazyTranslation,
+        //     validation: Validation::Checked,
+        // }),
+        // Box::new(Tinywasm),
+        // Box::new(Wasm3 {
+        //     compilation_mode: wasm3::CompilationMode::Eager,
+        // }),
+        // Box::new(Wasm3 {
+        //     compilation_mode: wasm3::CompilationMode::Lazy,
+        // }),
+        // Box::new(Stitch),
+        // Box::new(Wasmtime {
+        //     strategy: ::wasmtime::Strategy::Cranelift,
+        // }),
+        // // Box::new(Wasmtime {
+        // //     strategy: ::wasmtime::Strategy::Winch,
+        // // })
         Box::new(Wasmer {
             compiler: wasmer::WasmerCompiler::Cranelift,
         }),
         Box::new(Wasmer {
             compiler: wasmer::WasmerCompiler::Singlepass,
         }),
+        // Box::new(Rwasm),
+        Box::new(RwasmRm)
     ]
 }
 

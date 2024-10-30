@@ -23,6 +23,7 @@ pub enum VmAndConfig {
     WasmtimeWinch,
     WasmerCranelift,
     WasmerSinglepass,
+    Rwasm
 }
 
 impl VmAndConfig {
@@ -43,6 +44,7 @@ impl VmAndConfig {
             VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
             VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
             VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
+            VmAndConfig::Rwasm => "Rwasm",
         }
     }
 
@@ -60,6 +62,7 @@ impl VmAndConfig {
             Self::Stitch => RGBColor(220, 175, 180),
             Self::WasmtimeCranelift | Self::WasmtimeWinch => RGBColor(140, 120, 160),
             Self::WasmerCranelift | Self::WasmerSinglepass => RGBColor(95, 140, 175),
+            Self::Rwasm => RGBColor(95, 140, 175),
         }
     }
 }
@@ -83,6 +86,7 @@ impl FromStr for VmAndConfig {
             "wasmtime.winch" => Ok(Self::WasmtimeWinch),
             "wasmer.cranelift" => Ok(Self::WasmerCranelift),
             "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
+            "rwasm" => Ok(Self::Rwasm),
             _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         }
     }

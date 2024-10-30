@@ -26,7 +26,7 @@ fn execute_benchmark(
 }
 
 pub fn bench_counter(c: &mut Criterion) {
-    execute_benchmark(c, "counter", 1_000_000, InputEncoding::Wat, |filter| {
+    execute_benchmark(c, "counter", 2_000_000, InputEncoding::Wat, |filter| {
         filter.execute.counter
     })
 }
