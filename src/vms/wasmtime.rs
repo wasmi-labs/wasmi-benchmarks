@@ -94,7 +94,10 @@ impl BenchVm for Wasmtime {
 impl Wasmtime {
     fn store(&self) -> wasmtime::Store<()> {
         let mut config = wasmtime::Config::default();
-        if matches!(self.strategy, wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift) {
+        if matches!(
+            self.strategy,
+            wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift
+        ) {
             config.wasm_tail_call(true);
         }
         config.strategy(self.strategy);
