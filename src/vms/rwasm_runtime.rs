@@ -1,20 +1,22 @@
+use super::{elapsed_ms, BenchRuntime, BenchVm};
+use fluentbase_codec::Encoder;
 use fluentbase_runtime::instruction::runtime_register_handlers;
-use rwasm::{Config, Engine, Extern, Linker, Memory, MemoryType, Module, StackLimits, Store, Value};
+use fluentbase_runtime::{Runtime, RuntimeContext};
+use fluentbase_types::SharedContextInputV1;
+use rwasm::engine::bytecode::Instruction;
 use rwasm::engine::{RwasmConfig, StateRouterConfig, Tracer};
 use rwasm::module::FuncIdx;
 use rwasm::rwasm::instruction::InstructionExtra;
 use rwasm::rwasm::{BinaryFormat, BinaryFormatWriter, RwasmModule};
-use fluentbase_runtime::{Runtime, RuntimeContext};
-use fluentbase_types::SharedContextInputV1;
-use rwasm::engine::bytecode::Instruction;
+use rwasm::{
+    Config, Engine, Extern, Linker, Memory, MemoryType, Module, StackLimits, Store, Value,
+};
 use wasmi_new::ModuleImportsIter;
-use super::{elapsed_ms, BenchRuntime, BenchVm};
-use fluentbase_codec::Encoder;
 
 pub struct RwasmRm;
 
 struct RwasmRuntime {
-    runtime: fluentbase_runtime::Runtime
+    runtime: fluentbase_runtime::Runtime,
 }
 
 impl RwasmRm {
@@ -37,25 +39,27 @@ impl RwasmRm {
     #[inline(always)]
     fn rwasm_module(wasm_binary: &[u8]) -> RwasmModule {
         let mut config = RwasmModule::default_config(None);
-        config.rwasm_config(RwasmConfig {
-            state_router: Some(StateRouterConfig {
-                states: Box::new([
-                    ("deploy".to_string(), RwasmRm::STATE_DEPLOY),
-                    ("main".to_string(), RwasmRm::STATE_MAIN),
-                ]),
-                opcode: Instruction::Call(0x0002u32.into()),
-            }),
-            entrypoint_name: None,
-            import_linker: Some(Runtime::new_import_linker()),
-            wrap_import_functions: true,
-        });
+        config
+            .rwasm_config(RwasmConfig {
+                state_router: Some(StateRouterConfig {
+                    states: Box::new([
+                        ("deploy".to_string(), RwasmRm::STATE_DEPLOY),
+                        ("main".to_string(), RwasmRm::STATE_MAIN),
+                    ]),
+                    opcode: Instruction::Call(0x0002u32.into()),
+                }),
+                entrypoint_name: None,
+                import_linker: Some(Runtime::new_import_linker()),
+                wrap_import_functions: true,
+            })
+            .wasm_tail_call(true);
         RwasmModule::compile_with_config(wasm_binary, &config).unwrap()
     }
 }
 
 impl BenchVm for RwasmRm {
     fn name(&self) -> &'static str {
-      "rwasm-rm"
+        "rwasm-rm"
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
@@ -77,8 +81,6 @@ impl BenchVm for RwasmRm {
         module_builder.finish();
     }
 
-
-
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let rwasm_binary = RwasmRm::wasm2rwasm(wasm);
         let context_input = SharedContextInputV1 {
@@ -86,10 +88,9 @@ impl BenchVm for RwasmRm {
             tx: Default::default(),
             contract: Default::default(),
         }
-            .encode_to_vec(0);
+        .encode_to_vec(0);
 
         let mut ctx = RuntimeContext::new(rwasm_binary)
-
             .with_fuel_limit(100_000_000_000)
             .with_input(context_input)
             .with_state(RwasmRm::STATE_MAIN);
@@ -97,9 +98,7 @@ impl BenchVm for RwasmRm {
         let mut runtime = Runtime::new(ctx);
 
         runtime.data_mut().clear_output();
-        Box::new(RwasmRuntime {
-            runtime,
-        })
+        Box::new(RwasmRuntime { runtime })
     }
 
     fn coremark(&self, wasm: &[u8]) -> f32 {
@@ -109,7 +108,6 @@ impl BenchVm for RwasmRm {
 
 impl BenchRuntime for RwasmRuntime {
     fn call(&mut self, input: i64) {
-
         self.runtime.call();
     }
 }
