@@ -1,4 +1,3 @@
-use fluentbase_runtime::instruction::runtime_register_handlers;
 use super::{elapsed_ms, BenchRuntime, BenchVm};
 use wasmi_new::ModuleImportsIter;
 
@@ -26,16 +25,16 @@ impl BenchVm for WasmiOld {
         let module = wasmi_old::Module::new(engine, wasm).unwrap();
         let mut linker = wasmi_old::Linker::new(engine);
 
-        linker.func_wrap("fluentbase_v1preview", "_write",
-            |offset: u32, length: u32,| {
-
-            }
-        ).unwrap();
-        linker.func_wrap("fluentbase_v1preview", "_exit",
-                         |exit_code: i32| {
-
-                         }
-        ).unwrap();
+        linker
+            .func_wrap(
+                "fluentbase_v1preview",
+                "_write",
+                |offset: u32, length: u32| {},
+            )
+            .unwrap();
+        linker
+            .func_wrap("fluentbase_v1preview", "_exit", |exit_code: i32| {})
+            .unwrap();
 
         let instance = linker
             .instantiate(&mut store, &module)

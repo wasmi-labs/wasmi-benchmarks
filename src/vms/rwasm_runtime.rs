@@ -1,16 +1,9 @@
-use super::{elapsed_ms, BenchRuntime, BenchVm};
-use fluentbase_codec::Encoder;
-use fluentbase_runtime::instruction::runtime_register_handlers;
+use super::{BenchRuntime, BenchVm};
 use fluentbase_runtime::{Runtime, RuntimeContext};
-use fluentbase_types::SharedContextInputV1;
 use rwasm::engine::bytecode::Instruction;
-use rwasm::engine::{RwasmConfig, StateRouterConfig, Tracer};
-use rwasm::module::FuncIdx;
-use rwasm::rwasm::instruction::InstructionExtra;
+use rwasm::engine::{RwasmConfig, StateRouterConfig};
 use rwasm::rwasm::{BinaryFormat, BinaryFormatWriter, RwasmModule};
-use rwasm::{
-    Config, Engine, Extern, Linker, Memory, MemoryType, Module, StackLimits, Store, Value,
-};
+use rwasm::{Config, Engine};
 use wasmi_new::ModuleImportsIter;
 
 pub struct RwasmRm;
@@ -34,8 +27,8 @@ impl RwasmRm {
     }
 
     pub const STATE_DEPLOY: u32 = 1;
-
     pub const STATE_MAIN: u32 = 0;
+
     #[inline(always)]
     fn rwasm_module(wasm_binary: &[u8]) -> RwasmModule {
         let mut config = RwasmModule::default_config(None);
@@ -64,40 +57,24 @@ impl BenchVm for RwasmRm {
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let mut config = Config::default();
-
         config.rwasm_config(RwasmConfig {
             state_router: None,
             entrypoint_name: None,
             import_linker: None,
             wrap_import_functions: false,
         });
-
         let engine = Engine::new(&config);
-
         let rwasm_module = RwasmModule::compile_with_config(wasm, &config).unwrap();
-
         let mut module_builder = rwasm_module.to_module_builder(&engine);
-
         module_builder.finish();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
         let rwasm_binary = RwasmRm::wasm2rwasm(wasm);
-        let context_input = SharedContextInputV1 {
-            block: Default::default(),
-            tx: Default::default(),
-            contract: Default::default(),
-        }
-        .encode_to_vec(0);
-
-        let mut ctx = RuntimeContext::new(rwasm_binary)
+        let ctx = RuntimeContext::new(rwasm_binary)
             .with_fuel_limit(100_000_000_000)
-            .with_input(context_input)
             .with_state(RwasmRm::STATE_MAIN);
-
-        let mut runtime = Runtime::new(ctx);
-
-        runtime.data_mut().clear_output();
+        let runtime = Runtime::new(ctx);
         Box::new(RwasmRuntime { runtime })
     }
 

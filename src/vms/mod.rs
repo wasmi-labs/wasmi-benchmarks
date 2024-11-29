@@ -1,15 +1,17 @@
-pub use self::stitch::Stitch;
-pub use self::tinywasm::Tinywasm;
-pub use self::wasm3::Wasm3;
-pub use self::wasmer::Wasmer;
-pub use self::wasmi_new::WasmiNew;
-pub use self::wasmi_old::WasmiOld;
-pub use self::wasmtime::Wasmtime;
-use crate::utils::TestFilter;
+pub use self::{
+    stitch::Stitch,
+    tinywasm::Tinywasm,
+    wasm3::Wasm3,
+    wasmer::Wasmer,
+    wasmi_new::WasmiNew,
+    wasmi_old::WasmiOld,
+    wasmtime::Wasmtime,
+};
+use crate::{utils::TestFilter, vms::rwasm::Rwasm};
 use ::wasmi_new::ModuleImportsIter;
-use crate::vms::rwasm::Rwasm;
-use crate::vms::rwasm_runtime::RwasmRm;
 
+mod rwasm;
+mod rwasm_runtime;
 mod stitch;
 mod tinywasm;
 mod wasm3;
@@ -17,8 +19,6 @@ mod wasmer;
 mod wasmi_new;
 mod wasmi_old;
 mod wasmtime;
-mod rwasm;
-mod rwasm_runtime;
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchVm {
@@ -93,8 +93,8 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
         Box::new(Wasmer {
             compiler: wasmer::WasmerCompiler::Singlepass,
         }),
-        // Box::new(Rwasm),
-        Box::new(RwasmRm)
+        Box::new(Rwasm),
+        // Box::new(RwasmRm)
     ]
 }
 
