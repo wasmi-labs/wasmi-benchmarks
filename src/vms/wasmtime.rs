@@ -2,8 +2,14 @@ use super::{elapsed_ms, BenchRuntime, BenchVm};
 use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
+pub enum Strategy {
+    Cranelift,
+    Winch,
+    Pulley,
+}
+
 pub struct Wasmtime {
-    pub strategy: wasmtime::Strategy,
+    pub strategy: Strategy,
 }
 
 struct WasmtimeRuntime {
@@ -15,15 +21,15 @@ struct WasmtimeRuntime {
 impl BenchVm for Wasmtime {
     fn name(&self) -> &'static str {
         match self.strategy {
-            wasmtime::Strategy::Cranelift | wasmtime::Strategy::Auto => "wasmtime.cranelift",
-            wasmtime::Strategy::Winch => "wasmtime.winch",
-            _ => panic!("unknown Wasmtime strategy"),
+            Strategy::Cranelift => "wasmtime.cranelift",
+            Strategy::Winch => "wasmtime.winch",
+            Strategy::Pulley => "wasmtime.pulley",
         }
     }
 
     fn test_filter(&self) -> TestFilter {
         match self.strategy {
-            wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift => {
+            Strategy::Cranelift => {
                 TestFilter {
                     compile: CompileTestFilter {
                         ffmpeg: false, // takes too long to compile
@@ -32,7 +38,7 @@ impl BenchVm for Wasmtime {
                     ..Default::default()
                 }
             }
-            wasmtime::Strategy::Winch => {
+            Strategy::Winch => {
                 let winch_works = cfg!(target_arch = "x86_64");
                 TestFilter {
                     execute: ExecuteTestFilter {
@@ -48,7 +54,7 @@ impl BenchVm for Wasmtime {
                     },
                 }
             }
-            unknown => panic!("unknown Wasmtime strategy: {unknown:?}"),
+            Strategy::Pulley => TestFilter::default(),
         }
     }
 
@@ -96,11 +102,17 @@ impl Wasmtime {
         let mut config = wasmtime::Config::default();
         if matches!(
             self.strategy,
-            wasmtime::Strategy::Auto | wasmtime::Strategy::Cranelift
+            Strategy::Cranelift
         ) {
             config.wasm_tail_call(true);
         }
-        config.strategy(self.strategy);
+        config.strategy(match self.strategy {
+            Strategy::Cranelift | Strategy::Pulley => wasmtime::Strategy::Cranelift,
+            Strategy::Winch => wasmtime::Strategy::Winch,
+        });
+        if matches!(self.strategy, Strategy::Pulley) {
+            config.target("pulley64").unwrap();
+        }
         let engine = wasmtime::Engine::new(&config).unwrap();
         <wasmtime::Store<()>>::new(&engine, ())
     }

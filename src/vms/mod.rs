@@ -4,7 +4,7 @@ pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
 pub use self::wasmi_new::WasmiNew;
 pub use self::wasmi_old::WasmiOld;
-pub use self::wasmtime::Wasmtime;
+pub use self::wasmtime::{Wasmtime, Strategy as WasmtimeStrategy};
 use crate::utils::TestFilter;
 use ::wasmi_new::ModuleImportsIter;
 
@@ -78,10 +78,13 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
         }),
         Box::new(Stitch),
         Box::new(Wasmtime {
-            strategy: ::wasmtime::Strategy::Cranelift,
+            strategy: WasmtimeStrategy::Cranelift,
         }),
         Box::new(Wasmtime {
-            strategy: ::wasmtime::Strategy::Winch,
+            strategy: WasmtimeStrategy::Winch,
+        }),
+        Box::new(Wasmtime {
+            strategy: WasmtimeStrategy::Pulley,
         }),
         Box::new(Wasmer {
             compiler: wasmer::WasmerCompiler::Cranelift,
