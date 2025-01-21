@@ -21,6 +21,7 @@ pub enum VmAndConfig {
     Stitch,
     WasmtimeCranelift,
     WasmtimeWinch,
+    WasmtimePulley,
     WasmerCranelift,
     WasmerSinglepass,
 }
@@ -41,6 +42,7 @@ impl VmAndConfig {
             VmAndConfig::Stitch => "Stitch (lazy)",
             VmAndConfig::WasmtimeCranelift => "Wasmtime (Cranelift)",
             VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
+            VmAndConfig::WasmtimePulley => "Wasmtime (Pulley)",
             VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
             VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
         }
@@ -58,7 +60,9 @@ impl VmAndConfig {
             Self::Tinywasm => RGBColor(108, 140, 108),
             Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Stitch => RGBColor(220, 175, 180),
-            Self::WasmtimeCranelift | Self::WasmtimeWinch => RGBColor(140, 120, 160),
+            Self::WasmtimeCranelift | Self::WasmtimeWinch | Self::WasmtimePulley => {
+                RGBColor(140, 120, 160)
+            }
             Self::WasmerCranelift | Self::WasmerSinglepass => RGBColor(95, 140, 175),
         }
     }
@@ -81,6 +85,7 @@ impl FromStr for VmAndConfig {
             "stitch" => Ok(Self::Stitch),
             "wasmtime.cranelift" => Ok(Self::WasmtimeCranelift),
             "wasmtime.winch" => Ok(Self::WasmtimeWinch),
+            "wasmtime.pulley" => Ok(Self::WasmtimePulley),
             "wasmer.cranelift" => Ok(Self::WasmerCranelift),
             "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
             _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
