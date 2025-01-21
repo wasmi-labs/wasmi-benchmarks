@@ -4,7 +4,7 @@ pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
 pub use self::wasmi_new::WasmiNew;
 pub use self::wasmi_old::WasmiOld;
-pub use self::wasmtime::{Wasmtime, Strategy as WasmtimeStrategy};
+pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use crate::utils::TestFilter;
 use ::wasmi_new::ModuleImportsIter;
 

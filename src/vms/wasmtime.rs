@@ -54,7 +54,13 @@ impl BenchVm for Wasmtime {
                     },
                 }
             }
-            Strategy::Pulley => TestFilter::default(),
+            Strategy::Pulley => TestFilter {
+                execute: ExecuteTestFilter::default(),
+                compile: CompileTestFilter {
+                    ffmpeg: false,
+                    ..CompileTestFilter::default()
+                },
+            },
         }
     }
 
@@ -100,10 +106,7 @@ impl BenchVm for Wasmtime {
 impl Wasmtime {
     fn store(&self) -> wasmtime::Store<()> {
         let mut config = wasmtime::Config::default();
-        if matches!(
-            self.strategy,
-            Strategy::Cranelift
-        ) {
+        if matches!(self.strategy, Strategy::Cranelift) {
             config.wasm_tail_call(true);
         }
         config.strategy(match self.strategy {
