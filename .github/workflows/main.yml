@@ -179,6 +179,9 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
+            # The fontconfig package is required for the plotters dependency.
+            - name: Install fontconfig
+              run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev
             - name: Checkout Submodules
               run: git submodule update --init --recursive
             - name: Clippy (all features)
