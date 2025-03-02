@@ -12,8 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+    install-dependencies:
+      name: Install Dependencies
+      runs-on: ubuntu-latest
+      steps:
+        - name: Install fontconfig and ninja
+          # - libfontconfig1-dev: required for plotters
+          # - ninja-build: required for Wasmer's WAMR backend
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y libfontconfig1-dev ninja-build
+
     check:
         name: Build
+        needs: install-dependencies
         runs-on: ubuntu-latest
         steps:
           - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -30,15 +42,12 @@ jobs:
                 ~/target/
               key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
               restore-keys: ${{ runner.os }}-${{ github.job }}-
-          - name: Install Dependencies
-            # fontconfig is required for plotters
-            # ninja-build is required for Wasmer's WAMR backend
-            run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
           - name: Build (default features)
             run: cargo build --workspace
 
     bench-compile:
         name: Run Compile Benchmarks
+        needs: install-dependencies
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -55,10 +64,6 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
-            - name: Install Dependencies
-              # fontconfig is required for plotters
-              # ninja-build is required for Wasmer's WAMR backend
-              run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
             - name: System Information
               run: lscpu
             - name: Compile (--profile ci)
@@ -68,6 +73,7 @@ jobs:
 
     bench-execute:
         name: Run Execution Benchmarks
+        needs: install-dependencies
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -84,10 +90,6 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
-            - name: Install Dependencies
-              # fontconfig is required for plotters
-              # ninja-build is required for Wasmer's WAMR backend
-              run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
             - name: System Information
               run: lscpu
             - name: Compile (--profile ci)
@@ -97,6 +99,7 @@ jobs:
 
     coremark:
       name: Run Coremark
+      needs: install-dependencies
       runs-on: ubuntu-latest
       steps:
           - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -113,10 +116,6 @@ jobs:
                 ~/target/
               key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
               restore-keys: ${{ runner.os }}-${{ github.job }}-
-          - name: Install Dependencies
-            # fontconfig is required for plotters
-            # ninja-build is required for Wasmer's WAMR backend
-            run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
           - name: System Information
             run: lscpu
           - name: Compile (--profile ci)
@@ -137,6 +136,7 @@ jobs:
 
     doc:
         name: Documentation
+        needs: install-dependencies
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -155,10 +155,6 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
-            - name: Install Dependencies
-              # fontconfig is required for plotters
-              # ninja-build is required for Wasmer's WAMR backend
-              run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
             - name: Check Docs
               env:
                 RUSTDOCFLAGS: "-D warnings"
@@ -166,6 +162,7 @@ jobs:
 
     clippy:
         name: Clippy
+        needs: install-dependencies
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
@@ -184,10 +181,6 @@ jobs:
                   ~/target/
                 key: ${{ runner.os }}-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }}
                 restore-keys: ${{ runner.os }}-${{ github.job }}-
-            - name: Install Dependencies
-              # fontconfig is required for plotters
-              # ninja-build is required for Wasmer's WAMR backend
-              run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev ninja-build
             - name: Checkout Submodules
               run: git submodule update --init --recursive
             - name: Clippy (all features)
