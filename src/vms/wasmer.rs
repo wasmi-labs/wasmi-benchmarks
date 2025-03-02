@@ -95,7 +95,9 @@ impl Wasmer {
                 wasmer::Store::new(engine)
             }
             WasmerCompiler::Singlepass => {
-                wasmer::Store::new(wasmer_compiler_singlepass::Singlepass::new())
+                let builder =
+                    wasmer::sys::EngineBuilder::new(wasmer_compiler_singlepass::Singlepass::new());
+                wasmer::Store::new(builder)
             }
         }
     }
