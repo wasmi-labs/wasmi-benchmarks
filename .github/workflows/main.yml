@@ -21,7 +21,7 @@ jobs:
           # - ninja-build: required for Wasmer's WAMR backend
           run: |
             sudo apt-get update
-            sudo apt-get install -y libfontconfig1-dev ninja-build
+            sudo apt-get install -y libfontconfig1-dev ninja-build pkg-config
 
     check:
         name: Build
