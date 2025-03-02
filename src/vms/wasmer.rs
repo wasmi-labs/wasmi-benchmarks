@@ -9,6 +9,7 @@ pub struct Wasmer {
 pub enum WasmerCompiler {
     Cranelift,
     Singlepass,
+    Wamr,
 }
 
 struct WasmerRuntime {
@@ -22,6 +23,7 @@ impl BenchVm for Wasmer {
         match self.compiler {
             WasmerCompiler::Cranelift => "wasmer.cranelift",
             WasmerCompiler::Singlepass => "wasmer.singlepass",
+            WasmerCompiler::Wamr => "wasmer.wamr",
         }
     }
 
@@ -35,6 +37,13 @@ impl BenchVm for Wasmer {
                 ..Default::default()
             },
             WasmerCompiler::Singlepass => TestFilter {
+                execute: ExecuteTestFilter {
+                    fib_tailrec: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            WasmerCompiler::Wamr => TestFilter {
                 execute: ExecuteTestFilter {
                     fib_tailrec: false,
                     ..Default::default()
@@ -99,6 +108,7 @@ impl Wasmer {
                     wasmer::sys::EngineBuilder::new(wasmer_compiler_singlepass::Singlepass::new());
                 wasmer::Store::new(builder)
             }
+            WasmerCompiler::Wamr => wasmer::Store::new(wasmer::wamr::Wamr::new()),
         }
     }
 }

@@ -92,6 +92,9 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
         Box::new(Wasmer {
             compiler: wasmer::WasmerCompiler::Singlepass,
         }),
+        Box::new(Wasmer {
+            compiler: wasmer::WasmerCompiler::Wamr,
+        }),
     ]
 }
 

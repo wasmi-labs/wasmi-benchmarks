@@ -1,0 +1,12 @@
+name: 'Install Dependencies'
+description: 'Installs necessary dependencies like fontconfig and ninja.'
+runs:
+  using: 'composite' # Allows for multiple `steps`
+  steps:
+    - name: Install Dependencies
+      # - libfontconfig1-dev: required for plotters
+      # - ninja-build: required for Wasmer's WAMR backend
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfontconfig1-dev ninja-build
