@@ -32,7 +32,7 @@ serde_json = "1.0.117"
 plotters = "0.3.7"
 
 [dependencies.wasmtime]
-version = "29.0.0"
+version = "30.0.2"
 default-features = false
 features = ["winch", "cranelift", "pulley", "runtime"]
 
