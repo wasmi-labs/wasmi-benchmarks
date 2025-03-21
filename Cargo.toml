@@ -22,9 +22,9 @@ path = "src/plot.rs"
 wasmi_old = { package = "wasmi", version = "0.31.2" }
 wasmi_new = { package = "wasmi", version = "0.40.0" }
 tinywasm = "0.8.0"
-wasmer = { version = "6.0.0-alpha.2", default-features = false, features = ["engine", "compiler", "wamr"] }
-wasmer-compiler-singlepass = "6.0.0-alpha.2"
-wasmer-compiler-cranelift = "6.0.0-alpha.2"
+wasmer = { version = "6.0.0-beta.1", default-features = false, features = ["compiler", "wamr"] }
+wasmer-compiler-singlepass = "6.0.0-beta.1"
+wasmer-compiler-cranelift = "6.0.0-beta.1"
 makepad-stitch = "0.1.0"
 criterion = "0.5"
 wat = "1"
