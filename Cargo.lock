@@ -2728,9 +2728,9 @@ dependencies = [
 
 [[package]]
 name = "serde-wasm-bindgen"
-version = "0.4.5"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3b4c031cd0d9014307d82b8abf653c0290fbdaeb4c02d00c63cf52f728628bf"
+checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
 dependencies = [
  "js-sys",
  "serde",
@@ -3325,9 +3325,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a39e1488f326c14537f95a3cad3d7730f414d5366c7172dea1184de3cd65a80"
+checksum = "7b8204e4eb959d89b41d4a536e61ce73f5416bccc81c7d3b7fa993995538ee97"
 dependencies = [
  "bindgen 0.70.1",
  "bytes",
@@ -3360,9 +3360,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-compiler"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abc71412dbe50b798c53f78d63e8d16988ca18b61c121363320f9a0fed1e81c5"
+checksum = "690827b8ec4f3858d8b001d96ddfc25c28a255cbfa984ba5bd1ed173f29ffc2a"
 dependencies = [
  "backtrace",
  "bytes",
@@ -3391,9 +3391,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-compiler-cranelift"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f79182d12000f3e11317903cc7527bd0028e3cd535106a5a4699f8066ed44ce1"
+checksum = "2a46a83b498a2f0dcdc2e97d611db9eae92a38f20fc5dac4709d645bdfd8d2d6"
 dependencies = [
  "cranelift-codegen 0.110.2",
  "cranelift-entity 0.110.2",
@@ -3411,9 +3411,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-compiler-singlepass"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b2e3a67e1c901426d9ca6b98a168f70baee57b12ee928754fcf9a4d98e82b46"
+checksum = "20035442e90438f683b312efe5a5e1a1ccafc0fbf01547ea32c079ffddce0213"
 dependencies = [
  "byteorder",
  "dynasm",
@@ -3429,9 +3429,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-derive"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db1a949e79ebf33485e4a03ed039457d4e25257ca2a588e76d92f323e9a35ef2"
+checksum = "ccaedaf20c22736904ad842127cdbe46432998dbcdd840b024dda856a8b52265"
 dependencies = [
  "proc-macro-error2",
  "proc-macro2",
@@ -3441,9 +3441,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-types"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "296ce026f20edbea001c95d5aac528903d2f3cc6a66cbaea0137ee633d60f8bf"
+checksum = "1b45fd1274b21365d3232732afe53c220ecbcdb78946405087e7016e7b2369a0"
 dependencies = [
  "bytecheck 0.6.12",
  "enum-iterator",
@@ -3461,9 +3461,9 @@ dependencies = [
 
 [[package]]
 name = "wasmer-vm"
-version = "6.0.0-beta.1"
+version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "38954a9922fb4f74a155d527c4ba4ebe32ea9013a6a33ec9e5fcfa1148bf65b1"
+checksum = "ac4e7cec7b509e70664773f03907e6122d1633c100cb28009da770786806e6db"
 dependencies = [
  "backtrace",
  "cc",
