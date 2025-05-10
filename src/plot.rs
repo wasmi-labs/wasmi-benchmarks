@@ -65,7 +65,9 @@ impl VmAndConfig {
             Self::WasmtimeCranelift | Self::WasmtimeWinch | Self::WasmtimePulley => {
                 RGBColor(140, 120, 160)
             }
-            Self::WasmerCranelift | Self::WasmerSinglepass | Self::WasmerWamr => RGBColor(95, 140, 175),
+            Self::WasmerCranelift | Self::WasmerSinglepass | Self::WasmerWamr => {
+                RGBColor(95, 140, 175)
+            }
         }
     }
 }
