@@ -37,10 +37,14 @@ jobs:
               uses: ./.github/actions/install-dependencies
             - name: System Information
               run: lscpu
+            - name: Install Cargo Criterion (tool)
+              run: cargo install cargo-criterion || true
             - name: Compile (--profile ci)
               run: cargo build --benches --profile ci
             - name: Run Compilation Benches (--profile ci)
-              run: cargo bench compile/ --profile ci
+              run: cargo criterion --bench criterion --profile ci --message-format=json compile/ > out.json
+            - name: Print JSON Output
+              run: cat out.json
 
     bench-execute:
         name: Run Execution Benchmarks
@@ -54,10 +58,14 @@ jobs:
               uses: ./.github/actions/install-dependencies
             - name: System Information
               run: lscpu
+            - name: Install Cargo Criterion (tool)
+              run: cargo install cargo-criterion || true
             - name: Compile (--profile ci)
               run: cargo build --benches --profile ci
             - name: Run Execution Benches (--profile ci)
-              run: cargo bench execute/ --profile ci
+              run: cargo criterion --bench criterion --profile ci --message-format=json execute/ > out.json
+            - name: Print JSON Output
+              run: cat out.json
 
     coremark:
       name: Run Coremark
