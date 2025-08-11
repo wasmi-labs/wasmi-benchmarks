@@ -39,13 +39,12 @@ impl BenchVm for Wasmtime {
                 }
             }
             Strategy::Winch => {
-                let winch_works = cfg!(target_arch = "x86_64");
+                let winch_works = cfg!(target_arch = "x86_64") || cfg!(target_arch = "aarch64");
                 TestFilter {
                     execute: ExecuteTestFilter {
                         fib_tailrec: false,
                         argon2: false,
                         bulk_ops: false,
-                        coremark: false,
                         ..ExecuteTestFilter::set_to(winch_works)
                     },
                     compile: CompileTestFilter {
