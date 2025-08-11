@@ -43,20 +43,15 @@ impl BenchVm for Wasmtime {
                 TestFilter {
                     execute: ExecuteTestFilter {
                         fib_tailrec: false,
-                        argon2: false,
-                        bulk_ops: false,
                         ..ExecuteTestFilter::set_to(winch_works)
                     },
-                    compile: CompileTestFilter {
-                        argon2: false,
-                        ..CompileTestFilter::set_to(winch_works)
-                    },
+                    compile: CompileTestFilter::set_to(winch_works),
                 }
             }
             Strategy::Pulley => TestFilter {
                 execute: ExecuteTestFilter::default(),
                 compile: CompileTestFilter {
-                    ffmpeg: false,
+                    ffmpeg: false, // takes too long to compile
                     ..CompileTestFilter::default()
                 },
             },
