@@ -1,5 +1,5 @@
 use std::collections::BTreeMap;
-use wasmi_benchmarks::{read_benchmark_file, vms_under_test, InputEncoding};
+use wasmi_benchmarks::{InputEncoding, read_benchmark_file, vms_under_test};
 
 fn main() {
     let coremark_wasm = read_benchmark_file(InputEncoding::Wasm, "coremark-minimal");

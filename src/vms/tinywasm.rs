@@ -1,4 +1,4 @@
-use super::{elapsed_ms, BenchRuntime, BenchVm};
+use super::{BenchRuntime, BenchVm, elapsed_ms};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 

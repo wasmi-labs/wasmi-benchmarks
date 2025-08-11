@@ -1,6 +1,6 @@
 use crate::{CompileTestFilter, ExecuteTestFilter, TestFilter};
 
-use super::{elapsed_ms, BenchRuntime, BenchVm};
+use super::{BenchRuntime, BenchVm, elapsed_ms};
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
 use wasmi_new::ModuleImportsIter;
