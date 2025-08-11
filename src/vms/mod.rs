@@ -54,8 +54,8 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
             validation: Validation::Checked,
         }),
         Box::new(WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Eager,
-            validation: Validation::Unchecked,
+            compilation_mode: ::wasmi_new::CompilationMode::LazyTranslation,
+            validation: Validation::Checked,
         }),
         Box::new(WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Lazy,
