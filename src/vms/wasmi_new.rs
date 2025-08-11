@@ -42,10 +42,7 @@ impl BenchVm for WasmiNew {
         // since we do not expect them to have significantly different behavior compared to
         // `eager.checked` and `lazy.checked`.
         let execute = matches!(self.validation, Validation::Checked)
-            && matches!(
-                self.compilation_mode,
-                CompilationMode::Eager | CompilationMode::Lazy
-            );
+            && matches!(self.compilation_mode, CompilationMode::Eager);
         TestFilter {
             execute: ExecuteTestFilter::set_to(execute),
             ..TestFilter::set_to(true)
