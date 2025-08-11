@@ -62,9 +62,7 @@ impl BenchVm for WasmiNew {
         let engine = store.engine();
         let module = self.module(engine, wasm);
         let linker = wasmi_new::Linker::new(engine);
-        let instance = linker
-            .instantiate_and_start(&mut store, &module)
-            .unwrap();
+        let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiNewRuntime {
             store,
