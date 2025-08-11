@@ -1,6 +1,6 @@
-use super::{elapsed_ms, BenchRuntime, BenchVm};
+use super::{BenchRuntime, BenchVm, elapsed_ms};
 use crate::utils::{ExecuteTestFilter, TestFilter};
-use wasmi_new::{core::ValType, ModuleImportsIter};
+use wasmi_new::{ModuleImportsIter, core::ValType};
 
 pub struct Wasm3 {
     pub compilation_mode: CompilationMode,
@@ -134,20 +134,39 @@ impl Wasm3 {
                         field_name,
                     )?
                 }
-                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
-                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), ()>(
-                        module,
-                        module_name,
-                        field_name,
-                    )?
-                }
-                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], []) => {
-                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32, i32), ()>(
-                        module,
-                        module_name,
-                        field_name,
-                    )?
-                }
+                (
+                    [
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                    ],
+                    [],
+                ) => Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), ()>(
+                    module,
+                    module_name,
+                    field_name,
+                )?,
+                (
+                    [
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                    ],
+                    [],
+                ) => Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32, i32), ()>(
+                    module,
+                    module_name,
+                    field_name,
+                )?,
                 // With return type:
                 ([], [Ty::I32]) => Self::link_stub::<(), i32>(module, module_name, field_name)?,
                 ([Ty::I32], [Ty::I32]) => {
@@ -176,15 +195,33 @@ impl Wasm3 {
                         field_name,
                     )?
                 }
-                ([Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32], [Ty::I32]) => {
-                    Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), i32>(
-                        module,
-                        module_name,
-                        field_name,
-                    )?
-                }
                 (
-                    [Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32],
+                    [
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                    ],
+                    [Ty::I32],
+                ) => Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32), i32>(
+                    module,
+                    module_name,
+                    field_name,
+                )?,
+                (
+                    [
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                    ],
                     [Ty::I32],
                 ) => Self::link_stub::<(i32, i32, i32, i32, i32, i32, i32, i32), i32>(
                     module,
@@ -206,7 +243,17 @@ impl Wasm3 {
                     )?
                 }
                 (
-                    [Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I32, Ty::I64, Ty::I64, Ty::I32, Ty::I32],
+                    [
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I32,
+                        Ty::I64,
+                        Ty::I64,
+                        Ty::I32,
+                        Ty::I32,
+                    ],
                     [Ty::I32],
                 ) => Self::link_stub::<(i32, i32, i32, i32, i32, i64, i64, i32, i32), i32>(
                     module,

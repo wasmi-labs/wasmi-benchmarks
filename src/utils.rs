@@ -120,11 +120,10 @@ pub fn read_benchmark_file(encoding: InputEncoding, name: &str) -> Vec<u8> {
     let wasm_or_wat = std::fs::read(&path).unwrap_or_else(|error| {
         panic!("failed to read benchmark input:\n\tpath = {path}\n\terror = {error}")
     });
-    let wasm = match encoding {
+    match encoding {
         InputEncoding::Wasm => wasm_or_wat,
         InputEncoding::Wat => wat::parse_bytes(&wasm_or_wat[..])
             .unwrap_or_else(|error| panic!("failed to convert `.wat` to `.wasm`: {error}"))
             .to_vec(),
-    };
-    wasm
+    }
 }
