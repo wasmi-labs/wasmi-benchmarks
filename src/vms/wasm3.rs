@@ -25,10 +25,11 @@ impl BenchVm for Wasm3 {
     }
 
     fn test_filter(&self) -> TestFilter {
+        let execute = matches!(self.compilation_mode, CompilationMode::Lazy);
         TestFilter {
             execute: ExecuteTestFilter {
                 fib_tailrec: false,
-                ..Default::default()
+                ..ExecuteTestFilter::set_to(execute)
             },
             ..Default::default()
         }
