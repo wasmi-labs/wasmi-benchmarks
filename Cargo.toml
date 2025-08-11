@@ -30,6 +30,7 @@ criterion = "0.7"
 wat = "1"
 serde_json = "1.0.117"
 plotters = "0.3.7"
+compiler_builtins = { version = "0.1", features = ["rustc-dep-of-std"] } # Required to fix Wasmer build on CI
 
 [dependencies.wasmtime]
 version = "35.0.0"
