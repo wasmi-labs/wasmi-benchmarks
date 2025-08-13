@@ -1,4 +1,4 @@
-use super::{BenchInstance, BenchRuntime, elapsed_ms};
+use benchmark_utils::{BenchRuntime, BenchInstance, elapsed_ms};
 use wasmi_new::ModuleImportsIter;
 
 pub struct WasmiOld;

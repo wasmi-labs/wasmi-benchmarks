@@ -1,5 +1,4 @@
-use super::{BenchInstance, BenchRuntime, elapsed_ms};
-use crate::utils::{ExecuteTestFilter, TestFilter};
+use benchmark_utils::{BenchRuntime, BenchInstance, elapsed_ms, TestFilter, ExecuteTestFilter};
 use wasmi_new::ModuleImportsIter;
 
 pub struct Tinywasm;

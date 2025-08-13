@@ -1,5 +1,4 @@
-use super::{BenchInstance, BenchRuntime, elapsed_ms};
-use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
+use benchmark_utils::{BenchRuntime, BenchInstance, elapsed_ms, TestFilter, CompileTestFilter, ExecuteTestFilter};
 use wasmi_new::ModuleImportsIter;
 
 pub enum Strategy {
