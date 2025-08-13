@@ -1,10 +1,12 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
-use wasmi_new::{CompilationMode, ModuleImportsIter};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
+};
+use wasmi_new::CompilationMode;
 
 pub struct WasmiNew {
-    pub compilation_mode: wasmi_new::CompilationMode,
+    pub compilation_mode: CompilationMode,
     pub validation: Validation,
 }
 
@@ -23,18 +25,16 @@ struct WasmiNewRuntime {
 impl BenchRuntime for WasmiNew {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
-            (wasmi_new::CompilationMode::Eager, Validation::Checked) => "wasmi-new.eager.checked",
-            (wasmi_new::CompilationMode::Eager, Validation::Unchecked) => {
-                "wasmi-new.eager.unchecked"
-            }
-            (wasmi_new::CompilationMode::LazyTranslation, Validation::Checked) => {
+            (CompilationMode::Eager, Validation::Checked) => "wasmi-new.eager.checked",
+            (CompilationMode::Eager, Validation::Unchecked) => "wasmi-new.eager.unchecked",
+            (CompilationMode::LazyTranslation, Validation::Checked) => {
                 "wasmi-new.lazy-translation.checked"
             }
-            (wasmi_new::CompilationMode::LazyTranslation, Validation::Unchecked) => {
+            (CompilationMode::LazyTranslation, Validation::Unchecked) => {
                 "wasmi-new.lazy-translation.unchecked"
             }
-            (wasmi_new::CompilationMode::Lazy, Validation::Checked) => "wasmi-new.lazy.checked",
-            (wasmi_new::CompilationMode::Lazy, Validation::Unchecked) => "wasmi-new.lazy.unchecked",
+            (CompilationMode::Lazy, Validation::Checked) => "wasmi-new.lazy.checked",
+            (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-new.lazy.unchecked",
         }
     }
 
