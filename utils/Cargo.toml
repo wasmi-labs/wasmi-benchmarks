@@ -9,3 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 wasmi_new = { workspace = true }
+wat = { workspace = true }

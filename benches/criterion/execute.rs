@@ -1,6 +1,7 @@
 use benchmark_utils::TestFilter;
+use benchmark_utils::{InputEncoding, read_benchmark_file, wat2wasm};
 use criterion::Criterion;
-use wasmi_benchmarks::{InputEncoding, read_benchmark_file, vms_under_test, wat2wasm};
+use wasmi_benchmarks::vms_under_test;
 
 fn execute_benchmark(
     c: &mut Criterion,

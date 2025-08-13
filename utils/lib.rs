@@ -1,3 +1,4 @@
+use std::fmt;
 pub use wasmi_new::ModuleImportsIter;
 pub use wasmi_new::{ExternType, Module, ValType};
 
@@ -132,5 +133,48 @@ impl CompileTestFilter {
 impl Default for CompileTestFilter {
     fn default() -> Self {
         Self::set_to(true)
+    }
+}
+
+/// Converts the `.wat` encoded `bytes` into `.wasm` encoded bytes.
+pub fn wat2wasm(bytes: &[u8]) -> Vec<u8> {
+    wat::parse_bytes(bytes).unwrap().into_owned()
+}
+
+/// The encoded format of the input.
+#[derive(Debug, Copy, Clone)]
+pub enum InputEncoding {
+    /// The input is encoded as `.wat` text format.
+    Wat,
+    /// The input is encoded as `.wasm` binary.
+    Wasm,
+}
+
+impl fmt::Display for InputEncoding {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            InputEncoding::Wat => "wat".fmt(f),
+            InputEncoding::Wasm => "wasm".fmt(f),
+        }
+    }
+}
+
+/// Returns the bytes of the named benchmark file with the given `encoding`.
+///
+/// # Panics
+///
+/// - If the file cannot be found at the associated path.
+/// - If the file contents cannot be decoded as either `.wat` or `.wasm`.
+/// - If the `.wat` file format cannot be encoded into the `.wasm` format.
+pub fn read_benchmark_file(encoding: InputEncoding, name: &str) -> Vec<u8> {
+    let path = format!("benches/res/{encoding}/{name}.{encoding}");
+    let wasm_or_wat = std::fs::read(&path).unwrap_or_else(|error| {
+        panic!("failed to read benchmark input:\n\tpath = {path}\n\terror = {error}")
+    });
+    match encoding {
+        InputEncoding::Wasm => wasm_or_wat,
+        InputEncoding::Wat => wat::parse_bytes(&wasm_or_wat[..])
+            .unwrap_or_else(|error| panic!("failed to convert `.wat` to `.wasm`: {error}"))
+            .to_vec(),
     }
 }
