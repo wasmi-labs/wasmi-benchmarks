@@ -1,4 +1,3 @@
-pub use self::stitch::Stitch;
 pub use self::tinywasm::Tinywasm;
 pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
@@ -7,7 +6,6 @@ pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
 pub use rt_wasmi::WasmiNew;
 
-mod stitch;
 mod tinywasm;
 mod wasm3;
 mod wasmer;
@@ -41,7 +39,7 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
         Box::new(Wasm3 {
             compilation_mode: wasm3::CompilationMode::Lazy,
         }),
-        Box::new(Stitch),
+        Box::new(rt_stitch::Stitch),
         Box::new(Wasmtime {
             strategy: WasmtimeStrategy::Cranelift,
         }),

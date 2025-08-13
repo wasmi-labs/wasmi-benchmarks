@@ -23,6 +23,8 @@ path = "bins/plot.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 rt-wasmi = { workspace = true }
+rt-stitch = { workspace = true }
+
 wasmi_old = { workspace = true }
 wasmi_new = { workspace = true }
 tinywasm = { workspace = true }
@@ -41,6 +43,7 @@ wasm3 = { workspace = true }
 benchmark-utils = { path = "utils" }
 
 rt-wasmi = { path = "runtimes/wasmi" }
+rt-stitch = { path = "runtimes/stitch" }
 
 wasmi_old = { package = "wasmi", version = "0.31.2" }
 wasmi_new = { package = "wasmi", version = "0.50.0" }

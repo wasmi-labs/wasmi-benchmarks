@@ -2536,6 +2536,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-stitch"
+version = "0.0.0"
+dependencies = [
+ "benchmark-utils",
+ "makepad-stitch",
+]
+
+[[package]]
 name = "rt-wasmi"
 version = "0.0.0"
 dependencies = [
@@ -3490,6 +3498,7 @@ dependencies = [
  "criterion",
  "makepad-stitch",
  "plotters",
+ "rt-stitch",
  "rt-wasmi",
  "serde_json",
  "tinywasm",
