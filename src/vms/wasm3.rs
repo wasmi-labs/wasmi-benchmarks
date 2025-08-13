@@ -1,5 +1,7 @@
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
-use wasmi_new::{ModuleImportsIter, core::ValType};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
+};
+use wasmi_new::core::ValType;
 
 pub struct Wasm3 {
     pub compilation_mode: CompilationMode,

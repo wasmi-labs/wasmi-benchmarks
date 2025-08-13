@@ -1,7 +1,7 @@
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, ModuleImportsIter,
+    TestFilter, elapsed_ms,
 };
-use wasmi_new::ModuleImportsIter;
 
 pub enum Strategy {
     Cranelift,
