@@ -1,4 +1,3 @@
-pub use self::tinywasm::Tinywasm;
 pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
 pub use self::wasmi_old::WasmiOld;
@@ -6,7 +5,6 @@ pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
 pub use rt_wasmi::WasmiNew;
 
-mod tinywasm;
 mod wasm3;
 mod wasmer;
 mod wasmi_old;
@@ -32,7 +30,7 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             compilation_mode: ::wasmi_new::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Unchecked,
         }),
-        Box::new(Tinywasm),
+        Box::new(rt_tinywasm::Tinywasm),
         Box::new(Wasm3 {
             compilation_mode: wasm3::CompilationMode::Eager,
         }),

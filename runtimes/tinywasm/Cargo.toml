@@ -1,0 +1,12 @@
+[package]
+name = "rt-tinywasm"
+edition = "2024"
+resolver = "2"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+tinywasm = { workspace = true }
