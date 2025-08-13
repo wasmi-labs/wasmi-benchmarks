@@ -1,5 +1,5 @@
-use criterion::Criterion;
 use benchmark_utils::TestFilter;
+use criterion::Criterion;
 use wasmi_benchmarks::{InputEncoding, read_benchmark_file, vms_under_test};
 
 /// Parses the `wasm` bytes and returns a Wasmi [`Module`].

@@ -1,4 +1,6 @@
-use benchmark_utils::{BenchRuntime, BenchInstance, elapsed_ms, TestFilter, CompileTestFilter, ExecuteTestFilter};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
+};
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
 use wasmi_new::ModuleImportsIter;

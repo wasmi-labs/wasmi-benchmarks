@@ -2,10 +2,10 @@ pub use self::stitch::Stitch;
 pub use self::tinywasm::Tinywasm;
 pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
-pub use rt_wasmi::WasmiNew;
 pub use self::wasmi_old::WasmiOld;
 pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
+pub use rt_wasmi::WasmiNew;
 
 mod stitch;
 mod tinywasm;

@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, elapsed_ms, ExecuteTestFilter, TestFilter};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 use wasmi_new::{CompilationMode, ModuleImportsIter};
 
 pub struct WasmiNew {

@@ -1,4 +1,4 @@
-use benchmark_utils::{BenchRuntime, BenchInstance, elapsed_ms, TestFilter, ExecuteTestFilter};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 use wasmi_new::{ModuleImportsIter, core::ValType};
 
 pub struct Wasm3 {
