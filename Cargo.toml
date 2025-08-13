@@ -12,11 +12,11 @@ members = [
 
 [[bin]]
 name = "coremark"
-path = "src/coremark.rs"
+path = "bins/coremark.rs"
 
 [[bin]]
 name = "plot"
-path = "src/plot.rs"
+path = "bins/plot.rs"
 
 [dependencies]
 wasmi_old = { package = "wasmi", version = "0.31.2" }
