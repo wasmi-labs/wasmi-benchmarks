@@ -1,9 +1,11 @@
-use crate::{CompileTestFilter, ExecuteTestFilter, TestFilter};
+#![crate_type = "dylib"]
 
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, ModuleImportsIter,
+    TestFilter, elapsed_ms,
+};
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
-use wasmi_new::ModuleImportsIter;
 
 pub struct Stitch;
 
@@ -13,7 +15,7 @@ struct StitchRuntime {
     func: Func,
 }
 
-impl BenchVm for Stitch {
+impl BenchRuntime for Stitch {
     fn name(&self) -> &'static str {
         "stitch"
     }
@@ -41,7 +43,7 @@ impl BenchVm for Stitch {
         Module::new(&engine, wasm).unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let engine = Engine::new();
         let mut store = Store::new(engine);
         let engine = store.engine();
@@ -76,7 +78,7 @@ impl BenchVm for Stitch {
     }
 }
 
-impl BenchRuntime for StitchRuntime {
+impl BenchInstance for StitchRuntime {
     fn call(&mut self, input: i64) {
         let mut result = Val::I64(0);
         self.func

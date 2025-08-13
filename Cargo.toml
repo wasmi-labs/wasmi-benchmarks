@@ -7,18 +7,45 @@ default-run = "coremark"
 
 [workspace]
 members = [
-    "benches/res/rust/*"
+    "benches/res/rust/*",
+    "utils",
+    "runtimes/wasmi",
 ]
 
 [[bin]]
 name = "coremark"
-path = "src/coremark.rs"
+path = "bins/coremark.rs"
 
 [[bin]]
 name = "plot"
-path = "src/plot.rs"
+path = "bins/plot.rs"
 
 [dependencies]
+benchmark-utils = { workspace = true }
+rt-wasmi = { workspace = true }
+rt-stitch = { workspace = true }
+rt-tinywasm = { workspace = true }
+rt-wasmi-031 = { workspace = true }
+rt-wasmer = { workspace = true }
+rt-wasmtime = { workspace = true }
+rt-wasm3 = { workspace = true }
+
+criterion = { workspace = true }
+wat = { workspace = true }
+serde_json = { workspace = true }
+plotters = { workspace = true }
+
+[workspace.dependencies]
+benchmark-utils = { path = "utils" }
+
+rt-wasmi = { path = "runtimes/wasmi" }
+rt-stitch = { path = "runtimes/stitch" }
+rt-tinywasm = { path = "runtimes/tinywasm" }
+rt-wasmi-031 = { path = "runtimes/wasmi-031" }
+rt-wasmer = { path = "runtimes/wasmer" }
+rt-wasmtime = { path = "runtimes/wasmtime" }
+rt-wasm3 = { path = "runtimes/wasm3" }
+
 wasmi_old = { package = "wasmi", version = "0.31.2" }
 wasmi_new = { package = "wasmi", version = "0.50.0" }
 tinywasm = "0.8.0"
@@ -31,12 +58,12 @@ wat = "1"
 serde_json = "1.0.117"
 plotters = "0.3.7"
 
-[dependencies.wasmtime]
+[workspace.dependencies.wasmtime]
 version = "35.0.0"
 default-features = false
 features = ["winch", "cranelift", "pulley", "runtime"]
 
-[dependencies.wasm3]
+[workspace.dependencies.wasm3]
 git = "https://github.com/robbepop/wasm3-rs.git"
 branch = "rf-fix-wasm3-rs"
 features = ["build-bindgen"]

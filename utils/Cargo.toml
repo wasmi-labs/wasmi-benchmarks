@@ -1,0 +1,12 @@
+[package]
+name = "benchmark-utils"
+edition = "2024"
+resolver = "2"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+wasmi_new = { workspace = true }
+wat = { workspace = true }

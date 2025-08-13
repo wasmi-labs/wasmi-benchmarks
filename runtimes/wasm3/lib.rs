@@ -1,6 +1,9 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
-use crate::utils::{ExecuteTestFilter, TestFilter};
-use wasmi_new::{ModuleImportsIter, core::ValType};
+#![crate_type = "dylib"]
+
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, ValType,
+    elapsed_ms,
+};
 
 pub struct Wasm3 {
     pub compilation_mode: CompilationMode,
@@ -16,7 +19,7 @@ struct Wasm3Runtime {
     runtime: wasm3::Runtime,
 }
 
-impl BenchVm for Wasm3 {
+impl BenchRuntime for Wasm3 {
     fn name(&self) -> &'static str {
         match self.compilation_mode {
             CompilationMode::Lazy => "wasm3.lazy",
@@ -50,7 +53,7 @@ impl BenchVm for Wasm3 {
         }
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let runtime = self.setup_runtime();
         let mut module = runtime.parse_and_load_module(wasm).unwrap();
         if matches!(self.compilation_mode, CompilationMode::Eager) {
@@ -93,16 +96,16 @@ impl Wasm3 {
             let module_name = import.module();
             let field_name = import.name();
             let func_type = match import.ty() {
-                wasmi_new::ExternType::Global(ty) => {
+                benchmark_utils::ExternType::Global(ty) => {
                     unimplemented!("cannot stub link imported global variables but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Table(ty) => {
+                benchmark_utils::ExternType::Table(ty) => {
                     unimplemented!("cannot stub link imported tables but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Memory(ty) => {
+                benchmark_utils::ExternType::Memory(ty) => {
                     unimplemented!("cannot stub link imported linear memories but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Func(ty) => ty,
+                benchmark_utils::ExternType::Func(ty) => ty,
             };
             use ValType as Ty;
             // Note: unfortunately the Rust Wasm3 bindings do not allow to bind functions
@@ -283,7 +286,7 @@ impl Wasm3 {
     }
 }
 
-impl BenchRuntime for Wasm3Runtime {
+impl BenchInstance for Wasm3Runtime {
     fn call(&mut self, input: i64) {
         let func = self.runtime.find_function::<i64, i64>("run").unwrap();
         func.call(input).unwrap();
