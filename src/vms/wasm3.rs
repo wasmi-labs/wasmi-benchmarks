@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use super::{BenchInstance, BenchRuntime, elapsed_ms};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::{ModuleImportsIter, core::ValType};
 
@@ -16,7 +16,7 @@ struct Wasm3Runtime {
     runtime: wasm3::Runtime,
 }
 
-impl BenchVm for Wasm3 {
+impl BenchRuntime for Wasm3 {
     fn name(&self) -> &'static str {
         match self.compilation_mode {
             CompilationMode::Lazy => "wasm3.lazy",
@@ -50,7 +50,7 @@ impl BenchVm for Wasm3 {
         }
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let runtime = self.setup_runtime();
         let mut module = runtime.parse_and_load_module(wasm).unwrap();
         if matches!(self.compilation_mode, CompilationMode::Eager) {
@@ -283,7 +283,7 @@ impl Wasm3 {
     }
 }
 
-impl BenchRuntime for Wasm3Runtime {
+impl BenchInstance for Wasm3Runtime {
     fn call(&mut self, input: i64) {
         let func = self.runtime.find_function::<i64, i64>("run").unwrap();
         func.call(input).unwrap();

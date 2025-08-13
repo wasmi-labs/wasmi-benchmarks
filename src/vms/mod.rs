@@ -17,7 +17,7 @@ mod wasmi_old;
 mod wasmtime;
 
 /// A Wasm runtime that is capable of being benchmarked.
-pub trait BenchVm {
+pub trait BenchRuntime {
     /// Returns the name of the Wasm runtime and its configuration.
     fn name(&self) -> &'static str;
 
@@ -32,20 +32,20 @@ pub trait BenchVm {
     /// Loads a Wasm module instance using the Wasm runtime and its configuration.
     ///
     /// The returned Wasm module instance can then be used to issue calls.
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime>;
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance>;
 
     /// Runs the given Coremark Wasm test and returns the result.
     fn coremark(&self, wasm: &[u8]) -> f32;
 }
 
 /// The module instance of a Wasm runtime that is capable of being benchmarked.
-pub trait BenchRuntime {
+pub trait BenchInstance {
     /// Calls the callable Wasm runtime module instance.
     fn call(&mut self, input: i64);
 }
 
 /// Returns the Wasm runtimes with a set of configurations to test.
-pub fn vms_under_test() -> Vec<Box<dyn BenchVm>> {
+pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     use self::wasmi_new::Validation;
     vec![
         Box::new(WasmiOld),

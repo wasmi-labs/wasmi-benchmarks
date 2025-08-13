@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use super::{BenchInstance, BenchRuntime, elapsed_ms};
 use crate::utils::{CompileTestFilter, ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
@@ -18,7 +18,7 @@ struct WasmtimeRuntime {
     func: wasmtime::TypedFunc<i64, i64>,
 }
 
-impl BenchVm for Wasmtime {
+impl BenchRuntime for Wasmtime {
     fn name(&self) -> &'static str {
         match self.strategy {
             Strategy::Cranelift => "wasmtime.cranelift",
@@ -63,7 +63,7 @@ impl BenchVm for Wasmtime {
         wasmtime::Module::new(store.engine(), wasm).unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let mut store = self.store();
         let engine = store.engine();
         let module = wasmtime::Module::new(engine, wasm).unwrap();
@@ -115,7 +115,7 @@ impl Wasmtime {
     }
 }
 
-impl BenchRuntime for WasmtimeRuntime {
+impl BenchInstance for WasmtimeRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }

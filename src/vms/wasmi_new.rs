@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use super::{BenchInstance, BenchRuntime, elapsed_ms};
 use crate::{ExecuteTestFilter, TestFilter};
 use wasmi_new::{CompilationMode, ModuleImportsIter};
 
@@ -19,7 +19,7 @@ struct WasmiNewRuntime {
     func: wasmi_new::TypedFunc<i64, i64>,
 }
 
-impl BenchVm for WasmiNew {
+impl BenchRuntime for WasmiNew {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
             (wasmi_new::CompilationMode::Eager, Validation::Checked) => "wasmi-new.eager.checked",
@@ -54,7 +54,7 @@ impl BenchVm for WasmiNew {
         self.module(store.engine(), wasm);
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let mut store = self.store();
         let engine = store.engine();
         let module = self.module(engine, wasm);
@@ -103,7 +103,7 @@ impl WasmiNew {
     }
 }
 
-impl BenchRuntime for WasmiNewRuntime {
+impl BenchInstance for WasmiNewRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }

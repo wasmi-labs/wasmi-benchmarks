@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use super::{BenchInstance, BenchRuntime, elapsed_ms};
 use wasmi_new::ModuleImportsIter;
 
 pub struct WasmiOld;
@@ -9,7 +9,7 @@ struct WasmiOldRuntime {
     func: wasmi_old::TypedFunc<i64, i64>,
 }
 
-impl BenchVm for WasmiOld {
+impl BenchRuntime for WasmiOld {
     fn name(&self) -> &'static str {
         "wasmi-old"
     }
@@ -19,7 +19,7 @@ impl BenchVm for WasmiOld {
         wasmi_old::Module::new(store.engine(), wasm).unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let mut store = self.store();
         let engine = store.engine();
         let module = wasmi_old::Module::new(engine, wasm).unwrap();
@@ -67,7 +67,7 @@ impl WasmiOld {
     }
 }
 
-impl BenchRuntime for WasmiOldRuntime {
+impl BenchInstance for WasmiOldRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }

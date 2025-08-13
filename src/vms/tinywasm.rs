@@ -1,4 +1,4 @@
-use super::{BenchRuntime, BenchVm, elapsed_ms};
+use super::{BenchInstance, BenchRuntime, elapsed_ms};
 use crate::utils::{ExecuteTestFilter, TestFilter};
 use wasmi_new::ModuleImportsIter;
 
@@ -10,7 +10,7 @@ struct TinywasmRuntime {
     func: tinywasm::FuncHandleTyped<i64, i64>,
 }
 
-impl BenchVm for Tinywasm {
+impl BenchRuntime for Tinywasm {
     fn name(&self) -> &'static str {
         "tinywasm"
     }
@@ -29,7 +29,7 @@ impl BenchVm for Tinywasm {
         tinywasm::Module::parse_bytes(wasm).unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchRuntime> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let mut store = tinywasm::Store::new();
         let module = tinywasm::Module::parse_bytes(wasm).unwrap();
         let instance = module.instantiate(&mut store, None).unwrap();
@@ -64,7 +64,7 @@ impl BenchVm for Tinywasm {
     }
 }
 
-impl BenchRuntime for TinywasmRuntime {
+impl BenchInstance for TinywasmRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }
