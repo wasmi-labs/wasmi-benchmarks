@@ -2552,6 +2552,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wasm3"
+version = "0.0.0"
+dependencies = [
+ "benchmark-utils",
+ "wasm3",
+]
+
+[[package]]
 name = "rt-wasmer"
 version = "0.0.0"
 dependencies = [
@@ -3533,6 +3541,7 @@ dependencies = [
  "plotters",
  "rt-stitch",
  "rt-tinywasm",
+ "rt-wasm3",
  "rt-wasmer",
  "rt-wasmi",
  "rt-wasmi-031",
