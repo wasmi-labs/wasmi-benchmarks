@@ -3,7 +3,6 @@ pub use self::wasmer::Wasmer;
 pub use self::wasmi_old::WasmiOld;
 pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
-pub use rt_wasmi::WasmiNew;
 
 mod wasm3;
 mod wasmer;
@@ -14,19 +13,19 @@ mod wasmtime;
 pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
         Box::new(WasmiOld),
-        Box::new(WasmiNew {
+        Box::new(rt_wasmi::WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Eager,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(WasmiNew {
+        Box::new(rt_wasmi::WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::LazyTranslation,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(WasmiNew {
+        Box::new(rt_wasmi::WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(WasmiNew {
+        Box::new(rt_wasmi::WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Unchecked,
         }),
