@@ -27,13 +27,10 @@ rt-stitch = { workspace = true }
 rt-tinywasm = { workspace = true }
 rt-wasmi-031 = { workspace = true }
 
-wasmi_old = { workspace = true }
 wasmi_new = { workspace = true }
-tinywasm = { workspace = true }
 wasmer = { workspace = true }
 wasmer-compiler-singlepass = { workspace = true }
 wasmer-compiler-cranelift = { workspace = true }
-makepad-stitch = { workspace = true }
 criterion = { workspace = true }
 wat = { workspace = true }
 serde_json = { workspace = true }
