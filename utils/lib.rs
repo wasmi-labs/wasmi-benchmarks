@@ -1,4 +1,4 @@
-use wasmi_new::ModuleImportsIter;
+pub use wasmi_new::ModuleImportsIter;
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchRuntime {
