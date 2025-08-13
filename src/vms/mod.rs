@@ -1,18 +1,16 @@
 pub use self::wasm3::Wasm3;
 pub use self::wasmer::Wasmer;
-pub use self::wasmi_old::WasmiOld;
 pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
 
 mod wasm3;
 mod wasmer;
-mod wasmi_old;
 mod wasmtime;
 
 /// Returns the Wasm runtimes with a set of configurations to test.
 pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
-        Box::new(WasmiOld),
+        Box::new(rt_wasmi_031::WasmiOld),
         Box::new(rt_wasmi::WasmiNew {
             compilation_mode: ::wasmi_new::CompilationMode::Eager,
             validation: rt_wasmi::Validation::Checked,

@@ -1,3 +1,5 @@
+#![crate_type = "dylib"]
+
 use benchmark_utils::{BenchInstance, BenchRuntime, ModuleImportsIter, elapsed_ms};
 
 pub struct WasmiOld;
