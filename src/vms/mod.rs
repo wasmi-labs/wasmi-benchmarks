@@ -1,9 +1,7 @@
 pub use self::wasm3::Wasm3;
-pub use self::wasmtime::{Strategy as WasmtimeStrategy, Wasmtime};
 use benchmark_utils::BenchRuntime;
 
 mod wasm3;
-mod wasmtime;
 
 /// Returns the Wasm runtimes with a set of configurations to test.
 pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
@@ -33,14 +31,14 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             compilation_mode: wasm3::CompilationMode::Lazy,
         }),
         Box::new(rt_stitch::Stitch),
-        Box::new(Wasmtime {
-            strategy: WasmtimeStrategy::Cranelift,
+        Box::new(rt_wasmtime::Wasmtime {
+            strategy: rt_wasmtime::Strategy::Cranelift,
         }),
-        Box::new(Wasmtime {
-            strategy: WasmtimeStrategy::Winch,
+        Box::new(rt_wasmtime::Wasmtime {
+            strategy: rt_wasmtime::Strategy::Winch,
         }),
-        Box::new(Wasmtime {
-            strategy: WasmtimeStrategy::Pulley,
+        Box::new(rt_wasmtime::Wasmtime {
+            strategy: rt_wasmtime::Strategy::Pulley,
         }),
         Box::new(rt_wasmer::Wasmer {
             compiler: rt_wasmer::WasmerCompiler::Cranelift,

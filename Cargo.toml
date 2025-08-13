@@ -27,13 +27,13 @@ rt-stitch = { workspace = true }
 rt-tinywasm = { workspace = true }
 rt-wasmi-031 = { workspace = true }
 rt-wasmer = { workspace = true }
+rt-wasmtime = { workspace = true }
 
 wasmi_new = { workspace = true }
 criterion = { workspace = true }
 wat = { workspace = true }
 serde_json = { workspace = true }
 plotters = { workspace = true }
-wasmtime = { workspace = true }
 wasm3 = { workspace = true }
 
 [workspace.dependencies]
@@ -44,6 +44,7 @@ rt-stitch = { path = "runtimes/stitch" }
 rt-tinywasm = { path = "runtimes/tinywasm" }
 rt-wasmi-031 = { path = "runtimes/wasmi-031" }
 rt-wasmer = { path = "runtimes/wasmer" }
+rt-wasmtime = { path = "runtimes/wasmtime" }
 
 wasmi_old = { package = "wasmi", version = "0.31.2" }
 wasmi_new = { package = "wasmi", version = "0.50.0" }

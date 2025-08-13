@@ -2578,6 +2578,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wasmtime"
+version = "0.0.0"
+dependencies = [
+ "benchmark-utils",
+ "wasmtime",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3528,10 +3536,10 @@ dependencies = [
  "rt-wasmer",
  "rt-wasmi",
  "rt-wasmi-031",
+ "rt-wasmtime",
  "serde_json",
  "wasm3",
  "wasmi 0.50.0",
- "wasmtime",
  "wat",
 ]
 
