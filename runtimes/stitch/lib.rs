@@ -1,3 +1,5 @@
+#![crate_type = "dylib"]
+
 use benchmark_utils::{
     BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, ModuleImportsIter,
     TestFilter, elapsed_ms,
