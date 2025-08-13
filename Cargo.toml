@@ -34,7 +34,6 @@ criterion = { workspace = true }
 wat = { workspace = true }
 serde_json = { workspace = true }
 plotters = { workspace = true }
-wasm3 = { workspace = true }
 
 [workspace.dependencies]
 benchmark-utils = { path = "utils" }

@@ -3548,7 +3548,6 @@ dependencies = [
  "rt-wasmi-031",
  "rt-wasmtime",
  "serde_json",
- "wasm3",
  "wat",
 ]
 
