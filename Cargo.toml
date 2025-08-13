@@ -7,7 +7,8 @@ default-run = "coremark"
 
 [workspace]
 members = [
-    "benches/res/rust/*"
+    "benches/res/rust/*",
+    "utils",
 ]
 
 [[bin]]
@@ -19,6 +20,7 @@ name = "plot"
 path = "bins/plot.rs"
 
 [dependencies]
+benchmark-utils = { workspace = true }
 wasmi_old = { workspace = true }
 wasmi_new = { workspace = true }
 tinywasm = { workspace = true }
@@ -34,6 +36,7 @@ wasmtime = { workspace = true }
 wasm3 = { workspace = true }
 
 [workspace.dependencies]
+benchmark-utils = { path = "utils" }
 wasmi_old = { package = "wasmi", version = "0.31.2" }
 wasmi_new = { package = "wasmi", version = "0.50.0" }
 tinywasm = "0.8.0"
