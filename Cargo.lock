@@ -2552,6 +2552,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wasmer"
+version = "0.0.0"
+dependencies = [
+ "benchmark-utils",
+ "wasmer",
+ "wasmer-compiler-cranelift",
+ "wasmer-compiler-singlepass",
+]
+
+[[package]]
 name = "rt-wasmi"
 version = "0.0.0"
 dependencies = [
@@ -3515,13 +3525,11 @@ dependencies = [
  "plotters",
  "rt-stitch",
  "rt-tinywasm",
+ "rt-wasmer",
  "rt-wasmi",
  "rt-wasmi-031",
  "serde_json",
  "wasm3",
- "wasmer",
- "wasmer-compiler-cranelift",
- "wasmer-compiler-singlepass",
  "wasmi 0.50.0",
  "wasmtime",
  "wat",
