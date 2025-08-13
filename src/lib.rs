@@ -1,3 +1,5 @@
+#![crate_type = "dylib"]
+
 use benchmark_utils::BenchRuntime;
 
 /// Returns the Wasm runtimes with a set of configurations to test.

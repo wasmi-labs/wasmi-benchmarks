@@ -1,3 +1,5 @@
+#![crate_type = "dylib"]
+
 use std::fmt;
 pub use wasmi_new::ModuleImportsIter;
 pub use wasmi_new::{ExternType, Module, ValType};
