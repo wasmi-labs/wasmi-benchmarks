@@ -3,7 +3,7 @@
 use benchmark_utils::{
     BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
 };
-use wasmi_new::CompilationMode;
+pub use wasmi_new::CompilationMode;
 
 pub struct WasmiNew {
     pub compilation_mode: CompilationMode,

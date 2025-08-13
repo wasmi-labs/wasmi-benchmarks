@@ -1,19 +1,6 @@
-use benchmark_utils::TestFilter;
+use benchmark_utils::{TestFilter, parse_module};
 use criterion::Criterion;
 use wasmi_benchmarks::{InputEncoding, read_benchmark_file, vms_under_test};
-
-/// Parses the `wasm` bytes and returns a Wasmi [`Module`].
-///
-/// The returned [`Module`] can then be used to query import information.
-/// This import information is then fed into the benchmarked VMs for their disposal.
-///
-/// [`Module`]: wasmi_new::Module
-fn parse_module(wasm: &[u8]) -> wasmi_new::Module {
-    let mut config = wasmi_new::Config::default();
-    config.compilation_mode(wasmi_new::CompilationMode::Lazy);
-    let engine = wasmi_new::Engine::new(&config);
-    wasmi_new::Module::new(&engine, wasm).unwrap()
-}
 
 fn compile_benchmark(
     c: &mut Criterion,

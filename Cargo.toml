@@ -29,7 +29,6 @@ rt-wasmi-031 = { workspace = true }
 rt-wasmer = { workspace = true }
 rt-wasmtime = { workspace = true }
 
-wasmi_new = { workspace = true }
 criterion = { workspace = true }
 wat = { workspace = true }
 serde_json = { workspace = true }

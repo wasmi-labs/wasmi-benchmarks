@@ -1,4 +1,5 @@
 pub use wasmi_new::ModuleImportsIter;
+pub use wasmi_new::{ExternType, Module, ValType};
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchRuntime {
@@ -34,6 +35,19 @@ pub fn elapsed_ms() -> u32 {
     static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
     let elapsed = STARTED.get_or_init(Instant::now).elapsed();
     elapsed.as_millis() as u32
+}
+
+/// Parses the `wasm` bytes and returns a Wasmi [`Module`].
+///
+/// The returned [`Module`] can then be used to query import information.
+/// This import information is then fed into the benchmarked VMs for their disposal.
+///
+/// [`Module`]: wasmi_new::Module
+pub fn parse_module(wasm: &[u8]) -> wasmi_new::Module {
+    let mut config = wasmi_new::Config::default();
+    config.compilation_mode(wasmi_new::CompilationMode::Lazy);
+    let engine = wasmi_new::Engine::new(&config);
+    wasmi_new::Module::new(&engine, wasm).unwrap()
 }
 
 #[derive(Debug, Copy, Clone)]

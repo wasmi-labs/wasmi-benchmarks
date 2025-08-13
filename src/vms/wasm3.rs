@@ -1,7 +1,7 @@
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, ValType,
+    elapsed_ms,
 };
-use wasmi_new::core::ValType;
 
 pub struct Wasm3 {
     pub compilation_mode: CompilationMode,
@@ -94,16 +94,16 @@ impl Wasm3 {
             let module_name = import.module();
             let field_name = import.name();
             let func_type = match import.ty() {
-                wasmi_new::ExternType::Global(ty) => {
+                benchmark_utils::ExternType::Global(ty) => {
                     unimplemented!("cannot stub link imported global variables but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Table(ty) => {
+                benchmark_utils::ExternType::Table(ty) => {
                     unimplemented!("cannot stub link imported tables but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Memory(ty) => {
+                benchmark_utils::ExternType::Memory(ty) => {
                     unimplemented!("cannot stub link imported linear memories but found: {ty:?}")
                 }
-                wasmi_new::ExternType::Func(ty) => ty,
+                benchmark_utils::ExternType::Func(ty) => ty,
             };
             use ValType as Ty;
             // Note: unfortunately the Rust Wasm3 bindings do not allow to bind functions

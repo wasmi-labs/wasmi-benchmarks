@@ -8,19 +8,19 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
         Box::new(rt_wasmi_031::WasmiOld),
         Box::new(rt_wasmi::WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Eager,
+            compilation_mode: rt_wasmi::CompilationMode::Eager,
             validation: rt_wasmi::Validation::Checked,
         }),
         Box::new(rt_wasmi::WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::LazyTranslation,
+            compilation_mode: rt_wasmi::CompilationMode::LazyTranslation,
             validation: rt_wasmi::Validation::Checked,
         }),
         Box::new(rt_wasmi::WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Lazy,
+            compilation_mode: rt_wasmi::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Checked,
         }),
         Box::new(rt_wasmi::WasmiNew {
-            compilation_mode: ::wasmi_new::CompilationMode::Lazy,
+            compilation_mode: rt_wasmi::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Unchecked,
         }),
         Box::new(rt_tinywasm::Tinywasm),
