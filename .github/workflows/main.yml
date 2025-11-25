@@ -39,10 +39,10 @@ jobs:
               run: lscpu
             - name: Install Cargo Criterion (tool)
               run: cargo install cargo-criterion || true
-            - name: Compile (--profile ci)
-              run: cargo build --benches --profile ci
-            - name: Run Compilation Benches (--profile ci)
-              run: cargo criterion --bench criterion --profile ci --message-format=json compile/ > out.json
+            - name: Compile Benchmarks
+              run: cargo build --benches
+            - name: Run Benchmarks
+              run: cargo criterion --bench criterion --message-format=json compile/ > out.json
             - name: Print JSON Output
               run: cat out.json
 
@@ -60,10 +60,10 @@ jobs:
               run: lscpu
             - name: Install Cargo Criterion (tool)
               run: cargo install cargo-criterion || true
-            - name: Compile (--profile ci)
-              run: cargo build --benches --profile ci
-            - name: Run Execution Benches (--profile ci)
-              run: cargo criterion --bench criterion --profile ci --message-format=json execute/ > out.json
+            - name: Compile Benchmarks
+              run: cargo build --benches
+            - name: Run Benchmarks
+              run: cargo criterion --bench criterion --message-format=json execute/ > out.json
             - name: Print JSON Output
               run: cat out.json
 
@@ -79,10 +79,10 @@ jobs:
             uses: ./.github/actions/install-dependencies
           - name: System Information
             run: lscpu
-          - name: Compile (--profile ci)
-            run: cargo build --bin coremark --profile ci
-          - name: Run Coremark (--profile ci)
-            run: cargo run --bin coremark --profile ci
+          - name: Compile Benchmark
+            run: cargo build --bin coremark --profile bench
+          - name: Run Benchmark
+            run: cargo run --bin coremark --profile bench
 
     fmt:
         name: Formatting

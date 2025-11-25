@@ -9,12 +9,12 @@ use std::str::FromStr;
 /// VM under test and its configuration.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum VmAndConfig {
-    WasmiOld,
-    WasmiNew,
-    WasmiNewUnchecked,
-    WasmiNewLazyTranslation,
-    WasmiNewLazy,
-    WasmiNewLazyUnchecked,
+    Wasmi031,
+    Wasmi,
+    WasmiUnchecked,
+    WasmiLazyTranslation,
+    WasmiLazy,
+    WasmiLazyUnchecked,
     Tinywasm,
     Wasm3,
     Wasm3Lazy,
@@ -31,34 +31,34 @@ impl VmAndConfig {
     /// Returns the label of the Wasm runtime kind.
     fn label(&self) -> &str {
         match self {
-            VmAndConfig::WasmiOld => "Wasmi v0.31",
-            VmAndConfig::WasmiNew => "Wasmi v0.32 (eager)",
-            VmAndConfig::WasmiNewUnchecked => "Wasmi v0.32 (eager, unchecked)",
-            VmAndConfig::WasmiNewLazy => "Wasmi v0.32 (lazy)",
-            VmAndConfig::WasmiNewLazyUnchecked => "Wasmi v0.32 (lazy, unchecked)",
-            VmAndConfig::WasmiNewLazyTranslation => "Wasmi v0.32 (lazy-translation)",
-            VmAndConfig::Tinywasm => "Tinywasm",
-            VmAndConfig::Wasm3 => "Wasm3 (eager)",
-            VmAndConfig::Wasm3Lazy => "Wasm3 (lazy)",
-            VmAndConfig::Stitch => "Stitch (lazy)",
-            VmAndConfig::WasmtimeCranelift => "Wasmtime (Cranelift)",
-            VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
-            VmAndConfig::WasmtimePulley => "Wasmtime (Pulley)",
-            VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
-            VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
-            VmAndConfig::WasmerWamr => "Wasmer (WAMR)",
+            Self::Wasmi031 => "Wasmi v0.31",
+            Self::Wasmi => "Wasmi",
+            Self::WasmiUnchecked => "Wasmi (eager, unchecked)",
+            Self::WasmiLazy => "Wasmi (lazy)",
+            Self::WasmiLazyUnchecked => "Wasmi (lazy, unchecked)",
+            Self::WasmiLazyTranslation => "Wasmi (lazy-translation)",
+            Self::Tinywasm => "Tinywasm",
+            Self::Wasm3 => "Wasm3 (eager)",
+            Self::Wasm3Lazy => "Wasm3 (lazy)",
+            Self::Stitch => "Stitch (lazy)",
+            Self::WasmtimeCranelift => "Wasmtime (Cranelift)",
+            Self::WasmtimeWinch => "Wasmtime (Winch)",
+            Self::WasmtimePulley => "Wasmtime (Pulley)",
+            Self::WasmerCranelift => "Wasmer (Cranelift)",
+            Self::WasmerSinglepass => "Wasmer (Singlepass)",
+            Self::WasmerWamr => "Wasmer (WAMR)",
         }
     }
 
     /// Returns the color associated to the Wasm runtime kind.
     fn color(&self) -> RGBColor {
         match self {
-            Self::WasmiOld => RGBColor(140, 130, 50),
-            Self::WasmiNew
-            | Self::WasmiNewUnchecked
-            | Self::WasmiNewLazy
-            | Self::WasmiNewLazyUnchecked
-            | Self::WasmiNewLazyTranslation => RGBColor(200, 200, 70),
+            Self::Wasmi031 => RGBColor(140, 130, 50),
+            Self::Wasmi
+            | Self::WasmiUnchecked
+            | Self::WasmiLazy
+            | Self::WasmiLazyUnchecked
+            | Self::WasmiLazyTranslation => RGBColor(200, 200, 70),
             Self::Tinywasm => RGBColor(108, 140, 108),
             Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Stitch => RGBColor(220, 175, 180),
@@ -76,25 +76,26 @@ impl FromStr for VmAndConfig {
     type Err = FromStrError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        match input {
-            "wasmi-old" => Ok(Self::WasmiOld),
-            "wasmi-new.eager.checked" => Ok(Self::WasmiNew),
-            "wasmi-new.eager.unchecked" => Ok(Self::WasmiNewUnchecked),
-            "wasmi-new.lazy.checked" => Ok(Self::WasmiNewLazy),
-            "wasmi-new.lazy.unchecked" => Ok(Self::WasmiNewLazyUnchecked),
-            "wasmi-new.lazy-translation.checked" => Ok(Self::WasmiNewLazyTranslation),
-            "tinywasm" => Ok(Self::Tinywasm),
-            "wasm3.eager" => Ok(Self::Wasm3),
-            "wasm3.lazy" => Ok(Self::Wasm3Lazy),
-            "stitch" => Ok(Self::Stitch),
-            "wasmtime.cranelift" => Ok(Self::WasmtimeCranelift),
-            "wasmtime.winch" => Ok(Self::WasmtimeWinch),
-            "wasmtime.pulley" => Ok(Self::WasmtimePulley),
-            "wasmer.cranelift" => Ok(Self::WasmerCranelift),
-            "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
-            "wasmer.wamr" => Ok(Self::WasmerWamr),
-            _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
-        }
+        let vm_and_config = match input {
+            "wasmi-v0.31" => Self::Wasmi031,
+            "wasmi.eager.checked" => Self::Wasmi,
+            "wasmi.eager.unchecked" => Self::WasmiUnchecked,
+            "wasmi.lazy.checked" => Self::WasmiLazy,
+            "wasmi.lazy.unchecked" => Self::WasmiLazyUnchecked,
+            "wasmi.lazy-translation.checked" => Self::WasmiLazyTranslation,
+            "tinywasm" => Self::Tinywasm,
+            "wasm3.eager" => Self::Wasm3,
+            "wasm3.lazy" => Self::Wasm3Lazy,
+            "stitch" => Self::Stitch,
+            "wasmtime.cranelift" => Self::WasmtimeCranelift,
+            "wasmtime.winch" => Self::WasmtimeWinch,
+            "wasmtime.pulley" => Self::WasmtimePulley,
+            "wasmer.cranelift" => Self::WasmerCranelift,
+            "wasmer.singlepass" => Self::WasmerSinglepass,
+            "wasmer.wamr" => Self::WasmerWamr,
+            _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
+        };
+        Ok(vm_and_config)
     }
 }
 

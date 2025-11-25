@@ -8,5 +8,5 @@ publish = false
 path = "lib.rs"
 
 [dependencies]
-wasmi_new = { workspace = true }
+wasmi = { workspace = true }
 wat = { workspace = true }

@@ -5,26 +5,26 @@ use benchmark_utils::{BenchInstance, BenchRuntime, ModuleImportsIter, elapsed_ms
 pub struct WasmiOld;
 
 struct WasmiOldRuntime {
-    store: wasmi_old::Store<()>,
-    _instance: wasmi_old::Instance,
-    func: wasmi_old::TypedFunc<i64, i64>,
+    store: wasmi031::Store<()>,
+    _instance: wasmi031::Instance,
+    func: wasmi031::TypedFunc<i64, i64>,
 }
 
 impl BenchRuntime for WasmiOld {
     fn name(&self) -> &'static str {
-        "wasmi-old"
+        "wasmi-v0.31"
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
         let store = self.store();
-        wasmi_old::Module::new(store.engine(), wasm).unwrap();
+        wasmi031::Module::new(store.engine(), wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let mut store = self.store();
         let engine = store.engine();
-        let module = wasmi_old::Module::new(engine, wasm).unwrap();
-        let linker = wasmi_old::Linker::new(engine);
+        let module = wasmi031::Module::new(engine, wasm).unwrap();
+        let linker = wasmi031::Linker::new(engine);
         let instance = linker
             .instantiate(&mut store, &module)
             .unwrap()
@@ -39,19 +39,19 @@ impl BenchRuntime for WasmiOld {
     }
 
     fn coremark(&self, wasm: &[u8]) -> f32 {
-        let engine = wasmi_old::Engine::default();
-        let mut store = <wasmi_old::Store<()>>::new(&engine, ());
-        let mut linker = wasmi_old::Linker::new(store.engine());
+        let engine = wasmi031::Engine::default();
+        let mut store = <wasmi031::Store<()>>::new(&engine, ());
+        let mut linker = wasmi031::Linker::new(store.engine());
         linker
             .func_wrap("env", "clock_ms", || elapsed_ms() as i32)
             .unwrap();
-        let module = wasmi_old::Module::new(store.engine(), wasm).unwrap();
+        let module = wasmi031::Module::new(store.engine(), wasm).unwrap();
         let result = linker
             .instantiate(&mut store, &module)
             .unwrap()
             .ensure_no_start(&mut store)
             .unwrap()
-            .get_typed_func::<(), wasmi_old::core::F32>(&mut store, "run")
+            .get_typed_func::<(), wasmi031::core::F32>(&mut store, "run")
             .unwrap()
             .call(&mut store, ())
             .unwrap();
@@ -60,11 +60,11 @@ impl BenchRuntime for WasmiOld {
 }
 
 impl WasmiOld {
-    fn store(&self) -> wasmi_old::Store<()> {
-        let mut config = wasmi_old::Config::default();
+    fn store(&self) -> wasmi031::Store<()> {
+        let mut config = wasmi031::Config::default();
         config.wasm_tail_call(true);
-        let engine = wasmi_old::Engine::new(&config);
-        <wasmi_old::Store<()>>::new(&engine, ())
+        let engine = wasmi031::Engine::new(&config);
+        <wasmi031::Store<()>>::new(&engine, ())
     }
 }
 
