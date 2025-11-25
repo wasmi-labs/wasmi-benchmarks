@@ -10,6 +10,7 @@ use std::str::FromStr;
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum VmAndConfig {
     Wasmi031,
+    Wasmi032,
     Wasmi,
     WasmiUnchecked,
     WasmiLazyTranslation,
@@ -32,6 +33,7 @@ impl VmAndConfig {
     fn label(&self) -> &str {
         match self {
             Self::Wasmi031 => "Wasmi v0.31",
+            Self::Wasmi032 => "Wasmi v0.32",
             Self::Wasmi => "Wasmi",
             Self::WasmiUnchecked => "Wasmi (eager, unchecked)",
             Self::WasmiLazy => "Wasmi (lazy)",
@@ -54,6 +56,7 @@ impl VmAndConfig {
     fn color(&self) -> RGBColor {
         match self {
             Self::Wasmi031 => RGBColor(140, 130, 50),
+            Self::Wasmi032 => RGBColor(160, 160, 60),
             Self::Wasmi
             | Self::WasmiUnchecked
             | Self::WasmiLazy
@@ -78,6 +81,7 @@ impl FromStr for VmAndConfig {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let vm_and_config = match input {
             "wasmi-v0.31" => Self::Wasmi031,
+            "wasmi-v0.32" => Self::Wasmi032,
             "wasmi.eager.checked" => Self::Wasmi,
             "wasmi.eager.unchecked" => Self::WasmiUnchecked,
             "wasmi.lazy.checked" => Self::WasmiLazy,

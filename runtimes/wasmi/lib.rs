@@ -5,7 +5,7 @@ use benchmark_utils::{
 };
 pub use wasmi::CompilationMode;
 
-pub struct WasmiNew {
+pub struct Wasmi {
     pub compilation_mode: CompilationMode,
     pub validation: Validation,
 }
@@ -16,13 +16,13 @@ pub enum Validation {
     Unchecked,
 }
 
-struct WasmiNewRuntime {
+struct WasmiRuntime {
     store: wasmi::Store<()>,
     _instance: wasmi::Instance,
     func: wasmi::TypedFunc<i64, i64>,
 }
 
-impl BenchRuntime for WasmiNew {
+impl BenchRuntime for Wasmi {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
             (CompilationMode::Eager, Validation::Checked) => "wasmi.eager.checked",
@@ -62,7 +62,7 @@ impl BenchRuntime for WasmiNew {
         let linker = wasmi::Linker::new(engine);
         let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
-        Box::new(WasmiNewRuntime {
+        Box::new(WasmiRuntime {
             store,
             _instance: instance,
             func,
@@ -84,7 +84,7 @@ impl BenchRuntime for WasmiNew {
     }
 }
 
-impl WasmiNew {
+impl Wasmi {
     fn store(&self) -> wasmi::Store<()> {
         let mut config = wasmi::Config::default();
         config.wasm_tail_call(true);
@@ -104,7 +104,7 @@ impl WasmiNew {
     }
 }
 
-impl BenchInstance for WasmiNewRuntime {
+impl BenchInstance for WasmiRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }

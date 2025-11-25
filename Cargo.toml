@@ -26,6 +26,7 @@ rt-wasmi = { workspace = true }
 rt-stitch = { workspace = true }
 rt-tinywasm = { workspace = true }
 rt-wasmi-031 = { workspace = true }
+rt-wasmi-032 = { workspace = true }
 rt-wasmer = { workspace = true }
 rt-wasmtime = { workspace = true }
 rt-wasm3 = { workspace = true }
@@ -42,11 +43,13 @@ rt-wasmi = { path = "runtimes/wasmi" }
 rt-stitch = { path = "runtimes/stitch" }
 rt-tinywasm = { path = "runtimes/tinywasm" }
 rt-wasmi-031 = { path = "runtimes/wasmi-031" }
+rt-wasmi-032 = { path = "runtimes/wasmi-032" }
 rt-wasmer = { path = "runtimes/wasmer" }
 rt-wasmtime = { path = "runtimes/wasmtime" }
 rt-wasm3 = { path = "runtimes/wasm3" }
 
 wasmi031 = { package = "wasmi", version = "0.31.2" }
+wasmi032 = { package = "wasmi", version = "0.32.3" }
 wasmi = { package = "wasmi", version = "0.51.2" }
 tinywasm = "0.8.0"
 wasmer = { version = "6.1.0", default-features = false, features = ["compiler", "wamr"] }
