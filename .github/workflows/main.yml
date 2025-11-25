@@ -80,9 +80,9 @@ jobs:
           - name: System Information
             run: lscpu
           - name: Compile Benchmark
-            run: cargo build --bin coremark
+            run: cargo build --bin coremark --profile bench
           - name: Run Benchmark
-            run: cargo run --bin coremark
+            run: cargo run --bin coremark --profile bench
 
     fmt:
         name: Formatting
