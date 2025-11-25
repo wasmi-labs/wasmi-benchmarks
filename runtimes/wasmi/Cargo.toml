@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-wasmi_new = { workspace = true }
+wasmi = { workspace = true }

@@ -3,7 +3,7 @@
 use benchmark_utils::{
     BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
 };
-pub use wasmi_new::CompilationMode;
+pub use wasmi::CompilationMode;
 
 pub struct WasmiNew {
     pub compilation_mode: CompilationMode,
@@ -17,24 +17,24 @@ pub enum Validation {
 }
 
 struct WasmiNewRuntime {
-    store: wasmi_new::Store<()>,
-    _instance: wasmi_new::Instance,
-    func: wasmi_new::TypedFunc<i64, i64>,
+    store: wasmi::Store<()>,
+    _instance: wasmi::Instance,
+    func: wasmi::TypedFunc<i64, i64>,
 }
 
 impl BenchRuntime for WasmiNew {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
-            (CompilationMode::Eager, Validation::Checked) => "wasmi-new.eager.checked",
-            (CompilationMode::Eager, Validation::Unchecked) => "wasmi-new.eager.unchecked",
+            (CompilationMode::Eager, Validation::Checked) => "wasmi.eager.checked",
+            (CompilationMode::Eager, Validation::Unchecked) => "wasmi.eager.unchecked",
             (CompilationMode::LazyTranslation, Validation::Checked) => {
-                "wasmi-new.lazy-translation.checked"
+                "wasmi.lazy-translation.checked"
             }
             (CompilationMode::LazyTranslation, Validation::Unchecked) => {
-                "wasmi-new.lazy-translation.unchecked"
+                "wasmi.lazy-translation.unchecked"
             }
-            (CompilationMode::Lazy, Validation::Checked) => "wasmi-new.lazy.checked",
-            (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-new.lazy.unchecked",
+            (CompilationMode::Lazy, Validation::Checked) => "wasmi.lazy.checked",
+            (CompilationMode::Lazy, Validation::Unchecked) => "wasmi.lazy.unchecked",
         }
     }
 
@@ -59,7 +59,7 @@ impl BenchRuntime for WasmiNew {
         let mut store = self.store();
         let engine = store.engine();
         let module = self.module(engine, wasm);
-        let linker = wasmi_new::Linker::new(engine);
+        let linker = wasmi::Linker::new(engine);
         let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiNewRuntime {
@@ -70,10 +70,10 @@ impl BenchRuntime for WasmiNew {
     }
 
     fn coremark(&self, wasm: &[u8]) -> f32 {
-        let mut store = <wasmi_new::Store<()>>::default();
-        let mut linker = wasmi_new::Linker::new(store.engine());
+        let mut store = <wasmi::Store<()>>::default();
+        let mut linker = wasmi::Linker::new(store.engine());
         linker.func_wrap("env", "clock_ms", elapsed_ms).unwrap();
-        let module = wasmi_new::Module::new(store.engine(), wasm).unwrap();
+        let module = wasmi::Module::new(store.engine(), wasm).unwrap();
         linker
             .instantiate_and_start(&mut store, &module)
             .unwrap()
@@ -85,20 +85,20 @@ impl BenchRuntime for WasmiNew {
 }
 
 impl WasmiNew {
-    fn store(&self) -> wasmi_new::Store<()> {
-        let mut config = wasmi_new::Config::default();
+    fn store(&self) -> wasmi::Store<()> {
+        let mut config = wasmi::Config::default();
         config.wasm_tail_call(true);
         config.compilation_mode(self.compilation_mode);
-        let engine = wasmi_new::Engine::new(&config);
-        <wasmi_new::Store<()>>::new(&engine, ())
+        let engine = wasmi::Engine::new(&config);
+        <wasmi::Store<()>>::new(&engine, ())
     }
 
-    fn module(&self, engine: &wasmi_new::Engine, wasm: &[u8]) -> wasmi_new::Module {
+    fn module(&self, engine: &wasmi::Engine, wasm: &[u8]) -> wasmi::Module {
         match self.validation {
-            Validation::Checked => wasmi_new::Module::new(engine, wasm).unwrap(),
+            Validation::Checked => wasmi::Module::new(engine, wasm).unwrap(),
             Validation::Unchecked => {
                 // SAFETY: We only use properly valid Wasm in our benchmarks.
-                unsafe { wasmi_new::Module::new_unchecked(engine, wasm).unwrap() }
+                unsafe { wasmi::Module::new_unchecked(engine, wasm).unwrap() }
             }
         }
     }
