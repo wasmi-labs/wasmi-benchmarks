@@ -5,20 +5,21 @@ use benchmark_utils::BenchRuntime;
 /// Returns the Wasm runtimes with a set of configurations to test.
 pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
-        Box::new(rt_wasmi_031::WasmiOld),
-        Box::new(rt_wasmi::WasmiNew {
+        Box::new(rt_wasmi_031::Wasmi031),
+        Box::new(rt_wasmi_032::Wasmi032),
+        Box::new(rt_wasmi::Wasmi {
             compilation_mode: rt_wasmi::CompilationMode::Eager,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(rt_wasmi::WasmiNew {
+        Box::new(rt_wasmi::Wasmi {
             compilation_mode: rt_wasmi::CompilationMode::LazyTranslation,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(rt_wasmi::WasmiNew {
+        Box::new(rt_wasmi::Wasmi {
             compilation_mode: rt_wasmi::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Checked,
         }),
-        Box::new(rt_wasmi::WasmiNew {
+        Box::new(rt_wasmi::Wasmi {
             compilation_mode: rt_wasmi::CompilationMode::Lazy,
             validation: rt_wasmi::Validation::Unchecked,
         }),
