@@ -31,22 +31,22 @@ impl VmAndConfig {
     /// Returns the label of the Wasm runtime kind.
     fn label(&self) -> &str {
         match self {
-            VmAndConfig::Wasmi031 => "Wasmi v0.31",
-            VmAndConfig::Wasmi => "Wasmi",
-            VmAndConfig::WasmiUnchecked => "Wasmi (eager, unchecked)",
-            VmAndConfig::WasmiLazy => "Wasmi (lazy)",
-            VmAndConfig::WasmiLazyUnchecked => "Wasmi (lazy, unchecked)",
-            VmAndConfig::WasmiLazyTranslation => "Wasmi (lazy-translation)",
-            VmAndConfig::Tinywasm => "Tinywasm",
-            VmAndConfig::Wasm3 => "Wasm3 (eager)",
-            VmAndConfig::Wasm3Lazy => "Wasm3 (lazy)",
-            VmAndConfig::Stitch => "Stitch (lazy)",
-            VmAndConfig::WasmtimeCranelift => "Wasmtime (Cranelift)",
-            VmAndConfig::WasmtimeWinch => "Wasmtime (Winch)",
-            VmAndConfig::WasmtimePulley => "Wasmtime (Pulley)",
-            VmAndConfig::WasmerCranelift => "Wasmer (Cranelift)",
-            VmAndConfig::WasmerSinglepass => "Wasmer (Singlepass)",
-            VmAndConfig::WasmerWamr => "Wasmer (WAMR)",
+            Self::Wasmi031 => "Wasmi v0.31",
+            Self::Wasmi => "Wasmi",
+            Self::WasmiUnchecked => "Wasmi (eager, unchecked)",
+            Self::WasmiLazy => "Wasmi (lazy)",
+            Self::WasmiLazyUnchecked => "Wasmi (lazy, unchecked)",
+            Self::WasmiLazyTranslation => "Wasmi (lazy-translation)",
+            Self::Tinywasm => "Tinywasm",
+            Self::Wasm3 => "Wasm3 (eager)",
+            Self::Wasm3Lazy => "Wasm3 (lazy)",
+            Self::Stitch => "Stitch (lazy)",
+            Self::WasmtimeCranelift => "Wasmtime (Cranelift)",
+            Self::WasmtimeWinch => "Wasmtime (Winch)",
+            Self::WasmtimePulley => "Wasmtime (Pulley)",
+            Self::WasmerCranelift => "Wasmer (Cranelift)",
+            Self::WasmerSinglepass => "Wasmer (Singlepass)",
+            Self::WasmerWamr => "Wasmer (WAMR)",
         }
     }
 
@@ -76,25 +76,26 @@ impl FromStr for VmAndConfig {
     type Err = FromStrError;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        match input {
-            "wasmi-v0.31" => Ok(Self::Wasmi031),
-            "wasmi.eager.checked" => Ok(Self::Wasmi),
-            "wasmi.eager.unchecked" => Ok(Self::WasmiUnchecked),
-            "wasmi.lazy.checked" => Ok(Self::WasmiLazy),
-            "wasmi.lazy.unchecked" => Ok(Self::WasmiLazyUnchecked),
-            "wasmi.lazy-translation.checked" => Ok(Self::WasmiLazyTranslation),
-            "tinywasm" => Ok(Self::Tinywasm),
-            "wasm3.eager" => Ok(Self::Wasm3),
-            "wasm3.lazy" => Ok(Self::Wasm3Lazy),
-            "stitch" => Ok(Self::Stitch),
-            "wasmtime.cranelift" => Ok(Self::WasmtimeCranelift),
-            "wasmtime.winch" => Ok(Self::WasmtimeWinch),
-            "wasmtime.pulley" => Ok(Self::WasmtimePulley),
-            "wasmer.cranelift" => Ok(Self::WasmerCranelift),
-            "wasmer.singlepass" => Ok(Self::WasmerSinglepass),
-            "wasmer.wamr" => Ok(Self::WasmerWamr),
-            _ => Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
-        }
+        let vm_and_config = match input {
+            "wasmi-v0.31" => Self::Wasmi031,
+            "wasmi.eager.checked" => Self::Wasmi,
+            "wasmi.eager.unchecked" => Self::WasmiUnchecked,
+            "wasmi.lazy.checked" => Self::WasmiLazy,
+            "wasmi.lazy.unchecked" => Self::WasmiLazyUnchecked,
+            "wasmi.lazy-translation.checked" => Self::WasmiLazyTranslation,
+            "tinywasm" => Self::Tinywasm,
+            "wasm3.eager" => Self::Wasm3,
+            "wasm3.lazy" => Self::Wasm3Lazy,
+            "stitch" => Self::Stitch,
+            "wasmtime.cranelift" => Self::WasmtimeCranelift,
+            "wasmtime.winch" => Self::WasmtimeWinch,
+            "wasmtime.pulley" => Self::WasmtimePulley,
+            "wasmer.cranelift" => Self::WasmerCranelift,
+            "wasmer.singlepass" => Self::WasmerSinglepass,
+            "wasmer.wamr" => Self::WasmerWamr,
+            _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
+        };
+        Ok(vm_and_config)
     }
 }
 
