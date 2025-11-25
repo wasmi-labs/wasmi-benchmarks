@@ -9,12 +9,12 @@ use std::str::FromStr;
 /// VM under test and its configuration.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum VmAndConfig {
-    WasmiOld,
-    WasmiNew,
-    WasmiNewUnchecked,
-    WasmiNewLazyTranslation,
-    WasmiNewLazy,
-    WasmiNewLazyUnchecked,
+    Wasmi031,
+    Wasmi,
+    WasmiUnchecked,
+    WasmiLazyTranslation,
+    WasmiLazy,
+    WasmiLazyUnchecked,
     Tinywasm,
     Wasm3,
     Wasm3Lazy,
@@ -31,12 +31,12 @@ impl VmAndConfig {
     /// Returns the label of the Wasm runtime kind.
     fn label(&self) -> &str {
         match self {
-            VmAndConfig::WasmiOld => "Wasmi v0.31",
-            VmAndConfig::WasmiNew => "Wasmi v0.32 (eager)",
-            VmAndConfig::WasmiNewUnchecked => "Wasmi v0.32 (eager, unchecked)",
-            VmAndConfig::WasmiNewLazy => "Wasmi v0.32 (lazy)",
-            VmAndConfig::WasmiNewLazyUnchecked => "Wasmi v0.32 (lazy, unchecked)",
-            VmAndConfig::WasmiNewLazyTranslation => "Wasmi v0.32 (lazy-translation)",
+            VmAndConfig::Wasmi031 => "Wasmi v0.31",
+            VmAndConfig::Wasmi => "Wasmi",
+            VmAndConfig::WasmiUnchecked => "Wasmi (eager, unchecked)",
+            VmAndConfig::WasmiLazy => "Wasmi (lazy)",
+            VmAndConfig::WasmiLazyUnchecked => "Wasmi (lazy, unchecked)",
+            VmAndConfig::WasmiLazyTranslation => "Wasmi (lazy-translation)",
             VmAndConfig::Tinywasm => "Tinywasm",
             VmAndConfig::Wasm3 => "Wasm3 (eager)",
             VmAndConfig::Wasm3Lazy => "Wasm3 (lazy)",
@@ -53,12 +53,12 @@ impl VmAndConfig {
     /// Returns the color associated to the Wasm runtime kind.
     fn color(&self) -> RGBColor {
         match self {
-            Self::WasmiOld => RGBColor(140, 130, 50),
-            Self::WasmiNew
-            | Self::WasmiNewUnchecked
-            | Self::WasmiNewLazy
-            | Self::WasmiNewLazyUnchecked
-            | Self::WasmiNewLazyTranslation => RGBColor(200, 200, 70),
+            Self::Wasmi031 => RGBColor(140, 130, 50),
+            Self::Wasmi
+            | Self::WasmiUnchecked
+            | Self::WasmiLazy
+            | Self::WasmiLazyUnchecked
+            | Self::WasmiLazyTranslation => RGBColor(200, 200, 70),
             Self::Tinywasm => RGBColor(108, 140, 108),
             Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Stitch => RGBColor(220, 175, 180),
@@ -77,12 +77,12 @@ impl FromStr for VmAndConfig {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
-            "wasmi-old" => Ok(Self::WasmiOld),
-            "wasmi-new.eager.checked" => Ok(Self::WasmiNew),
-            "wasmi-new.eager.unchecked" => Ok(Self::WasmiNewUnchecked),
-            "wasmi-new.lazy.checked" => Ok(Self::WasmiNewLazy),
-            "wasmi-new.lazy.unchecked" => Ok(Self::WasmiNewLazyUnchecked),
-            "wasmi-new.lazy-translation.checked" => Ok(Self::WasmiNewLazyTranslation),
+            "wasmi-v0.31" => Ok(Self::Wasmi031),
+            "wasmi.eager.checked" => Ok(Self::Wasmi),
+            "wasmi.eager.unchecked" => Ok(Self::WasmiUnchecked),
+            "wasmi.lazy.checked" => Ok(Self::WasmiLazy),
+            "wasmi.lazy.unchecked" => Ok(Self::WasmiLazyUnchecked),
+            "wasmi.lazy-translation.checked" => Ok(Self::WasmiLazyTranslation),
             "tinywasm" => Ok(Self::Tinywasm),
             "wasm3.eager" => Ok(Self::Wasm3),
             "wasm3.lazy" => Ok(Self::Wasm3Lazy),
