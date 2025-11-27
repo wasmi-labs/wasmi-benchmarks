@@ -36,8 +36,8 @@ def plot_coremark(csv_path: str, out_path: str):
     # plt.bar(runtimes, scores, color=colors[:len(runtimes)])
     plt.bar(runtimes, scores)
 
-    plt.title("Coremark - Apple M2 Pro - rustc 1.91.1 (ed61e7d7e 2025-11-07)")
-    plt.xlabel("Wasmi Version")
+    plt.title("Coremark - Apple M2 Pro - rustc 1.93.0-nightly (1be6b13be 2025-11-26)")
+    # plt.xlabel("Wasmi Version")
     plt.ylabel("Score (higher is better)")
     plt.ylim(bottom=0)
 
