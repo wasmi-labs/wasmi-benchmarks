@@ -183,7 +183,7 @@ checksum = "55248b47b0caf0546f7988906588779981c43bb1bc9d0c44087278f80cdb44ba"
 name = "benchmark-utils"
 version = "0.0.0"
 dependencies = [
- "wasmi 0.51.2",
+ "wasmi 1.0.0",
  "wat",
 ]
 
@@ -2648,7 +2648,7 @@ name = "rt-wasmi"
 version = "0.0.0"
 dependencies = [
  "benchmark-utils",
- "wasmi 0.51.2",
+ "wasmi 1.0.0",
 ]
 
 [[package]]
@@ -3627,13 +3627,12 @@ dependencies = [
 
 [[package]]
 name = "wasmi"
-version = "0.51.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "118030b2d125bc893e0cc5b1ce156eb41461f4373308cb5f2e3c698533b5e547"
+version = "1.0.0"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-prepare-wasmi-1.0#28eb0c049bc61b4dfffe8397653a4a63d9bcf75e"
 dependencies = [
  "spin",
- "wasmi_collections 0.51.2",
- "wasmi_core 0.51.2",
+ "wasmi_collections 1.0.0",
+ "wasmi_core 1.0.0",
  "wasmi_ir",
  "wasmparser 0.228.0",
  "wat",
@@ -3677,9 +3676,8 @@ dependencies = [
 
 [[package]]
 name = "wasmi_collections"
-version = "0.51.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "653fa20efc966818934524dceb54b1b81e6f845bbcc2e155d6e9fc32becf667e"
+version = "1.0.0"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-prepare-wasmi-1.0#28eb0c049bc61b4dfffe8397653a4a63d9bcf75e"
 dependencies = [
  "string-interner 0.19.0",
 ]
@@ -3710,20 +3708,18 @@ dependencies = [
 
 [[package]]
 name = "wasmi_core"
-version = "0.51.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65701f60308c7e46cca85f273ad17e80c60998cc63d3fa168ac393f62b123038"
+version = "1.0.0"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-prepare-wasmi-1.0#28eb0c049bc61b4dfffe8397653a4a63d9bcf75e"
 dependencies = [
  "libm",
 ]
 
 [[package]]
 name = "wasmi_ir"
-version = "0.51.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6539f63bf2a6838f27876e2877f0b00a088e84f91e92445620cc6b977fde032"
+version = "1.0.0"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-prepare-wasmi-1.0#28eb0c049bc61b4dfffe8397653a4a63d9bcf75e"
 dependencies = [
- "wasmi_core 0.51.2",
+ "wasmi_core 1.0.0",
 ]
 
 [[package]]

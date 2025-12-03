@@ -50,7 +50,7 @@ rt-wasm3 = { path = "runtimes/wasm3" }
 
 wasmi031 = { package = "wasmi", version = "0.31.2" }
 wasmi032 = { package = "wasmi", version = "0.32.3" }
-wasmi = { package = "wasmi", version = "0.51.2" }
+wasmi = { package = "wasmi", version = "1.0.0", git = "https://github.com/wasmi-labs/wasmi", branch = "rf-prepare-wasmi-1.0" }
 tinywasm = "0.8.0"
 wasmer = { version = "6.1.0", default-features = false, features = ["compiler", "wamr"] }
 wasmer-compiler-singlepass = "6.1.0"
