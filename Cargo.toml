@@ -27,8 +27,8 @@ rt-stitch = { workspace = true }
 rt-tinywasm = { workspace = true }
 rt-wasmi-031 = { workspace = true }
 rt-wasmi-032 = { workspace = true }
-rt-wasmer = { workspace = true }
-rt-wasmtime = { workspace = true }
+rt-wasmer = { workspace = true, optional = true }
+rt-wasmtime = { workspace = true, optional = true }
 rt-wasm3 = { workspace = true }
 
 criterion = { workspace = true }
@@ -99,3 +99,8 @@ inherits = "release"
 opt-level = 3
 lto = "thin"
 codegen-units = 4
+
+[features]
+default = []
+wasmer = ["dep:rt-wasmer"]
+wasmtime = ["dep:rt-wasmtime"]
