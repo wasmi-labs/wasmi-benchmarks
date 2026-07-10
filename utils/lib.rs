@@ -1,6 +1,7 @@
 #![crate_type = "dylib"]
 
 use std::fmt;
+use wasmi_v1 as wasmi;
 pub use wasmi::ModuleImportsIter;
 pub use wasmi::{ExternType, Module, ValType};
 

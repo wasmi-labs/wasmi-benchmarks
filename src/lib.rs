@@ -7,21 +7,21 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
         Box::new(rt_wasmi_031::Wasmi031),
         Box::new(rt_wasmi_032::Wasmi032),
-        Box::new(rt_wasmi::Wasmi {
-            compilation_mode: rt_wasmi::CompilationMode::Eager,
-            validation: rt_wasmi::Validation::Checked,
+        Box::new(rt_wasmi_v1::Wasmi {
+            compilation_mode: rt_wasmi_v1::CompilationMode::Eager,
+            validation: rt_wasmi_v1::Validation::Checked,
         }),
-        Box::new(rt_wasmi::Wasmi {
-            compilation_mode: rt_wasmi::CompilationMode::LazyTranslation,
-            validation: rt_wasmi::Validation::Checked,
+        Box::new(rt_wasmi_v1::Wasmi {
+            compilation_mode: rt_wasmi_v1::CompilationMode::LazyTranslation,
+            validation: rt_wasmi_v1::Validation::Checked,
         }),
-        Box::new(rt_wasmi::Wasmi {
-            compilation_mode: rt_wasmi::CompilationMode::Lazy,
-            validation: rt_wasmi::Validation::Checked,
+        Box::new(rt_wasmi_v1::Wasmi {
+            compilation_mode: rt_wasmi_v1::CompilationMode::Lazy,
+            validation: rt_wasmi_v1::Validation::Checked,
         }),
-        Box::new(rt_wasmi::Wasmi {
-            compilation_mode: rt_wasmi::CompilationMode::Lazy,
-            validation: rt_wasmi::Validation::Unchecked,
+        Box::new(rt_wasmi_v1::Wasmi {
+            compilation_mode: rt_wasmi_v1::CompilationMode::Lazy,
+            validation: rt_wasmi_v1::Validation::Unchecked,
         }),
         Box::new(rt_tinywasm::Tinywasm),
         Box::new(rt_wasm3::Wasm3 {

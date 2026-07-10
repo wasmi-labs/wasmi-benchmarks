@@ -9,7 +9,7 @@ default-run = "coremark"
 members = [
     "benches/res/rust/*",
     "utils",
-    "runtimes/wasmi",
+    "runtimes/wasmi-v1",
 ]
 
 [[bin]]
@@ -22,7 +22,7 @@ path = "bins/plot.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-rt-wasmi = { workspace = true }
+rt-wasmi-v1 = { workspace = true }
 rt-stitch = { workspace = true }
 rt-tinywasm = { workspace = true }
 rt-wasmi-031 = { workspace = true }
@@ -39,7 +39,7 @@ plotters = { workspace = true }
 [workspace.dependencies]
 benchmark-utils = { path = "utils" }
 
-rt-wasmi = { path = "runtimes/wasmi" }
+rt-wasmi-v1 = { path = "runtimes/wasmi-v1" }
 rt-stitch = { path = "runtimes/stitch" }
 rt-tinywasm = { path = "runtimes/tinywasm" }
 rt-wasmi-031 = { path = "runtimes/wasmi-031" }
@@ -50,7 +50,7 @@ rt-wasm3 = { path = "runtimes/wasm3" }
 
 wasmi031 = { package = "wasmi", version = "0.31.2" }
 wasmi032 = { package = "wasmi", version = "0.32.3" }
-wasmi = { package = "wasmi", version = "1.0.9" }
+wasmi-v1 = { package = "wasmi", version = "1.0.9" }
 tinywasm = { package = "tinywasm", version = "0.9.0", features = ["parser"] }
 wasmer = { version = "7.2.0", default-features = false, features = ["compiler", "singlepass", "cranelift"] }
 wasmer-compiler-singlepass = "7.2.0"

@@ -2216,14 +2216,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rt-wasmi"
-version = "0.0.0"
-dependencies = [
- "benchmark-utils",
- "wasmi 1.1.0",
-]
-
-[[package]]
 name = "rt-wasmi-031"
 version = "0.0.0"
 dependencies = [
@@ -2237,6 +2229,14 @@ version = "0.0.0"
 dependencies = [
  "benchmark-utils",
  "wasmi 0.32.3",
+]
+
+[[package]]
+name = "rt-wasmi-v1"
+version = "0.0.0"
+dependencies = [
+ "benchmark-utils",
+ "wasmi 1.1.0",
 ]
 
 [[package]]
@@ -3080,9 +3080,9 @@ dependencies = [
  "rt-tinywasm",
  "rt-wasm3",
  "rt-wasmer",
- "rt-wasmi",
  "rt-wasmi-031",
  "rt-wasmi-032",
+ "rt-wasmi-v1",
  "rt-wasmtime",
  "serde_json",
  "wat",
