@@ -102,5 +102,10 @@ codegen-units = 4
 
 [features]
 default = []
-wasmer = ["dep:rt-wasmer"]
-wasmtime = ["dep:rt-wasmtime"]
+wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
+wasmer-singlepass = ["dep:rt-wasmer"]
+wasmer-cranelift = ["dep:rt-wasmer"]
+wasmtime = ["wasmtime-cranelift", "wasmtime-winch", "wasmtime-pulley"]
+wasmtime-cranelift = ["dep:rt-wasmtime"]
+wasmtime-winch = ["dep:rt-wasmtime"]
+wasmtime-pulley = ["dep:rt-wasmtime"]

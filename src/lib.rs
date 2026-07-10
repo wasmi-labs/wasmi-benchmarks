@@ -31,23 +31,23 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             compilation_mode: rt_wasm3::CompilationMode::Lazy,
         }),
         Box::new(rt_stitch::Stitch),
-        #[cfg(feature = "wasmtime")]
+        #[cfg(feature = "wasmtime-cranelift")]
         Box::new(rt_wasmtime::Wasmtime {
             strategy: rt_wasmtime::Strategy::Cranelift,
         }),
-        #[cfg(feature = "wasmtime")]
+        #[cfg(feature = "wasmtime-winch")]
         Box::new(rt_wasmtime::Wasmtime {
             strategy: rt_wasmtime::Strategy::Winch,
         }),
-        #[cfg(feature = "wasmtime")]
+        #[cfg(feature = "wasmtime-pulley")]
         Box::new(rt_wasmtime::Wasmtime {
             strategy: rt_wasmtime::Strategy::Pulley,
         }),
-        #[cfg(feature = "wasmer")]
+        #[cfg(feature = "wasmer-cranelift")]
         Box::new(rt_wasmer::Wasmer {
             compiler: rt_wasmer::WasmerCompiler::Cranelift,
         }),
-        #[cfg(feature = "wasmer")]
+        #[cfg(feature = "wasmer-singlepass")]
         Box::new(rt_wasmer::Wasmer {
             compiler: rt_wasmer::WasmerCompiler::Singlepass,
         }),
