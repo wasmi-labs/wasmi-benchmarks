@@ -51,9 +51,5 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
         Box::new(rt_wasmer::Wasmer {
             compiler: rt_wasmer::WasmerCompiler::Singlepass,
         }),
-        #[cfg(feature = "wasmer")]
-        Box::new(rt_wasmer::Wasmer {
-            compiler: rt_wasmer::WasmerCompiler::Wamr,
-        }),
     ]
 }
