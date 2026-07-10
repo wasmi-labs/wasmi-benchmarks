@@ -9,7 +9,7 @@ pub struct Tinywasm;
 struct TinywasmRuntime {
     store: tinywasm::Store,
     _instance: tinywasm::ModuleInstance,
-    func: tinywasm::FuncHandleTyped<i64, i64>,
+    func: tinywasm::FunctionTyped<i64, i64>,
 }
 
 impl BenchRuntime for Tinywasm {
@@ -28,14 +28,14 @@ impl BenchRuntime for Tinywasm {
     }
 
     fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
-        tinywasm::Module::parse_bytes(wasm).unwrap();
+        tinywasm::parse_bytes(wasm).unwrap();
     }
 
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let mut store = tinywasm::Store::new();
-        let module = tinywasm::Module::parse_bytes(wasm).unwrap();
-        let instance = module.instantiate(&mut store, None).unwrap();
-        let func = instance.exported_func::<i64, i64>(&store, "run").unwrap();
+        let mut store = tinywasm::Store::default();
+        let module = tinywasm::parse_bytes(wasm).unwrap();
+        let instance = tinywasm::ModuleInstance::instantiate(&mut store, &module, None).unwrap();
+        let func = instance.func::<i64, i64>(&store, "run").unwrap();
         Box::new(TinywasmRuntime {
             store,
             _instance: instance,
@@ -44,24 +44,16 @@ impl BenchRuntime for Tinywasm {
     }
 
     fn coremark(&self, wasm: &[u8]) -> f32 {
-        let mut store = tinywasm::Store::new();
-        let module = tinywasm::Module::parse_bytes(wasm).unwrap();
+        let mut store = tinywasm::Store::default();
+        let module = tinywasm::parse_bytes(wasm).unwrap();
         let mut imports = tinywasm::Imports::new();
-        imports
-            .define(
-                "env",
-                "clock_ms",
-                tinywasm::Extern::func(
-                    &tinywasm::types::FuncType {
-                        params: Box::from([]),
-                        results: Box::from([tinywasm::types::ValType::I32]),
-                    },
-                    |_ctx, _args| Ok(vec![tinywasm::types::WasmValue::I32(elapsed_ms() as i32)]),
-                ),
-            )
-            .unwrap();
-        let instance = module.instantiate(&mut store, Some(imports)).unwrap();
-        let func = instance.exported_func::<(), f32>(&store, "run").unwrap();
+        imports.define(
+            "env",
+            "clock_ms",
+            tinywasm::HostFunction::from(&mut store, |_ctx, _arg: ()| Ok(elapsed_ms() as i32)),
+        );
+        let instance = tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
+        let func = instance.func::<(), f32>(&store, "run").unwrap();
         func.call(&mut store, ()).unwrap()
     }
 }

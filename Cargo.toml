@@ -51,7 +51,7 @@ rt-wasm3 = { path = "runtimes/wasm3" }
 wasmi031 = { package = "wasmi", version = "0.31.2" }
 wasmi032 = { package = "wasmi", version = "0.32.3" }
 wasmi = { package = "wasmi", version = "1.0.9" }
-tinywasm = "0.8.0"
+tinywasm = { package = "tinywasm", version = "0.9.0", features = ["parser"] }
 wasmer = { version = "6.1.0", default-features = false, features = ["compiler", "wamr"] }
 wasmer-compiler-singlepass = "6.1.0"
 wasmer-compiler-cranelift = "6.1.0"
