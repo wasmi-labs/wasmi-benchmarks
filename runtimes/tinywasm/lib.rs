@@ -52,7 +52,8 @@ impl BenchRuntime for Tinywasm {
             "clock_ms",
             tinywasm::HostFunction::from(&mut store, |_ctx, _arg: ()| Ok(elapsed_ms() as i32)),
         );
-        let instance = tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
+        let instance =
+            tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
         let func = instance.func::<(), f32>(&store, "run").unwrap();
         func.call(&mut store, ()).unwrap()
     }
