@@ -8,8 +8,9 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
 
 [dependencies.wasmtime]
 version = "46.0.0"
 default-features = false
-features = ["winch", "cranelift", "pulley", "runtime"]
+features = ["winch", "cranelift", "pulley", "runtime", "anyhow"]
