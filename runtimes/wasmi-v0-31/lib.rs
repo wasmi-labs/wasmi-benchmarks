@@ -2,17 +2,17 @@
 
 use benchmark_utils::{BenchInstance, BenchRuntime, elapsed_ms};
 
-pub struct Wasmi032;
+pub struct WasmiV031;
 
-struct Wasmi032Runtime {
+struct Wasmi031Runtime {
     store: wasmi::Store<()>,
     _instance: wasmi::Instance,
     func: wasmi::TypedFunc<i64, i64>,
 }
 
-impl BenchRuntime for Wasmi032 {
+impl BenchRuntime for WasmiV031 {
     fn name(&self) -> &'static str {
-        "wasmi-v0.32"
+        "wasmi-v0.31"
     }
 
     fn compile(&self, wasm: &[u8]) {
@@ -31,7 +31,7 @@ impl BenchRuntime for Wasmi032 {
             .start(&mut store)
             .unwrap();
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
-        Box::new(Wasmi032Runtime {
+        Box::new(Wasmi031Runtime {
             store,
             _instance: instance,
             func,
@@ -59,7 +59,7 @@ impl BenchRuntime for Wasmi032 {
     }
 }
 
-impl Wasmi032 {
+impl WasmiV031 {
     fn store(&self) -> wasmi::Store<()> {
         let mut config = wasmi::Config::default();
         config.wasm_tail_call(true);
@@ -68,7 +68,7 @@ impl Wasmi032 {
     }
 }
 
-impl BenchInstance for Wasmi032Runtime {
+impl BenchInstance for Wasmi031Runtime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
     }

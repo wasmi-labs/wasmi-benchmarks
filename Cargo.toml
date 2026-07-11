@@ -22,10 +22,10 @@ path = "bins/plot.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-rt-wasmi-031 = { path = "runtimes/wasmi-031" }
-rt-wasmi-032 = { path = "runtimes/wasmi-032" }
-rt-wasmi-v1 = { path = "runtimes/wasmi-v1" }
-rt-wasmi-v2 = { path = "runtimes/wasmi-v2" }
+rt-wasmi-v0-31 = { path = "runtimes/wasmi-v0-31", optional = true }
+rt-wasmi-v0-32 = { path = "runtimes/wasmi-v0-32", optional = true }
+rt-wasmi-v1 = { path = "runtimes/wasmi-v1", optional = true }
+rt-wasmi-v2 = { path = "runtimes/wasmi-v2", optional = true }
 rt-stitch = { path = "runtimes/stitch", optional = true }
 rt-tinywasm = { path = "runtimes/tinywasm", optional = true }
 rt-wasmer = { path = "runtimes/wasmer", optional = true }
@@ -74,7 +74,7 @@ lto = "thin"
 codegen-units = 4
 
 [features]
-default = ["stitch", "wasm3", "tinywasm"]
+default = ["wasmi-v0-31", "wasmi-v0-32", "wasmi-v1", "wasmi-v2", "stitch", "wasm3", "tinywasm"]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer"]
 wasmer-cranelift = ["dep:rt-wasmer"]
@@ -85,3 +85,7 @@ wasmtime-pulley = ["dep:rt-wasmtime"]
 wasm3 = ["dep:rt-wasm3"]
 stitch = ["dep:rt-stitch"]
 tinywasm = ["dep:rt-tinywasm"]
+wasmi-v0-31 = ["dep:rt-wasmi-v0-31"]
+wasmi-v0-32 = ["dep:rt-wasmi-v0-32"]
+wasmi-v1 = ["dep:rt-wasmi-v1"]
+wasmi-v2 = ["dep:rt-wasmi-v2"]

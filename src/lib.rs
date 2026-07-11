@@ -5,36 +5,46 @@ use benchmark_utils::BenchRuntime;
 /// Returns the Wasm runtimes with a set of configurations to test.
 pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
     vec![
-        Box::new(rt_wasmi_031::Wasmi031),
-        Box::new(rt_wasmi_032::Wasmi032),
+        #[cfg(feature = "wasmi-v0-31")]
+        Box::new(rt_wasmi_v0_31::WasmiV031),
+        #[cfg(feature = "wasmi-v0-32")]
+        Box::new(rt_wasmi_v0_32::WasmiV032),
+        #[cfg(feature = "wasmi-v1")]
         Box::new(rt_wasmi_v1::Wasmi {
             compilation_mode: rt_wasmi_v1::CompilationMode::Eager,
             validation: rt_wasmi_v1::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v1")]
         Box::new(rt_wasmi_v1::Wasmi {
             compilation_mode: rt_wasmi_v1::CompilationMode::LazyTranslation,
             validation: rt_wasmi_v1::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v1")]
         Box::new(rt_wasmi_v1::Wasmi {
             compilation_mode: rt_wasmi_v1::CompilationMode::Lazy,
             validation: rt_wasmi_v1::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v1")]
         Box::new(rt_wasmi_v1::Wasmi {
             compilation_mode: rt_wasmi_v1::CompilationMode::Lazy,
             validation: rt_wasmi_v1::Validation::Unchecked,
         }),
+        #[cfg(feature = "wasmi-v2")]
         Box::new(rt_wasmi_v2::Wasmi {
             compilation_mode: rt_wasmi_v2::CompilationMode::Eager,
             validation: rt_wasmi_v2::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v2")]
         Box::new(rt_wasmi_v2::Wasmi {
             compilation_mode: rt_wasmi_v2::CompilationMode::LazyTranslation,
             validation: rt_wasmi_v2::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v2")]
         Box::new(rt_wasmi_v2::Wasmi {
             compilation_mode: rt_wasmi_v2::CompilationMode::Lazy,
             validation: rt_wasmi_v2::Validation::Checked,
         }),
+        #[cfg(feature = "wasmi-v2")]
         Box::new(rt_wasmi_v2::Wasmi {
             compilation_mode: rt_wasmi_v2::CompilationMode::Lazy,
             validation: rt_wasmi_v2::Validation::Unchecked,
