@@ -22,14 +22,14 @@ path = "bins/plot.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-rt-wasmi-v1 = { workspace = true }
-rt-stitch = { workspace = true }
-rt-tinywasm = { workspace = true }
-rt-wasmi-031 = { workspace = true }
-rt-wasmi-032 = { workspace = true }
-rt-wasmer = { workspace = true, optional = true }
-rt-wasmtime = { workspace = true, optional = true }
-rt-wasm3 = { workspace = true }
+rt-wasmi-v1 = { path = "runtimes/wasmi-v1" }
+rt-stitch = { path = "runtimes/stitch" }
+rt-tinywasm = { path = "runtimes/tinywasm" }
+rt-wasmi-031 = { path = "runtimes/wasmi-031" }
+rt-wasmi-032 = { path = "runtimes/wasmi-032" }
+rt-wasmer = { path = "runtimes/wasmer", optional = true }
+rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
+rt-wasm3 = { path = "runtimes/wasm3" }
 
 criterion = { workspace = true }
 wat = { workspace = true }
@@ -38,16 +38,6 @@ plotters = { workspace = true }
 
 [workspace.dependencies]
 benchmark-utils = { path = "utils" }
-
-rt-wasmi-v1 = { path = "runtimes/wasmi-v1" }
-rt-stitch = { path = "runtimes/stitch" }
-rt-tinywasm = { path = "runtimes/tinywasm" }
-rt-wasmi-031 = { path = "runtimes/wasmi-031" }
-rt-wasmi-032 = { path = "runtimes/wasmi-032" }
-rt-wasmer = { path = "runtimes/wasmer" }
-rt-wasmtime = { path = "runtimes/wasmtime" }
-rt-wasm3 = { path = "runtimes/wasm3" }
-
 wasmi-v1 = { package = "wasmi", version = "1.0.9" }
 criterion = "0.8.2"
 wat = "1"
