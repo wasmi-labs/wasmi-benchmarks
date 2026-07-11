@@ -1,6 +1,10 @@
 #![crate_type = "dylib"]
 
+use benchmark_utils as utils;
 use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
+use wasmer::Function;
+use wasmer::Type as ValType;
+use wasmer::Value as Val;
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -13,8 +17,10 @@ pub enum WasmerCompiler {
 
 struct WasmerRuntime {
     store: wasmer::Store,
-    _instance: wasmer::Instance,
+    instance: wasmer::Instance,
     func: wasmer::TypedFunction<i64, i64>,
+    params: Vec<Val>,
+    results: Vec<Val>,
 }
 
 impl BenchRuntime for Wasmer {
@@ -45,8 +51,10 @@ impl BenchRuntime for Wasmer {
             .unwrap();
         Box::new(WasmerRuntime {
             store,
-            _instance: instance,
+            instance,
             func,
+            params: Vec::new(),
+            results: Vec::new(),
         })
     }
 
@@ -91,5 +99,72 @@ impl Wasmer {
 impl BenchInstance for WasmerRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
+    }
+
+    fn call_with(
+        &mut self,
+        name: &str,
+        params: &[utils::Val],
+        results: &mut [utils::Val],
+    ) -> anyhow::Result<()> {
+        let func = self.instance.exports.get_function(name).cloned()?;
+        assert_eq!(params.len(), func.ty(&self.store).params().len());
+        assert_eq!(results.len(), func.ty(&self.store).results().len());
+        self.prepare_params(params);
+        self.prepare_results(&func);
+        let call_results = func.call(&mut self.store, &self.params[..])?;
+        self.write_back_results(results, call_results);
+        Ok(())
+    }
+}
+
+impl WasmerRuntime {
+    fn prepare_params(&mut self, params: &[utils::Val]) {
+        self.params.clear();
+        self.params
+            .extend(params.iter().copied().map(from_utils_val));
+    }
+
+    fn prepare_results(&mut self, func: &Function) {
+        self.results.clear();
+        for ty in func.ty(&self.store).results() {
+            self.results.push(default_val(*ty))
+        }
+    }
+
+    fn write_back_results(&self, dst: &mut [utils::Val], src: Box<[Val]>) {
+        assert_eq!(dst.len(), src.len());
+        for (dst, src) in dst.iter_mut().zip(src) {
+            *dst = into_utils_val(src);
+        }
+    }
+}
+
+fn default_val(ty: ValType) -> Val {
+    match ty {
+        ValType::I32 => Val::I32(0),
+        ValType::I64 => Val::I64(0),
+        ValType::F32 => Val::F32(0.0),
+        ValType::F64 => Val::F64(0.0),
+        _ => unreachable!(),
+    }
+}
+
+fn from_utils_val(val: utils::Val) -> Val {
+    match val {
+        utils::Val::I32(val) => Val::I32(val),
+        utils::Val::I64(val) => Val::I64(val),
+        utils::Val::F32(val) => Val::F32(val),
+        utils::Val::F64(val) => Val::F64(val),
+    }
+}
+
+fn into_utils_val(val: Val) -> utils::Val {
+    match val {
+        Val::I32(val) => utils::Val::I32(val),
+        Val::I64(val) => utils::Val::I64(val),
+        Val::F32(val) => utils::Val::F32(val),
+        Val::F64(val) => utils::Val::F64(val),
+        _ => panic!(),
     }
 }
