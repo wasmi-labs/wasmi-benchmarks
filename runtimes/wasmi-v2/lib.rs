@@ -1,6 +1,8 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, TestId, elapsed_ms,
+};
 pub use wasmi::CompilationMode;
 
 pub struct Wasmi {
@@ -45,6 +47,16 @@ impl BenchRuntime for Wasmi {
         TestFilter {
             execute: ExecuteTestFilter::set_to(execute),
             ..TestFilter::set_to(true)
+        }
+    }
+
+    fn can_run(&self, id: TestId) -> bool {
+        match id {
+            TestId::Execute(_) => {
+                matches!(self.validation, Validation::Checked)
+                    && matches!(self.compilation_mode, CompilationMode::Eager)
+            }
+            _ => true,
         }
     }
 

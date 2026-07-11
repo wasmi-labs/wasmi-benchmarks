@@ -1,7 +1,8 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestFilter, CompileTestId, ExecuteTestFilter,
+    ExecuteTestId, TestFilter, TestId, elapsed_ms,
 };
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
@@ -34,6 +35,15 @@ impl BenchRuntime for Stitch {
                 ffmpeg: false, // function body too large for stitch
                 ..CompileTestFilter::set_to(stitch_works)
             },
+        }
+    }
+
+    fn can_run(&self, id: TestId) -> bool {
+        match id {
+            TestId::Compile(id) => !matches!(id, CompileTestId::Ffmpeg),
+            TestId::Execute(id) => {
+                !matches!(id, ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2)
+            }
         }
     }
 

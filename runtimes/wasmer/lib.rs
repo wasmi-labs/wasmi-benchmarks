@@ -1,6 +1,8 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ExecuteTestId, TestFilter, TestId, elapsed_ms,
+};
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -41,6 +43,13 @@ impl BenchRuntime for Wasmer {
                 },
                 ..Default::default()
             },
+        }
+    }
+
+    fn can_run(&self, id: TestId) -> bool {
+        match id {
+            TestId::Execute(ExecuteTestId::FibonacciTail) => false,
+            _ => true,
         }
     }
 

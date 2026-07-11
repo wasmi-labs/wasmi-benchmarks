@@ -12,6 +12,9 @@ pub trait BenchRuntime {
         TestFilter::default()
     }
 
+    /// Returns `true` if `self` can run the test with the given `id`.
+    fn can_run(&self, id: TestId) -> bool;
+
     /// Compiles the `wasm` using the Wasm runtime and its configuration.
     fn compile(&self, wasm: &[u8]);
 
@@ -57,6 +60,35 @@ impl Default for TestFilter {
     fn default() -> Self {
         Self::set_to(true)
     }
+}
+
+#[derive(Copy, Clone)]
+pub enum TestId {
+    Compile(CompileTestId),
+    Execute(ExecuteTestId),
+}
+
+#[derive(Copy, Clone)]
+pub enum CompileTestId {
+    Bz2,
+    PulldownCmark,
+    Spidermonkey,
+    Ffmpeg,
+    CoreMarkMinimal,
+    Argon2,
+}
+
+#[derive(Copy, Clone)]
+pub enum ExecuteTestId {
+    Counter,
+    FibonacciIter,
+    FibonacciRec,
+    FibonacciTail,
+    Primes,
+    MatrixMultiply,
+    Argon2,
+    BulkOps,
+    CoreMark,
 }
 
 #[derive(Debug, Copy, Clone)]

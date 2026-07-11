@@ -1,6 +1,8 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
+use benchmark_utils::{
+    BenchInstance, BenchRuntime, ExecuteTestFilter, ExecuteTestId, TestFilter, TestId, elapsed_ms,
+};
 
 pub struct Tinywasm;
 
@@ -23,6 +25,10 @@ impl BenchRuntime for Tinywasm {
             },
             ..Default::default()
         }
+    }
+
+    fn can_run(&self, id: TestId) -> bool {
+        !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
     }
 
     fn compile(&self, wasm: &[u8]) {

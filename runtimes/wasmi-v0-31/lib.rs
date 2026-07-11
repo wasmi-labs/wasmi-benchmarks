@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, TestId, elapsed_ms};
 
 pub struct WasmiV031;
 
@@ -13,6 +13,10 @@ struct Wasmi031Runtime {
 impl BenchRuntime for WasmiV031 {
     fn name(&self) -> &'static str {
         "wasmi-v0.31"
+    }
+
+    fn can_run(&self, _id: TestId) -> bool {
+        true
     }
 
     fn compile(&self, wasm: &[u8]) {

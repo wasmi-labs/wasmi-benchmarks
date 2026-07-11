@@ -1,7 +1,8 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestFilter, CompileTestId, ExecuteTestFilter,
+    ExecuteTestId, TestFilter, TestId, elapsed_ms,
 };
 
 pub enum Strategy {
@@ -56,6 +57,29 @@ impl BenchRuntime for Wasmtime {
                     ffmpeg: false, // takes too long to compile
                     ..CompileTestFilter::default()
                 },
+            },
+        }
+    }
+
+    fn can_run(&self, id: TestId) -> bool {
+        match self.strategy {
+            Strategy::Cranelift => match id {
+                // Note: ffmpeg takes too long to compile for Cranelift
+                TestId::Compile(CompileTestId::Ffmpeg) => false,
+                _ => true,
+            },
+            Strategy::Winch => match id {
+                // Note: winch does not support the Wasm `tail-call` proposal.
+                TestId::Execute(ExecuteTestId::FibonacciTail) => false,
+                _ => {
+                    // Note: winch only works on `x86_64` and `aarch64`.
+                    cfg!(target_arch = "x86_64") || cfg!(target_arch = "aarch64")
+                }
+            },
+            Strategy::Pulley => match id {
+                // Note: ffmpeg takes too long to compile for Pulley
+                TestId::Compile(CompileTestId::Ffmpeg) => false,
+                _ => true,
             },
         }
     }
