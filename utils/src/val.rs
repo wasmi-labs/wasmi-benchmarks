@@ -1,0 +1,97 @@
+use core::fmt;
+
+/// A typed Wasm value.
+#[derive(Debug, Copy, Clone)]
+pub enum Val {
+    /// A Wasm `i32` value.
+    I32(i32),
+    /// A Wasm `i64` value.
+    I64(i64),
+    /// A Wasm `f32` value.
+    F32(f32),
+    /// A Wasm `f64` value.
+    F64(f64),
+}
+
+impl Val {
+    /// Returns the [`ValType`] of `self`.
+    #[inline]
+    pub fn ty(self) -> ValType {
+        match self {
+            Self::I32(_) => ValType::I32,
+            Self::I64(_) => ValType::I64,
+            Self::F32(_) => ValType::F32,
+            Self::F64(_) => ValType::F64,
+        }
+    }
+}
+
+/// A Wasm type.
+#[derive(Debug, Copy, Clone)]
+pub enum ValType {
+    /// Wasm `i32` type.
+    I32,
+    /// Wasm `i64` type.
+    I64,
+    /// Wasm `f32` type.
+    F32,
+    /// Wasm `f64` type.
+    F64,
+}
+
+impl fmt::Display for ValType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s = match self {
+            ValType::I32 => "i32",
+            ValType::I64 => "i64",
+            ValType::F32 => "f32",
+            ValType::F64 => "f64",
+        };
+        f.write_str(s)
+    }
+}
+
+macro_rules! impl_val {
+    ( $( $camel:ident($snake:ident) = { fn $unwrap:ident }),* $(,)? ) => {
+        $(
+            impl From<::core::primitive::$snake> for Val {
+                #[inline]
+                fn from(value: ::core::primitive::$snake) -> Self {
+                    Self::$camel(value)
+                }
+            }
+        )*
+
+        impl Val {
+            $(
+                #[doc = concat!("Unwraps a value of type [`ValType::", stringify!($camel), "`] or panics.")]
+                #[inline]
+                pub fn $unwrap(self) -> ::core::primitive::$snake {
+                    match self {
+                        Self::$camel(val) => val,
+                        found => {
+                            let required = ValType::$camel;
+                            let found = found.ty();
+                            panic!("mismatched type: required {required} but found {found}")
+                        }
+                    }
+                }
+
+                #[doc = concat!("Returns a value of type [`ValType::", stringify!($camel), "`] or `None`.")]
+                #[inline]
+                pub fn $snake(self) -> Option<::core::primitive::$snake> {
+                    match self {
+                        Self::$camel(val) => Some(val),
+                        _ => None,
+                    }
+                }
+            )*
+        }
+    };
+}
+impl_val! {
+    I32(i32) = { fn unwrap_i32 },
+    I64(i64) = { fn unwrap_i64 },
+    F32(f32) = { fn unwrap_f32 },
+    F64(f64) = { fn unwrap_f64 },
+}
