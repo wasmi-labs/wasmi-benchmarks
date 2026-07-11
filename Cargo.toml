@@ -2,7 +2,7 @@
 name = "wasmi-benchmarks"
 version = "0.1.0"
 edition = "2024"
-resolver = "2"
+resolver = "3"
 default-run = "coremark"
 
 [workspace]

@@ -1,7 +1,6 @@
 [package]
 name = "rt-wasmer"
 edition = "2024"
-resolver = "2"
 publish = false
 
 [lib]
