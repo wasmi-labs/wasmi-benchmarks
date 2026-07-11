@@ -47,10 +47,7 @@ impl BenchRuntime for Wasmer {
     }
 
     fn can_run(&self, id: TestId) -> bool {
-        match id {
-            TestId::Execute(ExecuteTestId::FibonacciTail) => false,
-            _ => true,
-        }
+        !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
     }
 
     fn compile(&self, wasm: &[u8]) {
