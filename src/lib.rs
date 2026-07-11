@@ -73,14 +73,14 @@ fn push_wasmi_v1_rts(rts: &mut Rts) {
 
 #[cfg(feature = "wasmi-v2")]
 fn push_wasmi_v2_rts(rts: &mut Rts) {
-    use rt_wasmi_v1::{CompilationMode, Validation};
+    use rt_wasmi_v2::{CompilationMode, Validation};
     for (compilation_mode, validation) in [
         (CompilationMode::Eager, Validation::Checked),
         (CompilationMode::LazyTranslation, Validation::Checked),
         (CompilationMode::Lazy, Validation::Checked),
         (CompilationMode::Lazy, Validation::Unchecked),
     ] {
-        rts.push(rt_wasmi_v1::Wasmi {
+        rts.push(rt_wasmi_v2::Wasmi {
             compilation_mode,
             validation,
         });
