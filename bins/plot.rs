@@ -134,7 +134,7 @@ fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<()
         .iter()
         .map(|(&vm, &BenchResult { estimate, unit: _ })| BenchEntry { vm, time: estimate })
         .collect();
-    data.sort_by(|lhs, rhs| lhs.vm.cmp(&rhs.vm));
+    data.sort_by_key(|lhs| lhs.vm);
     data.reverse();
 
     let category = bench_group.category;
