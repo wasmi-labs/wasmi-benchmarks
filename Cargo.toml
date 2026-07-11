@@ -30,7 +30,7 @@ rt-stitch = { path = "runtimes/stitch" }
 rt-tinywasm = { path = "runtimes/tinywasm" }
 rt-wasmer = { path = "runtimes/wasmer", optional = true }
 rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
-rt-wasm3 = { path = "runtimes/wasm3" }
+rt-wasm3 = { path = "runtimes/wasm3", optional = true }
 
 criterion = { workspace = true }
 wat = { workspace = true }
@@ -74,7 +74,7 @@ lto = "thin"
 codegen-units = 4
 
 [features]
-default = []
+default = ["wasm3"]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer"]
 wasmer-cranelift = ["dep:rt-wasmer"]
@@ -82,3 +82,4 @@ wasmtime = ["wasmtime-cranelift", "wasmtime-winch", "wasmtime-pulley"]
 wasmtime-cranelift = ["dep:rt-wasmtime"]
 wasmtime-winch = ["dep:rt-wasmtime"]
 wasmtime-pulley = ["dep:rt-wasmtime"]
+wasm3 = ["dep:rt-wasm3"]

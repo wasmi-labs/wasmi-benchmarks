@@ -40,6 +40,7 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             validation: rt_wasmi_v2::Validation::Unchecked,
         }),
         Box::new(rt_tinywasm::Tinywasm),
+        #[cfg(feature = "wasm3")]
         Box::new(rt_wasm3::Wasm3),
         Box::new(rt_stitch::Stitch),
         #[cfg(feature = "wasmtime-cranelift")]
