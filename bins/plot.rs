@@ -11,26 +11,36 @@ use std::str::FromStr;
 pub enum VmAndConfig {
     Wasmi031,
     Wasmi032,
-    WasmiV1,
-    WasmiV1Unchecked,
-    WasmiV1LazyTranslation,
-    WasmiV1Lazy,
-    WasmiV1LazyUnchecked,
-    WasmiV2,
-    WasmiV2Unchecked,
-    WasmiV2LazyTranslation,
-    WasmiV2Lazy,
-    WasmiV2LazyUnchecked,
+    WasmiV1(WasmiConfig),
+    WasmiV2(WasmiConfig),
     Tinywasm,
     Wasm3,
     Wasm3Lazy,
     Stitch,
-    WasmtimeCranelift,
-    WasmtimeWinch,
-    WasmtimePulley,
-    WasmerCranelift,
-    WasmerSinglepass,
-    WasmerWamr,
+    Wasmtime(WasmtimeConfig),
+    Wasmer(WasmerConfig),
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum WasmiConfig {
+    Checked,
+    Unchecked,
+    LazyTranslation,
+    Lazy,
+    LazyUnchecked,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum WasmtimeConfig {
+    Cranelift,
+    Winch,
+    Pulley,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum WasmerConfig {
+    Cranelift,
+    Singlepass,
 }
 
 impl VmAndConfig {
@@ -39,26 +49,25 @@ impl VmAndConfig {
         match self {
             Self::Wasmi031 => "Wasmi v0.31",
             Self::Wasmi032 => "Wasmi v0.32",
-            Self::WasmiV1 => "Wasmi v1",
-            Self::WasmiV1Unchecked => "Wasmi v1 (eager, unchecked)",
-            Self::WasmiV1Lazy => "Wasmi v1 (lazy)",
-            Self::WasmiV1LazyUnchecked => "Wasmi v1 (lazy, unchecked)",
-            Self::WasmiV1LazyTranslation => "Wasmi v1 (lazy-translation)",
-            Self::WasmiV2 => "Wasmi v2",
-            Self::WasmiV2Unchecked => "Wasmi v2 (eager, unchecked)",
-            Self::WasmiV2Lazy => "Wasmi v2 (lazy)",
-            Self::WasmiV2LazyUnchecked => "Wasmi v2 (lazy, unchecked)",
-            Self::WasmiV2LazyTranslation => "Wasmi v2 (lazy-translation)",
+            Self::WasmiV1(WasmiConfig::Checked) => "Wasmi v1",
+            Self::WasmiV1(WasmiConfig::Unchecked) => "Wasmi v1 (eager, unchecked)",
+            Self::WasmiV1(WasmiConfig::Lazy) => "Wasmi v1 (lazy)",
+            Self::WasmiV1(WasmiConfig::LazyUnchecked) => "Wasmi v1 (lazy, unchecked)",
+            Self::WasmiV1(WasmiConfig::LazyTranslation) => "Wasmi v1 (lazy-translation)",
+            Self::WasmiV2(WasmiConfig::Checked) => "Wasmi v2",
+            Self::WasmiV2(WasmiConfig::Unchecked) => "Wasmi v2 (eager, unchecked)",
+            Self::WasmiV2(WasmiConfig::Lazy) => "Wasmi v2 (lazy)",
+            Self::WasmiV2(WasmiConfig::LazyUnchecked) => "Wasmi v2 (lazy, unchecked)",
+            Self::WasmiV2(WasmiConfig::LazyTranslation) => "Wasmi v2 (lazy-translation)",
             Self::Tinywasm => "Tinywasm",
             Self::Wasm3 => "Wasm3 (eager)",
             Self::Wasm3Lazy => "Wasm3 (lazy)",
             Self::Stitch => "Stitch (lazy)",
-            Self::WasmtimeCranelift => "Wasmtime (Cranelift)",
-            Self::WasmtimeWinch => "Wasmtime (Winch)",
-            Self::WasmtimePulley => "Wasmtime (Pulley)",
-            Self::WasmerCranelift => "Wasmer (Cranelift)",
-            Self::WasmerSinglepass => "Wasmer (Singlepass)",
-            Self::WasmerWamr => "Wasmer (WAMR)",
+            Self::Wasmtime(WasmtimeConfig::Cranelift) => "Wasmtime (Cranelift)",
+            Self::Wasmtime(WasmtimeConfig::Winch) => "Wasmtime (Winch)",
+            Self::Wasmtime(WasmtimeConfig::Pulley) => "Wasmtime (Pulley)",
+            Self::Wasmer(WasmerConfig::Cranelift) => "Wasmer (Cranelift)",
+            Self::Wasmer(WasmerConfig::Singlepass) => "Wasmer (Singlepass)",
         }
     }
 
@@ -67,25 +76,13 @@ impl VmAndConfig {
         match self {
             Self::Wasmi031 => RGBColor(140, 130, 50),
             Self::Wasmi032 => RGBColor(160, 160, 60),
-            Self::WasmiV1
-            | Self::WasmiV1Unchecked
-            | Self::WasmiV1Lazy
-            | Self::WasmiV1LazyUnchecked
-            | Self::WasmiV1LazyTranslation => RGBColor(180, 180, 65),
-            Self::WasmiV2
-            | Self::WasmiV2Unchecked
-            | Self::WasmiV2Lazy
-            | Self::WasmiV2LazyUnchecked
-            | Self::WasmiV2LazyTranslation => RGBColor(210, 210, 70),
+            Self::WasmiV1(_) => RGBColor(180, 180, 65),
+            Self::WasmiV2(_) => RGBColor(210, 210, 70),
             Self::Tinywasm => RGBColor(108, 140, 108),
             Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Stitch => RGBColor(220, 175, 180),
-            Self::WasmtimeCranelift | Self::WasmtimeWinch | Self::WasmtimePulley => {
-                RGBColor(140, 120, 160)
-            }
-            Self::WasmerCranelift | Self::WasmerSinglepass | Self::WasmerWamr => {
-                RGBColor(95, 140, 175)
-            }
+            Self::Wasmtime(_) => RGBColor(140, 120, 160),
+            Self::Wasmer(_) => RGBColor(95, 140, 175),
         }
     }
 }
@@ -97,26 +94,25 @@ impl FromStr for VmAndConfig {
         let vm_and_config = match input {
             "wasmi-v0.31" => Self::Wasmi031,
             "wasmi-v0.32" => Self::Wasmi032,
-            "wasmi-v1.eager.checked" => Self::WasmiV1,
-            "wasmi-v1.eager.unchecked" => Self::WasmiV1Unchecked,
-            "wasmi-v1.lazy.checked" => Self::WasmiV1Lazy,
-            "wasmi-v1.lazy.unchecked" => Self::WasmiV1LazyUnchecked,
-            "wasmi-v1.lazy-translation.checked" => Self::WasmiV1LazyTranslation,
-            "wasmi-v2.eager.checked" => Self::WasmiV2,
-            "wasmi-v2.eager.unchecked" => Self::WasmiV2Unchecked,
-            "wasmi-v2.lazy.checked" => Self::WasmiV2Lazy,
-            "wasmi-v2.lazy.unchecked" => Self::WasmiV2LazyUnchecked,
-            "wasmi-v2.lazy-translation.checked" => Self::WasmiV2LazyTranslation,
+            "wasmi-v1.eager.checked" => Self::WasmiV1(WasmiConfig::Checked),
+            "wasmi-v1.eager.unchecked" => Self::WasmiV1(WasmiConfig::Unchecked),
+            "wasmi-v1.lazy.checked" => Self::WasmiV1(WasmiConfig::Lazy),
+            "wasmi-v1.lazy.unchecked" => Self::WasmiV1(WasmiConfig::LazyUnchecked),
+            "wasmi-v1.lazy-translation.checked" => Self::WasmiV1(WasmiConfig::LazyTranslation),
+            "wasmi-v2.eager.checked" => Self::WasmiV2(WasmiConfig::Checked),
+            "wasmi-v2.eager.unchecked" => Self::WasmiV2(WasmiConfig::Unchecked),
+            "wasmi-v2.lazy.checked" => Self::WasmiV2(WasmiConfig::Lazy),
+            "wasmi-v2.lazy.unchecked" => Self::WasmiV2(WasmiConfig::LazyUnchecked),
+            "wasmi-v2.lazy-translation.checked" => Self::WasmiV2(WasmiConfig::LazyTranslation),
             "tinywasm" => Self::Tinywasm,
             "wasm3.eager" => Self::Wasm3,
             "wasm3.lazy" => Self::Wasm3Lazy,
             "stitch" => Self::Stitch,
-            "wasmtime.cranelift" => Self::WasmtimeCranelift,
-            "wasmtime.winch" => Self::WasmtimeWinch,
-            "wasmtime.pulley" => Self::WasmtimePulley,
-            "wasmer.cranelift" => Self::WasmerCranelift,
-            "wasmer.singlepass" => Self::WasmerSinglepass,
-            "wasmer.wamr" => Self::WasmerWamr,
+            "wasmtime.cranelift" => Self::Wasmtime(WasmtimeConfig::Cranelift),
+            "wasmtime.winch" => Self::Wasmtime(WasmtimeConfig::Winch),
+            "wasmtime.pulley" => Self::Wasmtime(WasmtimeConfig::Pulley),
+            "wasmer.cranelift" => Self::Wasmer(WasmerConfig::Cranelift),
+            "wasmer.singlepass" => Self::Wasmer(WasmerConfig::Singlepass),
             _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         };
         Ok(vm_and_config)
