@@ -2,7 +2,6 @@
 
 use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 pub use wasmi::CompilationMode;
-use wasmi_v1 as wasmi;
 
 pub struct Wasmi {
     pub compilation_mode: CompilationMode,
