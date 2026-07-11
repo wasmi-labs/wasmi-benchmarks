@@ -3,8 +3,5 @@ name = "benchmark-utils"
 edition = "2024"
 publish = false
 
-[lib]
-path = "lib.rs"
-
 [dependencies]
 wat = { workspace = true }
