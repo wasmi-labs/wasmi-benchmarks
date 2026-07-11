@@ -5,3 +5,4 @@ publish = false
 
 [dependencies]
 wat = { workspace = true }
+anyhow = { workspace = true }

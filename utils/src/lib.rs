@@ -29,6 +29,13 @@ pub trait BenchRuntime {
 pub trait BenchInstance {
     /// Calls the callable Wasm runtime module instance.
     fn call(&mut self, input: i64);
+
+    /// Calls the function exported by `name` with `params` and writes the results back into `results`.
+    ///
+    /// # Note
+    ///
+    /// It is the callers responsibility to provide `params` and `results` buffers big enough to satisfy the called function.
+    fn call_with(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
 }
 
 /// Used to query elapsed time since last time this has been called. Used for Coremark benchmark.
