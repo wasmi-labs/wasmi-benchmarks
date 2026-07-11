@@ -1,8 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, CompileTestId, ExecuteTestFilter,
-    ExecuteTestId, TestFilter, TestId, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId, elapsed_ms,
 };
 
 pub enum Strategy {
@@ -27,37 +26,6 @@ impl BenchRuntime for Wasmtime {
             Strategy::Cranelift => "wasmtime.cranelift",
             Strategy::Winch => "wasmtime.winch",
             Strategy::Pulley => "wasmtime.pulley",
-        }
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        match self.strategy {
-            Strategy::Cranelift => {
-                TestFilter {
-                    compile: CompileTestFilter {
-                        ffmpeg: false, // takes too long to compile
-                        ..Default::default()
-                    },
-                    ..Default::default()
-                }
-            }
-            Strategy::Winch => {
-                let winch_works = cfg!(target_arch = "x86_64") || cfg!(target_arch = "aarch64");
-                TestFilter {
-                    execute: ExecuteTestFilter {
-                        fib_tailrec: false,
-                        ..ExecuteTestFilter::set_to(winch_works)
-                    },
-                    compile: CompileTestFilter::set_to(winch_works),
-                }
-            }
-            Strategy::Pulley => TestFilter {
-                execute: ExecuteTestFilter::default(),
-                compile: CompileTestFilter {
-                    ffmpeg: false, // takes too long to compile
-                    ..CompileTestFilter::default()
-                },
-            },
         }
     }
 

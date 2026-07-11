@@ -1,8 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, CompileTestId, ExecuteTestFilter,
-    ExecuteTestId, TestFilter, TestId, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId, elapsed_ms,
 };
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
@@ -18,24 +17,6 @@ struct StitchRuntime {
 impl BenchRuntime for Stitch {
     fn name(&self) -> &'static str {
         "stitch"
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        // Due to its reliance on LLVM's sibling calls optimization
-        // stitch only works on 64-bit platforms where this optimization
-        // is "guaranteed" to be applied.
-        let stitch_works = cfg!(target_pointer_width = "64");
-        TestFilter {
-            execute: ExecuteTestFilter {
-                fib_tailrec: false, // stich does not yet support tail calls
-                argon2: false,      // stitch currently seems to have a bug while executing
-                ..ExecuteTestFilter::set_to(stitch_works)
-            },
-            compile: CompileTestFilter {
-                ffmpeg: false, // function body too large for stitch
-                ..CompileTestFilter::set_to(stitch_works)
-            },
-        }
     }
 
     fn can_run(&self, id: TestId) -> bool {

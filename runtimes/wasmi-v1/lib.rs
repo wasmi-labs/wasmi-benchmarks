@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, TestId, elapsed_ms};
 pub use wasmi::CompilationMode;
 
 pub struct Wasmi {
@@ -35,18 +33,6 @@ impl BenchRuntime for Wasmi {
             }
             (CompilationMode::Lazy, Validation::Checked) => "wasmi-v1.lazy.checked",
             (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-v1.lazy.unchecked",
-        }
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        // We are not interested in `unchecked` or `lazy-translation` execution benchmarks
-        // since we do not expect them to have significantly different behavior compared to
-        // `eager.checked` and `lazy.checked`.
-        let execute = matches!(self.validation, Validation::Checked)
-            && matches!(self.compilation_mode, CompilationMode::Eager);
-        TestFilter {
-            execute: ExecuteTestFilter::set_to(execute),
-            ..TestFilter::set_to(true)
         }
     }
 

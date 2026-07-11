@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ExecuteTestId, TestFilter, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -24,25 +22,6 @@ impl BenchRuntime for Wasmer {
         match self.compiler {
             WasmerCompiler::Cranelift => "wasmer.cranelift",
             WasmerCompiler::Singlepass => "wasmer.singlepass",
-        }
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        match self.compiler {
-            WasmerCompiler::Cranelift => TestFilter {
-                execute: ExecuteTestFilter {
-                    fib_tailrec: false,
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
-            WasmerCompiler::Singlepass => TestFilter {
-                execute: ExecuteTestFilter {
-                    fib_tailrec: false,
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
         }
     }
 

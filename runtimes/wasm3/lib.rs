@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ExecuteTestId, TestFilter, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
 
 pub struct Wasm3;
 
@@ -13,16 +11,6 @@ struct Wasm3Runtime {
 impl BenchRuntime for Wasm3 {
     fn name(&self) -> &'static str {
         "wasm3.lazy"
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        TestFilter {
-            execute: ExecuteTestFilter {
-                fib_tailrec: false,
-                ..ExecuteTestFilter::set_to(true)
-            },
-            ..Default::default()
-        }
     }
 
     fn can_run(&self, id: TestId) -> bool {

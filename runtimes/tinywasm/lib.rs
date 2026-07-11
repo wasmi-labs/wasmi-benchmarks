@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ExecuteTestId, TestFilter, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
 
 pub struct Tinywasm;
 
@@ -15,16 +13,6 @@ struct TinywasmRuntime {
 impl BenchRuntime for Tinywasm {
     fn name(&self) -> &'static str {
         "tinywasm"
-    }
-
-    fn test_filter(&self) -> TestFilter {
-        TestFilter {
-            execute: ExecuteTestFilter {
-                fib_tailrec: false,
-                ..Default::default()
-            },
-            ..Default::default()
-        }
     }
 
     fn can_run(&self, id: TestId) -> bool {
