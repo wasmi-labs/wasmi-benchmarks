@@ -28,8 +28,9 @@ impl BenchRuntime for Wasm3 {
         env.parse_module(wasm).unwrap();
     }
 
-    fn load(&self, _wasm: &[u8]) -> Box<dyn BenchInstance> {
+    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
         let runtime = self.setup_runtime();
+        runtime.parse_and_load_module(wasm).unwrap();
         Box::new(Wasm3Runtime { runtime })
     }
 
