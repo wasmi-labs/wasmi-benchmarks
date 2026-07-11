@@ -38,7 +38,6 @@ plotters = { workspace = true }
 
 [workspace.dependencies]
 benchmark-utils = { path = "utils" }
-wasmi-v1 = { package = "wasmi", version = "1.0.9" }
 criterion = "0.8.2"
 wat = "1"
 serde_json = "1.0.117"

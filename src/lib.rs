@@ -24,12 +24,7 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             validation: rt_wasmi_v1::Validation::Unchecked,
         }),
         Box::new(rt_tinywasm::Tinywasm),
-        Box::new(rt_wasm3::Wasm3 {
-            compilation_mode: rt_wasm3::CompilationMode::Eager,
-        }),
-        Box::new(rt_wasm3::Wasm3 {
-            compilation_mode: rt_wasm3::CompilationMode::Lazy,
-        }),
+        Box::new(rt_wasm3::Wasm3),
         Box::new(rt_stitch::Stitch),
         #[cfg(feature = "wasmtime-cranelift")]
         Box::new(rt_wasmtime::Wasmtime {

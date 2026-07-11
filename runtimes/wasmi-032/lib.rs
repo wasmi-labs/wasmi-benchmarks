@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{BenchInstance, BenchRuntime, ModuleImportsIter, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, elapsed_ms};
 
 pub struct Wasmi032;
 
@@ -15,7 +15,7 @@ impl BenchRuntime for Wasmi032 {
         "wasmi-v0.32"
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         let store = self.store();
         wasmi::Module::new(store.engine(), wasm).unwrap();
     }

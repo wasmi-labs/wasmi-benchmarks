@@ -1,10 +1,8 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
-};
-use wasmi_v1 as wasmi;
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 pub use wasmi::CompilationMode;
+use wasmi_v1 as wasmi;
 
 pub struct Wasmi {
     pub compilation_mode: CompilationMode,
@@ -51,7 +49,7 @@ impl BenchRuntime for Wasmi {
         }
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         let store = self.store();
         self.module(store.engine(), wasm);
     }

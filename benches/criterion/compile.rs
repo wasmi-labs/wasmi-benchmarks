@@ -1,5 +1,5 @@
+use benchmark_utils::TestFilter;
 use benchmark_utils::{InputEncoding, read_benchmark_file};
-use benchmark_utils::{TestFilter, parse_module};
 use criterion::Criterion;
 use wasmi_benchmarks::vms_under_test;
 
@@ -10,7 +10,6 @@ fn compile_benchmark(
     filter: impl Fn(&TestFilter) -> bool,
 ) {
     let wasm = read_benchmark_file(encoding, name);
-    let module = parse_module(&wasm[..]);
     let mut g = c.benchmark_group(format!("compile/{name}"));
     for vm in vms_under_test() {
         if !filter(&vm.test_filter()) {
@@ -19,7 +18,7 @@ fn compile_benchmark(
         let id = format!("{}", vm.name());
         g.bench_function(&id, |b| {
             b.iter(|| {
-                vm.compile(&wasm[..], module.imports());
+                vm.compile(&wasm[..]);
             });
         });
     }

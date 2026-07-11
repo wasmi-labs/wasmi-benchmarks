@@ -1,9 +1,6 @@
 #![crate_type = "dylib"]
 
 use std::fmt;
-use wasmi_v1 as wasmi;
-pub use wasmi::ModuleImportsIter;
-pub use wasmi::{ExternType, Module, ValType};
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchRuntime {
@@ -16,7 +13,7 @@ pub trait BenchRuntime {
     }
 
     /// Compiles the `wasm` using the Wasm runtime and its configuration.
-    fn compile(&self, wasm: &[u8], imports: ModuleImportsIter);
+    fn compile(&self, wasm: &[u8]);
 
     /// Loads a Wasm module instance using the Wasm runtime and its configuration.
     ///
@@ -39,19 +36,6 @@ pub fn elapsed_ms() -> u32 {
     static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
     let elapsed = STARTED.get_or_init(Instant::now).elapsed();
     elapsed.as_millis() as u32
-}
-
-/// Parses the `wasm` bytes and returns a Wasmi [`Module`].
-///
-/// The returned [`Module`] can then be used to query import information.
-/// This import information is then fed into the benchmarked VMs for their disposal.
-///
-/// [`Module`]: wasmi::Module
-pub fn parse_module(wasm: &[u8]) -> wasmi::Module {
-    let mut config = wasmi::Config::default();
-    config.compilation_mode(wasmi::CompilationMode::Lazy);
-    let engine = wasmi::Engine::new(&config);
-    wasmi::Module::new(&engine, wasm).unwrap()
 }
 
 #[derive(Debug, Copy, Clone)]

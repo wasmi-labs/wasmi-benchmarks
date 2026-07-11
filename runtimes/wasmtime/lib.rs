@@ -1,8 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, ModuleImportsIter,
-    TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
 };
 
 pub enum Strategy {
@@ -61,7 +60,7 @@ impl BenchRuntime for Wasmtime {
         }
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         let store = self.store();
         wasmtime::Module::new(store.engine(), wasm).unwrap();
     }

@@ -1,8 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, ModuleImportsIter,
-    TestFilter, elapsed_ms,
+    BenchInstance, BenchRuntime, CompileTestFilter, ExecuteTestFilter, TestFilter, elapsed_ms,
 };
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val};
@@ -38,7 +37,7 @@ impl BenchRuntime for Stitch {
         }
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         let engine = Engine::new();
         Module::new(&engine, wasm).unwrap();
     }

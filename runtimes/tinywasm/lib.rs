@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 
 pub struct Tinywasm;
 
@@ -27,7 +25,7 @@ impl BenchRuntime for Tinywasm {
         }
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         tinywasm::parse_bytes(wasm).unwrap();
     }
 

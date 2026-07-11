@@ -1,8 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, ExecuteTestFilter, ModuleImportsIter, TestFilter, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestFilter, TestFilter, elapsed_ms};
 
 pub struct Wasmer {
     pub compiler: WasmerCompiler,
@@ -46,7 +44,7 @@ impl BenchRuntime for Wasmer {
         }
     }
 
-    fn compile(&self, wasm: &[u8], _imports: ModuleImportsIter) {
+    fn compile(&self, wasm: &[u8]) {
         let store = self.store();
         wasmer::Module::new(&store, wasm).unwrap();
     }

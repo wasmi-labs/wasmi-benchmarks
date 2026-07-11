@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-wasmi-v1 = { workspace = true }
+wasmi-v1 = { package = "wasmi", version = "1.0.9" }
