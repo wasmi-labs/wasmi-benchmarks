@@ -82,6 +82,7 @@ impl From<ExecuteTestId> for TestId {
 
 #[derive(Copy, Clone)]
 pub enum CompileTestId {
+    Erc20,
     Bz2,
     PulldownCmark,
     Spidermonkey,
