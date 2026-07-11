@@ -9,4 +9,8 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-wasm3 = { workspace = true }
+
+[dependencies.wasm3]
+git = "https://github.com/robbepop/wasm3-rs.git"
+branch = "rf-fix-wasm3-rs"
+features = ["build-bindgen"]

@@ -9,6 +9,10 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-wasmer = { workspace = true }
-wasmer-compiler-singlepass = { workspace = true }
-wasmer-compiler-cranelift = { workspace = true }
+wasmer-compiler-singlepass = "7.2.0"
+wasmer-compiler-cranelift = "7.2.0"
+
+[dependencies.wasmer]
+version = "7.2.0"
+default-features = false
+features = ["compiler", "singlepass", "cranelift"]

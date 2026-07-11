@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-makepad-stitch = { workspace = true }
+makepad-stitch = "0.1.0"

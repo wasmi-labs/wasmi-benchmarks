@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
-tinywasm = { workspace = true }
+tinywasm = { package = "tinywasm", version = "0.9.0", features = ["parser"] }

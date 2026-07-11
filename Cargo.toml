@@ -48,28 +48,11 @@ rt-wasmer = { path = "runtimes/wasmer" }
 rt-wasmtime = { path = "runtimes/wasmtime" }
 rt-wasm3 = { path = "runtimes/wasm3" }
 
-wasmi031 = { package = "wasmi", version = "0.31.2" }
-wasmi032 = { package = "wasmi", version = "0.32.3" }
 wasmi-v1 = { package = "wasmi", version = "1.0.9" }
-tinywasm = { package = "tinywasm", version = "0.9.0", features = ["parser"] }
-wasmer = { version = "7.2.0", default-features = false, features = ["compiler", "singlepass", "cranelift"] }
-wasmer-compiler-singlepass = "7.2.0"
-wasmer-compiler-cranelift = "7.2.0"
-makepad-stitch = "0.1.0"
 criterion = "0.8.2"
 wat = "1"
 serde_json = "1.0.117"
 plotters = "0.3.7"
-
-[workspace.dependencies.wasmtime]
-version = "46.0.0"
-default-features = false
-features = ["winch", "cranelift", "pulley", "runtime"]
-
-[workspace.dependencies.wasm3]
-git = "https://github.com/robbepop/wasm3-rs.git"
-branch = "rf-fix-wasm3-rs"
-features = ["build-bindgen"]
 
 [[bench]]
 name = "criterion"
