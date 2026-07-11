@@ -8,6 +8,7 @@ path = "lib.rs"
 
 [dependencies]
 benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
 
 [dependencies.wasm3]
 git = "https://github.com/robbepop/wasm3-rs.git"

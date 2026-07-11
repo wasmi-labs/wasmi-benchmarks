@@ -1,5 +1,6 @@
 #![crate_type = "dylib"]
 
+use benchmark_utils as utils;
 use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
 
 pub struct Wasm3;
@@ -53,5 +54,14 @@ impl BenchInstance for Wasm3Runtime {
     fn call(&mut self, input: i64) {
         let func = self.runtime.find_function::<i64, i64>("run").unwrap();
         func.call(input).unwrap();
+    }
+
+    fn call_with(
+        &mut self,
+        _name: &str,
+        _params: &[utils::Val],
+        _results: &mut [utils::Val],
+    ) -> anyhow::Result<()> {
+        todo!()
     }
 }
