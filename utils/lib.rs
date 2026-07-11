@@ -68,6 +68,18 @@ pub enum TestId {
     Execute(ExecuteTestId),
 }
 
+impl From<CompileTestId> for TestId {
+    fn from(value: CompileTestId) -> Self {
+        Self::Compile(value)
+    }
+}
+
+impl From<ExecuteTestId> for TestId {
+    fn from(value: ExecuteTestId) -> Self {
+        Self::Execute(value)
+    }
+}
+
 #[derive(Copy, Clone)]
 pub enum CompileTestId {
     Bz2,
