@@ -155,6 +155,7 @@ checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 name = "benchmark-utils"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "wat",
 ]
 
@@ -2184,6 +2185,7 @@ dependencies = [
 name = "rt-stitch"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "makepad-stitch",
 ]
@@ -2192,6 +2194,7 @@ dependencies = [
 name = "rt-tinywasm"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "tinywasm",
 ]
@@ -2200,6 +2203,7 @@ dependencies = [
 name = "rt-wasm3"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasm3",
 ]
@@ -2208,6 +2212,7 @@ dependencies = [
 name = "rt-wasmer"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmer",
  "wasmer-compiler-cranelift",
@@ -2218,6 +2223,7 @@ dependencies = [
 name = "rt-wasmi-v0-31"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmi 0.31.2",
 ]
@@ -2226,6 +2232,7 @@ dependencies = [
 name = "rt-wasmi-v0-32"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmi 0.32.3",
 ]
@@ -2234,6 +2241,7 @@ dependencies = [
 name = "rt-wasmi-v1"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmi 1.1.0",
 ]
@@ -2242,6 +2250,7 @@ dependencies = [
 name = "rt-wasmi-v2"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmi 2.0.0-beta.7",
 ]
@@ -2250,6 +2259,7 @@ dependencies = [
 name = "rt-wasmtime"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
  "benchmark-utils",
  "wasmtime",
 ]
@@ -3361,6 +3371,7 @@ version = "46.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f6ce74d60a8ed870548e7efa9710c54f982bbfcf80e5ee5eee8498318616483"
 dependencies = [
+ "anyhow",
  "hashbrown 0.17.1",
  "libm",
  "serde",
