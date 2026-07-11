@@ -11,11 +11,16 @@ use std::str::FromStr;
 pub enum VmAndConfig {
     Wasmi031,
     Wasmi032,
-    Wasmi,
-    WasmiUnchecked,
-    WasmiLazyTranslation,
-    WasmiLazy,
-    WasmiLazyUnchecked,
+    WasmiV1,
+    WasmiV1Unchecked,
+    WasmiV1LazyTranslation,
+    WasmiV1Lazy,
+    WasmiV1LazyUnchecked,
+    WasmiV2,
+    WasmiV2Unchecked,
+    WasmiV2LazyTranslation,
+    WasmiV2Lazy,
+    WasmiV2LazyUnchecked,
     Tinywasm,
     Wasm3,
     Wasm3Lazy,
@@ -34,11 +39,16 @@ impl VmAndConfig {
         match self {
             Self::Wasmi031 => "Wasmi v0.31",
             Self::Wasmi032 => "Wasmi v0.32",
-            Self::Wasmi => "Wasmi",
-            Self::WasmiUnchecked => "Wasmi (eager, unchecked)",
-            Self::WasmiLazy => "Wasmi (lazy)",
-            Self::WasmiLazyUnchecked => "Wasmi (lazy, unchecked)",
-            Self::WasmiLazyTranslation => "Wasmi (lazy-translation)",
+            Self::WasmiV1 => "Wasmi v1",
+            Self::WasmiV1Unchecked => "Wasmi v1 (eager, unchecked)",
+            Self::WasmiV1Lazy => "Wasmi v1 (lazy)",
+            Self::WasmiV1LazyUnchecked => "Wasmi v1 (lazy, unchecked)",
+            Self::WasmiV1LazyTranslation => "Wasmi v1 (lazy-translation)",
+            Self::WasmiV2 => "Wasmi v2",
+            Self::WasmiV2Unchecked => "Wasmi v2 (eager, unchecked)",
+            Self::WasmiV2Lazy => "Wasmi v2 (lazy)",
+            Self::WasmiV2LazyUnchecked => "Wasmi v2 (lazy, unchecked)",
+            Self::WasmiV2LazyTranslation => "Wasmi v2 (lazy-translation)",
             Self::Tinywasm => "Tinywasm",
             Self::Wasm3 => "Wasm3 (eager)",
             Self::Wasm3Lazy => "Wasm3 (lazy)",
@@ -57,11 +67,16 @@ impl VmAndConfig {
         match self {
             Self::Wasmi031 => RGBColor(140, 130, 50),
             Self::Wasmi032 => RGBColor(160, 160, 60),
-            Self::Wasmi
-            | Self::WasmiUnchecked
-            | Self::WasmiLazy
-            | Self::WasmiLazyUnchecked
-            | Self::WasmiLazyTranslation => RGBColor(200, 200, 70),
+            Self::WasmiV1
+            | Self::WasmiV1Unchecked
+            | Self::WasmiV1Lazy
+            | Self::WasmiV1LazyUnchecked
+            | Self::WasmiV1LazyTranslation => RGBColor(180, 180, 65),
+            Self::WasmiV2
+            | Self::WasmiV2Unchecked
+            | Self::WasmiV2Lazy
+            | Self::WasmiV2LazyUnchecked
+            | Self::WasmiV2LazyTranslation => RGBColor(210, 210, 70),
             Self::Tinywasm => RGBColor(108, 140, 108),
             Self::Wasm3 | Self::Wasm3Lazy => RGBColor(90, 90, 90),
             Self::Stitch => RGBColor(220, 175, 180),
@@ -82,11 +97,16 @@ impl FromStr for VmAndConfig {
         let vm_and_config = match input {
             "wasmi-v0.31" => Self::Wasmi031,
             "wasmi-v0.32" => Self::Wasmi032,
-            "wasmi.eager.checked" => Self::Wasmi,
-            "wasmi.eager.unchecked" => Self::WasmiUnchecked,
-            "wasmi.lazy.checked" => Self::WasmiLazy,
-            "wasmi.lazy.unchecked" => Self::WasmiLazyUnchecked,
-            "wasmi.lazy-translation.checked" => Self::WasmiLazyTranslation,
+            "wasmi-v1.eager.checked" => Self::WasmiV1,
+            "wasmi-v1.eager.unchecked" => Self::WasmiV1Unchecked,
+            "wasmi-v1.lazy.checked" => Self::WasmiV1Lazy,
+            "wasmi-v1.lazy.unchecked" => Self::WasmiV1LazyUnchecked,
+            "wasmi-v1.lazy-translation.checked" => Self::WasmiV1LazyTranslation,
+            "wasmi-v2.eager.checked" => Self::WasmiV2,
+            "wasmi-v2.eager.unchecked" => Self::WasmiV2Unchecked,
+            "wasmi-v2.lazy.checked" => Self::WasmiV2Lazy,
+            "wasmi-v2.lazy.unchecked" => Self::WasmiV2LazyUnchecked,
+            "wasmi-v2.lazy-translation.checked" => Self::WasmiV2LazyTranslation,
             "tinywasm" => Self::Tinywasm,
             "wasm3.eager" => Self::Wasm3,
             "wasm3.lazy" => Self::Wasm3Lazy,

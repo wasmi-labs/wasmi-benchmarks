@@ -23,6 +23,7 @@ path = "bins/plot.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 rt-wasmi-v1 = { path = "runtimes/wasmi-v1" }
+rt-wasmi-v2 = { path = "runtimes/wasmi-v2" }
 rt-stitch = { path = "runtimes/stitch" }
 rt-tinywasm = { path = "runtimes/tinywasm" }
 rt-wasmi-031 = { path = "runtimes/wasmi-031" }

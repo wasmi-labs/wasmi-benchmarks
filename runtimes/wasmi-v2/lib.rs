@@ -23,16 +23,16 @@ struct WasmiRuntime {
 impl BenchRuntime for Wasmi {
     fn name(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
-            (CompilationMode::Eager, Validation::Checked) => "wasmi-v1.eager.checked",
-            (CompilationMode::Eager, Validation::Unchecked) => "wasmi-v1.eager.unchecked",
+            (CompilationMode::Eager, Validation::Checked) => "wasmi-v2.eager.checked",
+            (CompilationMode::Eager, Validation::Unchecked) => "wasmi-v2.eager.unchecked",
             (CompilationMode::LazyTranslation, Validation::Checked) => {
-                "wasmi-v1.lazy-translation.checked"
+                "wasmi-v2.lazy-translation.checked"
             }
             (CompilationMode::LazyTranslation, Validation::Unchecked) => {
-                "wasmi-v1.lazy-translation.unchecked"
+                "wasmi-v2.lazy-translation.unchecked"
             }
-            (CompilationMode::Lazy, Validation::Checked) => "wasmi-v1.lazy.checked",
-            (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-v1.lazy.unchecked",
+            (CompilationMode::Lazy, Validation::Checked) => "wasmi-v2.lazy.checked",
+            (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-v2.lazy.unchecked",
         }
     }
 

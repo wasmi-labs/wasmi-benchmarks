@@ -23,6 +23,22 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
             compilation_mode: rt_wasmi_v1::CompilationMode::Lazy,
             validation: rt_wasmi_v1::Validation::Unchecked,
         }),
+        Box::new(rt_wasmi_v2::Wasmi {
+            compilation_mode: rt_wasmi_v2::CompilationMode::Eager,
+            validation: rt_wasmi_v2::Validation::Checked,
+        }),
+        Box::new(rt_wasmi_v2::Wasmi {
+            compilation_mode: rt_wasmi_v2::CompilationMode::LazyTranslation,
+            validation: rt_wasmi_v2::Validation::Checked,
+        }),
+        Box::new(rt_wasmi_v2::Wasmi {
+            compilation_mode: rt_wasmi_v2::CompilationMode::Lazy,
+            validation: rt_wasmi_v2::Validation::Checked,
+        }),
+        Box::new(rt_wasmi_v2::Wasmi {
+            compilation_mode: rt_wasmi_v2::CompilationMode::Lazy,
+            validation: rt_wasmi_v2::Validation::Unchecked,
+        }),
         Box::new(rt_tinywasm::Tinywasm),
         Box::new(rt_wasm3::Wasm3),
         Box::new(rt_stitch::Stitch),
