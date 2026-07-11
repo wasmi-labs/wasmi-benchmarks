@@ -1,7 +1,9 @@
 #![crate_type = "dylib"]
 
+use benchmark_utils as utils;
 use benchmark_utils::{BenchInstance, BenchRuntime, TestId, elapsed_ms};
 pub use wasmi::CompilationMode;
+use wasmi::{Func, Val};
 
 pub struct Wasmi {
     pub compilation_mode: CompilationMode,
@@ -16,8 +18,10 @@ pub enum Validation {
 
 struct WasmiRuntime {
     store: wasmi::Store<()>,
-    _instance: wasmi::Instance,
+    instance: wasmi::Instance,
     func: wasmi::TypedFunc<i64, i64>,
+    params: Vec<Val>,
+    results: Vec<Val>,
 }
 
 impl BenchRuntime for Wasmi {
@@ -60,8 +64,10 @@ impl BenchRuntime for Wasmi {
         let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiRuntime {
             store,
-            _instance: instance,
+            instance,
             func,
+            params: Vec::new(),
+            results: Vec::new(),
         })
     }
 
@@ -103,5 +109,66 @@ impl Wasmi {
 impl BenchInstance for WasmiRuntime {
     fn call(&mut self, input: i64) {
         self.func.call(&mut self.store, input).unwrap();
+    }
+
+    fn call_with(
+        &mut self,
+        name: &str,
+        params: &[utils::Val],
+        results: &mut [utils::Val],
+    ) -> anyhow::Result<()> {
+        let Some(func) = self.instance.get_func(&self.store, name) else {
+            anyhow::bail!("failed to find function")
+        };
+        assert_eq!(params.len(), func.ty(&self.store).params().len());
+        assert_eq!(results.len(), func.ty(&self.store).results().len());
+        self.prepare_params(params);
+        self.prepare_results(&func);
+        func.call(&mut self.store, &self.params[..], &mut self.results[..])?;
+        self.write_back_results(results);
+        Ok(())
+    }
+}
+
+impl WasmiRuntime {
+    fn prepare_params(&mut self, params: &[utils::Val]) {
+        self.params.clear();
+        self.params
+            .extend(params.iter().copied().map(from_utils_val));
+    }
+
+    fn prepare_results(&mut self, func: &Func) {
+        self.results.clear();
+        for ty in func.ty(&self.store).results() {
+            self.results.push(Val::default_for_ty(*ty))
+        }
+    }
+
+    fn write_back_results(&mut self, results: &mut [utils::Val]) {
+        assert_eq!(results.len(), self.results.len());
+        for (i, result) in results.iter_mut().enumerate() {
+            let ty = self.results[i].ty();
+            let src = core::mem::replace(&mut self.results[i], Val::default_for_ty(ty));
+            *result = into_utils_val(src);
+        }
+    }
+}
+
+fn from_utils_val(val: utils::Val) -> Val {
+    match val {
+        utils::Val::I32(val) => Val::I32(val),
+        utils::Val::I64(val) => Val::I64(val),
+        utils::Val::F32(val) => Val::F32(val.into()),
+        utils::Val::F64(val) => Val::F64(val.into()),
+    }
+}
+
+fn into_utils_val(val: Val) -> utils::Val {
+    match val {
+        Val::I32(val) => utils::Val::I32(val),
+        Val::I64(val) => utils::Val::I64(val),
+        Val::F32(val) => utils::Val::F32(val.to_float()),
+        Val::F64(val) => utils::Val::F64(val.to_float()),
+        _ => panic!(),
     }
 }
