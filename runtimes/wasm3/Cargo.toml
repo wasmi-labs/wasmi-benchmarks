@@ -9,8 +9,4 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-
-[dependencies.wasm3]
-git = "https://github.com/robbepop/wasm3-rs.git"
-branch = "rf-fix-wasm3-rs"
-features = ["build-bindgen"]
+wasm3 = { package = "wasm3x", version = "0.1" }
