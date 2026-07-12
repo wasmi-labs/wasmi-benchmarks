@@ -12,10 +12,11 @@ criterion_group!(
         .measurement_time(Duration::from_millis(2000))
         .warm_up_time(Duration::from_millis(1000));
     targets =
-        execute::bench_counter,
-        execute::bench_fib_recursive,
-        execute::bench_fib_iterative,
-        execute::bench_fib_tailrec,
+        execute::bench_counter_local,
+        execute::bench_counter_param,
+        execute::bench_fibonacci_rec,
+        execute::bench_fibonacci_iter,
+        execute::bench_fibonacci_tail,
         execute::bench_primes,
         execute::bench_matrix_multiply,
         execute::bench_argon2,
