@@ -35,14 +35,6 @@ pub trait BenchInstance {
     fn call(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
 }
 
-/// Used to query elapsed time since last time this has been called. Used for Coremark benchmark.
-pub fn elapsed_ms() -> u32 {
-    use std::time::Instant;
-    static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
-    let elapsed = STARTED.get_or_init(Instant::now).elapsed();
-    elapsed.as_millis() as u32
-}
-
 #[derive(Copy, Clone)]
 pub enum TestId {
     Compile(CompileTestId),

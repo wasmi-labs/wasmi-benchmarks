@@ -1,6 +1,14 @@
-use benchmark_utils::{ExecuteTestId, InputEncoding, elapsed_ms, read_benchmark_file};
+use benchmark_utils::{ExecuteTestId, InputEncoding, read_benchmark_file};
 use std::collections::BTreeMap;
 use wasmi_benchmarks::vms_under_test;
+
+/// Used to query elapsed time since last time this has been called. Used for Coremark benchmark.
+pub fn elapsed_ms() -> u32 {
+    use std::time::Instant;
+    static STARTED: std::sync::OnceLock<Instant> = std::sync::OnceLock::new();
+    let elapsed = STARTED.get_or_init(Instant::now).elapsed();
+    elapsed.as_millis() as u32
+}
 
 fn main() {
     let coremark_wasm = read_benchmark_file(InputEncoding::Wasm, "coremark-minimal");
