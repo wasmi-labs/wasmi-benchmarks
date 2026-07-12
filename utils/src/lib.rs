@@ -22,7 +22,7 @@ pub trait BenchRuntime {
     fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance>;
 
     /// Runs the given Coremark Wasm test and returns the result.
-    fn coremark(&self, wasm: &[u8]) -> f32;
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32;
 }
 
 /// The module instance of a Wasm runtime that is capable of being benchmarked.

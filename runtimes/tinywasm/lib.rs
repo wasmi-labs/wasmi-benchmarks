@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId};
 use tinywasm::types::WasmValue as Val;
 
 pub struct Tinywasm;
@@ -36,14 +36,14 @@ impl BenchRuntime for Tinywasm {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let mut store = tinywasm::Store::default();
         let module = tinywasm::parse_bytes(wasm).unwrap();
         let mut imports = tinywasm::Imports::new();
         imports.define(
             "env",
             "clock_ms",
-            tinywasm::HostFunction::from(&mut store, |_ctx, _arg: ()| Ok(elapsed_ms() as i32)),
+            tinywasm::HostFunction::from(&mut store, move |_ctx, _arg: ()| Ok(elapsed_ms() as i32)),
         );
         let instance =
             tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();

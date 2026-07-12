@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, TestId, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, TestId};
 use wasmi::Func;
 use wasmi::Value as Val;
 
@@ -46,12 +46,12 @@ impl BenchRuntime for WasmiV031 {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let engine = wasmi::Engine::default();
         let mut store = <wasmi::Store<()>>::new(&engine, ());
         let mut linker = wasmi::Linker::new(store.engine());
         linker
-            .func_wrap("env", "clock_ms", || elapsed_ms() as i32)
+            .func_wrap("env", "clock_ms", move || elapsed_ms() as i32)
             .unwrap();
         let module = wasmi::Module::new(store.engine(), wasm).unwrap();
         let result = linker

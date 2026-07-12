@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId};
 use wasmer::Function;
 use wasmer::Type as ValType;
 use wasmer::Value as Val;
@@ -52,7 +52,7 @@ impl BenchRuntime for Wasmer {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let mut store = self.store();
         let module = wasmer::Module::new(&store, wasm).unwrap();
         let import_object = wasmer::imports! {

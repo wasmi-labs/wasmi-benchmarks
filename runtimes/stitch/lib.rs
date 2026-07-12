@@ -1,9 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId};
 use core::slice;
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val, ValType};
 
@@ -50,7 +48,7 @@ impl BenchRuntime for Stitch {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let engine = Engine::new();
         let mut store = Store::new(engine);
         let engine = store.engine();

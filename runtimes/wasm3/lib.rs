@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{self as utils, ExecuteTestId};
-use benchmark_utils::{BenchInstance, BenchRuntime, TestId, elapsed_ms};
+use benchmark_utils::{BenchInstance, BenchRuntime, TestId};
 pub use wasm3::CompilationMode;
 use wasm3::{Func, Val};
 
@@ -53,7 +53,7 @@ impl BenchRuntime for Wasm3 {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let mut store = <wasm3::Store<()>>::default();
         let mut linker = wasm3::Linker::new(store.engine());
         linker.func_wrap("env", "clock_ms", elapsed_ms).unwrap();

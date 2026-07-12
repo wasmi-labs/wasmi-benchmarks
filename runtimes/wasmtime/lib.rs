@@ -1,9 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{
-    BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId, elapsed_ms,
-};
+use benchmark_utils::{BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId};
 use wasmtime::{Func, Val, ValType};
 
 pub enum Strategy {
@@ -74,7 +72,7 @@ impl BenchRuntime for Wasmtime {
         })
     }
 
-    fn coremark(&self, wasm: &[u8]) -> f32 {
+    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
         let mut store = self.store();
         let mut linker = wasmtime::Linker::new(store.engine());
         linker
