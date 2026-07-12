@@ -24,6 +24,16 @@ impl Val {
             Self::F64(_) => ValType::F64,
         }
     }
+
+    /// Returns the default [`Val`] for `ty`.
+    pub fn default_for_ty(ty: ValType) -> Self {
+        match ty {
+            ValType::I32 => Self::I32(0),
+            ValType::I64 => Self::I64(0),
+            ValType::F32 => Self::F32(0.0),
+            ValType::F64 => Self::F64(0.0),
+        }
+    }
 }
 
 /// A Wasm type.
