@@ -84,9 +84,9 @@ The Wasmi benchmarking test suite provides the following test cases:
 | `execute` | | |
 | | `counter-local` | Simple loop that counts a single local up to some number. |
 | | `counter-param` | Simple loop that counts up to some number via a control parameter. |
-| | `fibonacci.rec` | Recursive fibonacci calculation. Call-intense workload. |
-| | `fibonacci.iter` | Iterative fibonacci calculation. Compute intense workload. |
-| | `fibonacci.tail` | Tail-call based fibonacci calculation. |
+| | `fibonacci-rec` | Recursive fibonacci calculation. Call-intense workload. |
+| | `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
+| | `fibonacci-tail` | Tail-call based fibonacci calculation. |
 | | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
 | | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | | `argon2` | Password hashing library. Compute- and memory intense workload. |
