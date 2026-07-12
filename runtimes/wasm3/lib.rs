@@ -20,8 +20,8 @@ struct Wasm3Runtime {
 impl BenchRuntime for Wasm3 {
     fn name(&self) -> &'static str {
         match self.compilation_mode {
-            CompilationMode::Eager => "wasm3-v2.eager",
-            CompilationMode::Lazy => "wasm3-v2.lazy",
+            CompilationMode::Eager => "wasm3.eager",
+            CompilationMode::Lazy => "wasm3.lazy",
         }
     }
 
