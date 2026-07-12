@@ -19,7 +19,6 @@ pub struct Wasmtime {
 struct WasmtimeRuntime {
     store: wasmtime::Store<()>,
     instance: wasmtime::Instance,
-    func: wasmtime::TypedFunc<i64, i64>,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -67,13 +66,9 @@ impl BenchRuntime for Wasmtime {
         let module = wasmtime::Module::new(engine, wasm).unwrap();
         let linker = wasmtime::Linker::new(engine);
         let instance = linker.instantiate(&mut store, &module).unwrap();
-        let func = instance
-            .get_typed_func::<i64, i64>(&mut store, "run")
-            .unwrap();
         Box::new(WasmtimeRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -117,7 +112,11 @@ impl Wasmtime {
 
 impl BenchInstance for WasmtimeRuntime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .get_typed_func::<i64, i64>(&mut self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

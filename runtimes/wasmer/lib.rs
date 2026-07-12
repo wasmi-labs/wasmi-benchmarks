@@ -18,7 +18,6 @@ pub enum WasmerCompiler {
 struct WasmerRuntime {
     store: wasmer::Store,
     instance: wasmer::Instance,
-    func: wasmer::TypedFunction<i64, i64>,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -45,14 +44,9 @@ impl BenchRuntime for Wasmer {
         let module = wasmer::Module::new(&store, wasm).unwrap();
         let import_object = wasmer::imports! {};
         let instance = wasmer::Instance::new(&mut store, &module, &import_object).unwrap();
-        let func = instance
-            .exports
-            .get_typed_function::<i64, i64>(&store, "run")
-            .unwrap();
         Box::new(WasmerRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -98,7 +92,12 @@ impl Wasmer {
 
 impl BenchInstance for WasmerRuntime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .exports
+            .get_typed_function::<i64, i64>(&self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

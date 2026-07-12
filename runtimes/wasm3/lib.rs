@@ -12,7 +12,6 @@ pub struct Wasm3 {
 struct Wasm3Runtime {
     store: wasm3::Store<()>,
     instance: wasm3::Instance,
-    func: wasm3::TypedFunc<i64, i64>,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -46,11 +45,9 @@ impl BenchRuntime for Wasm3 {
         let module = self.module(engine, wasm);
         let linker = wasm3::Linker::new(engine);
         let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
-        let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(Wasm3Runtime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -86,7 +83,11 @@ impl Wasm3 {
 
 impl BenchInstance for Wasm3Runtime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .get_typed_func::<i64, i64>(&self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

@@ -19,7 +19,6 @@ pub enum Validation {
 struct WasmiRuntime {
     store: wasmi::Store<()>,
     instance: wasmi::Instance,
-    func: wasmi::TypedFunc<i64, i64>,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -61,11 +60,9 @@ impl BenchRuntime for Wasmi {
         let module = self.module(engine, wasm);
         let linker = wasmi::Linker::new(engine);
         let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
-        let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -108,7 +105,11 @@ impl Wasmi {
 
 impl BenchInstance for WasmiRuntime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .get_typed_func::<i64, i64>(&self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

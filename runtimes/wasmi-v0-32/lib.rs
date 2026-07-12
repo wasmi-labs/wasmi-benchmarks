@@ -10,7 +10,6 @@ pub struct WasmiV032;
 struct WasmiRuntime {
     store: wasmi::Store<()>,
     instance: wasmi::Instance,
-    func: wasmi::TypedFunc<i64, i64>,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -39,11 +38,9 @@ impl BenchRuntime for WasmiV032 {
             .unwrap()
             .start(&mut store)
             .unwrap();
-        let func = instance.get_typed_func::<i64, i64>(&store, "run").unwrap();
         Box::new(WasmiRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -81,7 +78,11 @@ impl WasmiV032 {
 
 impl BenchInstance for WasmiRuntime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .get_typed_func::<i64, i64>(&self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

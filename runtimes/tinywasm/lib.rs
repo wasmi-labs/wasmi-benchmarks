@@ -9,7 +9,6 @@ pub struct Tinywasm;
 struct TinywasmRuntime {
     store: tinywasm::Store,
     instance: tinywasm::ModuleInstance,
-    func: tinywasm::FunctionTyped<i64, i64>,
     params: Vec<Val>,
 }
 
@@ -30,11 +29,9 @@ impl BenchRuntime for Tinywasm {
         let mut store = tinywasm::Store::default();
         let module = tinywasm::parse_bytes(wasm).unwrap();
         let instance = tinywasm::ModuleInstance::instantiate(&mut store, &module, None).unwrap();
-        let func = instance.func::<i64, i64>(&store, "run").unwrap();
         Box::new(TinywasmRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
         })
     }
@@ -57,7 +54,11 @@ impl BenchRuntime for Tinywasm {
 
 impl BenchInstance for TinywasmRuntime {
     fn call(&mut self, input: i64) {
-        self.func.call(&mut self.store, input).unwrap();
+        self.instance
+            .func::<i64, i64>(&self.store, "run")
+            .unwrap()
+            .call(&mut self.store, input)
+            .unwrap();
     }
 
     fn call_with(

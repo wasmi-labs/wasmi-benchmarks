@@ -12,7 +12,6 @@ pub struct Stitch;
 struct StitchRuntime {
     store: Store,
     instance: Instance,
-    func: Func,
     params: Vec<Val>,
     results: Vec<Val>,
 }
@@ -43,11 +42,9 @@ impl BenchRuntime for Stitch {
         let module = Module::new(engine, wasm).unwrap();
         let linker = Linker::new();
         let instance = linker.instantiate(&mut store, &module).unwrap();
-        let func = instance.exported_func("run").unwrap();
         Box::new(StitchRuntime {
             store,
             instance,
-            func,
             params: Vec::new(),
             results: Vec::new(),
         })
@@ -76,7 +73,9 @@ impl BenchRuntime for Stitch {
 impl BenchInstance for StitchRuntime {
     fn call(&mut self, input: i64) {
         let mut result = Val::I64(0);
-        self.func
+        self.instance
+            .exported_func("run")
+            .unwrap()
             .call(
                 &mut self.store,
                 &[Val::I64(input)],
