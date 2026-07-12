@@ -91,15 +91,6 @@ impl Wasmer {
 }
 
 impl BenchInstance for WasmerRuntime {
-    fn call(&mut self, input: i64) {
-        self.instance
-            .exports
-            .get_typed_function::<i64, i64>(&self.store, "run")
-            .unwrap()
-            .call(&mut self.store, input)
-            .unwrap();
-    }
-
     fn call_with(
         &mut self,
         name: &str,

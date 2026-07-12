@@ -82,14 +82,6 @@ impl Wasm3 {
 }
 
 impl BenchInstance for Wasm3Runtime {
-    fn call(&mut self, input: i64) {
-        self.instance
-            .get_typed_func::<i64, i64>(&self.store, "run")
-            .unwrap()
-            .call(&mut self.store, input)
-            .unwrap();
-    }
-
     fn call_with(
         &mut self,
         name: &str,

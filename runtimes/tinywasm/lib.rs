@@ -53,14 +53,6 @@ impl BenchRuntime for Tinywasm {
 }
 
 impl BenchInstance for TinywasmRuntime {
-    fn call(&mut self, input: i64) {
-        self.instance
-            .func::<i64, i64>(&self.store, "run")
-            .unwrap()
-            .call(&mut self.store, input)
-            .unwrap();
-    }
-
     fn call_with(
         &mut self,
         name: &str,

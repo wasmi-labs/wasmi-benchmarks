@@ -27,9 +27,6 @@ pub trait BenchRuntime {
 
 /// The module instance of a Wasm runtime that is capable of being benchmarked.
 pub trait BenchInstance {
-    /// Calls the callable Wasm runtime module instance.
-    fn call(&mut self, input: i64);
-
     /// Calls the function exported by `name` with `params` and writes the results back into `results`.
     ///
     /// # Note

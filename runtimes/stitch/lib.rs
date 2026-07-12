@@ -71,19 +71,6 @@ impl BenchRuntime for Stitch {
 }
 
 impl BenchInstance for StitchRuntime {
-    fn call(&mut self, input: i64) {
-        let mut result = Val::I64(0);
-        self.instance
-            .exported_func("run")
-            .unwrap()
-            .call(
-                &mut self.store,
-                &[Val::I64(input)],
-                slice::from_mut(&mut result),
-            )
-            .unwrap();
-    }
-
     fn call_with(
         &mut self,
         name: &str,
