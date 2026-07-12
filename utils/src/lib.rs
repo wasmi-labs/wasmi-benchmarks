@@ -77,7 +77,6 @@ pub enum CompileTestId {
 
 #[derive(Copy, Clone)]
 pub enum ExecuteTestId {
-    Counter,
     CounterLocal,
     CounterParam,
     FibonacciIter,
