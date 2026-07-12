@@ -1,0 +1,21 @@
+(module
+    (func (export "run") (param $n i64) (result i64)
+        (local $a i64)
+        (local $b i64)
+        (local $i i64)
+        (local.set $a (i64.const 0))
+        (local.set $b (i64.const 1))
+        (local.set $i (local.get $n))
+        (block $break
+            (br_if $break (i64.eqz (local.get $i)))
+            (loop $continue
+                (i64.add (local.get $a) (local.get $b))
+                (local.set $a (local.get $b))
+                (local.set $b)
+                (local.set $i (i64.sub (local.get $i) (i64.const 1)))
+                (br_if $continue (i64.ne (local.get $i) (i64.const 0)))
+            )
+        )
+        (local.get $a)
+    )
+)
