@@ -25,7 +25,7 @@ struct WasmtimeRuntime {
 }
 
 impl BenchRuntime for Wasmtime {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         match self.strategy {
             Strategy::Cranelift => "wasmtime.cranelift",
             Strategy::Winch => "wasmtime.winch",

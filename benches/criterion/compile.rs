@@ -10,7 +10,7 @@ fn compile_benchmark(c: &mut Criterion, name: &str, encoding: InputEncoding, id:
         if !vm.can_run(id.into()) {
             continue;
         }
-        let id = format!("{}", vm.name());
+        let id = format!("{}", vm.id());
         g.bench_function(&id, |b| {
             b.iter(|| {
                 vm.compile(&wasm[..]);

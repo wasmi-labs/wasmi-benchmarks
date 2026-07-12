@@ -7,8 +7,8 @@ use core::fmt;
 
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchRuntime {
-    /// Returns the name of the Wasm runtime and its configuration.
-    fn name(&self) -> &'static str;
+    /// Returns the unique ID of the Wasm runtime and its configuration as string.
+    fn id(&self) -> &'static str;
 
     /// Returns `true` if `self` can run the test with the given `id`.
     fn can_run(&self, id: TestId) -> bool;

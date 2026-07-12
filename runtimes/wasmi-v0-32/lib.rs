@@ -16,7 +16,7 @@ struct WasmiRuntime {
 }
 
 impl BenchRuntime for WasmiV032 {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         "wasmi-v0.32"
     }
 

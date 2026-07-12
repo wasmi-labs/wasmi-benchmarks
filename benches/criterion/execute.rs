@@ -16,7 +16,7 @@ fn execute_benchmark(
         if !vm.can_run(id.into()) {
             continue;
         }
-        let id = format!("{}/{}", vm.name(), input);
+        let id = format!("{}/{}", vm.id(), input);
         g.bench_function(&id, |b| {
             let wasm = wat2wasm(&wasm[..]);
             let mut runtime = vm.load(&wasm[..]);

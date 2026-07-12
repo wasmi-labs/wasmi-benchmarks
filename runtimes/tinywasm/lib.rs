@@ -14,7 +14,7 @@ struct TinywasmRuntime {
 }
 
 impl BenchRuntime for Tinywasm {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         "tinywasm"
     }
 

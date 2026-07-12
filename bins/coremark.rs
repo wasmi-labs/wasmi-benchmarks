@@ -9,15 +9,15 @@ fn main() {
         if !vm.can_run(ExecuteTestId::CoreMark.into()) {
             continue;
         }
-        let name = vm.name();
+        let id = vm.id();
         println!(
             "\
             Running Coremark 1.0\n\
-            \tusing {name} ...\
+            \tusing {id} ...\
         "
         );
         let score = vm.coremark(&coremark_wasm[..]);
-        scores.insert(name.into(), score);
+        scores.insert(id.into(), score);
         println!("\tscore = {score}\n");
     }
     let json = serde_json::to_value(&scores).unwrap();

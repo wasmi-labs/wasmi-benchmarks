@@ -25,7 +25,7 @@ struct WasmiRuntime {
 }
 
 impl BenchRuntime for Wasmi {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
             (CompilationMode::Eager, Validation::Checked) => "wasmi-v2.eager.checked",
             (CompilationMode::Eager, Validation::Unchecked) => "wasmi-v2.eager.unchecked",

@@ -18,7 +18,7 @@ struct StitchRuntime {
 }
 
 impl BenchRuntime for Stitch {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         "stitch"
     }
 

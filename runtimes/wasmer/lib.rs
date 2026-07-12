@@ -24,7 +24,7 @@ struct WasmerRuntime {
 }
 
 impl BenchRuntime for Wasmer {
-    fn name(&self) -> &'static str {
+    fn id(&self) -> &'static str {
         match self.compiler {
             WasmerCompiler::Cranelift => "wasmer.cranelift",
             WasmerCompiler::Singlepass => "wasmer.singlepass",
