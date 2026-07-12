@@ -82,7 +82,7 @@ impl Wasm3 {
 }
 
 impl BenchInstance for Wasm3Runtime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],

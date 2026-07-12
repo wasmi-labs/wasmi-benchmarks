@@ -91,7 +91,7 @@ impl Wasmer {
 }
 
 impl BenchInstance for WasmerRuntime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],

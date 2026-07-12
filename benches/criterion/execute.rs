@@ -39,9 +39,7 @@ fn execute_benchmark_with_val(
             let inputs = [input.into()];
             let mut results = [Val::default_for_ty(input_ty)];
             b.iter(|| {
-                runtime
-                    .call_with("run", &inputs[..], &mut results[..])
-                    .unwrap();
+                runtime.call("run", &inputs[..], &mut results[..]).unwrap();
             });
         });
     }

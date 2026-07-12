@@ -111,7 +111,7 @@ impl Wasmtime {
 }
 
 impl BenchInstance for WasmtimeRuntime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],

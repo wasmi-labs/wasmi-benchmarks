@@ -77,7 +77,7 @@ impl WasmiV032 {
 }
 
 impl BenchInstance for WasmiRuntime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],

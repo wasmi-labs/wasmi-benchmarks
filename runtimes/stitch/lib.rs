@@ -71,7 +71,7 @@ impl BenchRuntime for Stitch {
 }
 
 impl BenchInstance for StitchRuntime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],

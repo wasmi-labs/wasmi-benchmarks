@@ -53,7 +53,7 @@ impl BenchRuntime for Tinywasm {
 }
 
 impl BenchInstance for TinywasmRuntime {
-    fn call_with(
+    fn call(
         &mut self,
         name: &str,
         params: &[utils::Val],
