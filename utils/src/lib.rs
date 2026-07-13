@@ -26,7 +26,7 @@ pub trait RuntimeInstance {
     ///
     /// # Note
     ///
-    /// Must be called before [`Self::load`].
+    /// Must be called before [`Self::instantiate`].
     fn link_func(
         &mut self,
         module: &str,
