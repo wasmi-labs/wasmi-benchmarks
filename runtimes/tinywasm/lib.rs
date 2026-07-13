@@ -1,58 +1,100 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, ExecuteTestId, TestId};
-use tinywasm::types::WasmValue as Val;
+use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
+use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
 pub struct Tinywasm;
 
-struct TinywasmRuntime {
+/// A concrete Tinywasm runtime with its store and imports, produced by [`Tinywasm::setup`].
+///
+/// Tinywasm binds host functions to a [`Store`](tinywasm::Store), so the store is created up
+/// front and the module that [`RuntimeInstance::load`] instantiates runs in this same store.
+struct TinywasmInstance {
+    store: tinywasm::Store,
+    imports: tinywasm::Imports,
+}
+
+/// An instantiated Tinywasm module, produced by [`TinywasmInstance::load`].
+struct TinywasmModule {
     store: tinywasm::Store,
     instance: tinywasm::ModuleInstance,
     params: Vec<Val>,
 }
 
-impl BenchRuntime for Tinywasm {
+impl Runtime for Tinywasm {
     fn id(&self) -> &'static str {
         "tinywasm"
     }
 
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
+        if !self.can_run(id.into()) {
+            return false;
+        }
+        tinywasm::parse_bytes(wasm).unwrap();
+        true
+    }
+
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        if !self.can_run(id) {
+            return None;
+        }
+        Some(Box::new(TinywasmInstance {
+            store: tinywasm::Store::default(),
+            imports: tinywasm::Imports::new(),
+        }))
+    }
+}
+
+impl Tinywasm {
     fn can_run(&self, id: TestId) -> bool {
         !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
     }
+}
 
-    fn compile(&self, wasm: &[u8]) {
-        tinywasm::parse_bytes(wasm).unwrap();
+impl RuntimeInstance for TinywasmInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+        let params: Vec<WasmType> = ty.params().iter().copied().map(to_wasm_type).collect();
+        let results: Vec<WasmType> = ty.results().iter().copied().map(to_wasm_type).collect();
+        let ty = TinyFuncType::new(&params, &results);
+        let host = tinywasm::HostFunction::from_untyped(
+            &mut self.store,
+            &ty,
+            move |_ctx, args: &[Val]| {
+                let in_params: Vec<utils::Val> = args.iter().copied().map(into_utils_val).collect();
+                let mut out: Vec<utils::Val> = result_tys
+                    .iter()
+                    .copied()
+                    .map(utils::Val::default_for_ty)
+                    .collect();
+                func(&in_params, &mut out);
+                Ok(out.into_iter().map(from_utils_val).collect())
+            },
+        );
+        self.imports.define(module, name, host);
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let mut store = tinywasm::Store::default();
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let TinywasmInstance { mut store, imports } = *self;
         let module = tinywasm::parse_bytes(wasm).unwrap();
-        let instance = tinywasm::ModuleInstance::instantiate(&mut store, &module, None).unwrap();
-        Box::new(TinywasmRuntime {
+        let instance =
+            tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
+        Box::new(TinywasmModule {
             store,
             instance,
             params: Vec::new(),
         })
     }
-
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
-        let mut store = tinywasm::Store::default();
-        let module = tinywasm::parse_bytes(wasm).unwrap();
-        let mut imports = tinywasm::Imports::new();
-        imports.define(
-            "env",
-            "clock_ms",
-            tinywasm::HostFunction::from(&mut store, move |_ctx, _arg: ()| Ok(elapsed_ms() as i32)),
-        );
-        let instance =
-            tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
-        let func = instance.func::<(), f32>(&store, "run").unwrap();
-        func.call(&mut store, ()).unwrap()
-    }
 }
 
-impl BenchInstance for TinywasmRuntime {
+impl ModuleInstance for TinywasmModule {
     fn call(
         &mut self,
         name: &str,
@@ -67,7 +109,7 @@ impl BenchInstance for TinywasmRuntime {
     }
 }
 
-impl TinywasmRuntime {
+impl TinywasmModule {
     fn prepare_params(&mut self, params: &[utils::Val]) {
         self.params.clear();
         self.params
@@ -79,6 +121,15 @@ impl TinywasmRuntime {
         for (i, result) in dst.iter_mut().enumerate() {
             *result = into_utils_val(src[i]);
         }
+    }
+}
+
+fn to_wasm_type(ty: utils::ValType) -> WasmType {
+    match ty {
+        utils::ValType::I32 => WasmType::I32,
+        utils::ValType::I64 => WasmType::I64,
+        utils::ValType::F32 => WasmType::F32,
+        utils::ValType::F64 => WasmType::F64,
     }
 }
 
