@@ -81,13 +81,13 @@ pub trait BenchInstance {
 
 #[derive(Copy, Clone)]
 pub enum TestId {
-    Compile(StartupTestId),
+    Startup(StartupTestId),
     Execute(ExecuteTestId),
 }
 
 impl From<StartupTestId> for TestId {
     fn from(value: StartupTestId) -> Self {
-        Self::Compile(value)
+        Self::Startup(value)
     }
 }
 
