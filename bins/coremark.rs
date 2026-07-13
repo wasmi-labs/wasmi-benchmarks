@@ -1,4 +1,4 @@
-use benchmark_utils::{ExecuteTestId, InputEncoding, read_benchmark_file};
+use benchmark_utils::{ExecuteTestId, FuncType, InputEncoding, Val, ValType, read_benchmark_file};
 use std::collections::BTreeMap;
 use wasmi_benchmarks::vms_under_test;
 
@@ -10,13 +10,21 @@ fn elapsed_ms() -> u32 {
     elapsed.as_millis() as u32
 }
 
+/// The `env.clock_ms` host function imported by the Coremark Wasm.
+///
+/// Defined as a plain `fn` (no captured state) so it can be linked through the generic
+/// [`benchmark_utils::RuntimeInstance::link_func`] interface, which every runtime supports.
+fn clock_ms(_params: &[Val], results: &mut [Val]) {
+    results[0] = Val::I32(elapsed_ms() as i32);
+}
+
 fn main() {
     let coremark_wasm = read_benchmark_file(InputEncoding::Wasm, "coremark-minimal");
     let mut scores = <BTreeMap<String, f32>>::new();
     for vm in vms_under_test() {
-        if !vm.can_run(ExecuteTestId::CoreMark.into()) {
+        let Some(mut rt) = vm.setup(ExecuteTestId::CoreMark.into()) else {
             continue;
-        }
+        };
         let id = vm.id();
         println!(
             "\
@@ -24,7 +32,16 @@ fn main() {
             \tusing {id} ...\
         "
         );
-        let score = vm.coremark(&coremark_wasm[..], elapsed_ms);
+        rt.link_func(
+            "env",
+            "clock_ms",
+            FuncType::new([], [ValType::I32]),
+            clock_ms,
+        );
+        let mut instance = rt.instantiate(&coremark_wasm[..]);
+        let mut results = [Val::F32(0.0)];
+        instance.call("run", &[], &mut results[..]).unwrap();
+        let score = results[0].unwrap_f32();
         scores.insert(id.into(), score);
         println!("\tscore = {score}\n");
     }
