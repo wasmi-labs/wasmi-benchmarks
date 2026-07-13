@@ -1,82 +1,104 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, TestId};
+use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use wasmi::Func;
 use wasmi::Val;
 
 pub struct WasmiV032;
 
-struct WasmiRuntime {
+/// A concrete Wasmi runtime with its linker, produced by [`WasmiV032::setup`].
+struct WasmiInstance {
+    linker: wasmi::Linker<()>,
+}
+
+/// An instantiated Wasmi module, produced by [`WasmiInstance::load`].
+struct WasmiModule {
     store: wasmi::Store<()>,
     instance: wasmi::Instance,
     params: Vec<Val>,
     results: Vec<Val>,
 }
 
-impl BenchRuntime for WasmiV032 {
+impl Runtime for WasmiV032 {
     fn id(&self) -> &'static str {
         "wasmi-v0.32"
     }
 
-    fn can_run(&self, _id: TestId) -> bool {
+    fn compile(&self, _id: CompileTestId, wasm: &[u8]) -> bool {
+        let engine = make_engine();
+        wasmi::Module::new(&engine, wasm).unwrap();
         true
     }
 
-    fn compile(&self, wasm: &[u8]) {
-        let store = self.store();
-        wasmi::Module::new(store.engine(), wasm).unwrap();
+    fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        let linker = wasmi::Linker::new(&make_engine());
+        Some(Box::new(WasmiInstance { linker }))
+    }
+}
+
+impl RuntimeInstance for WasmiInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+        let ty = wasmi::FuncType::new(
+            ty.params().iter().copied().map(to_wasmi_valtype),
+            ty.results().iter().copied().map(to_wasmi_valtype),
+        );
+        self.linker
+            .func_new(
+                module,
+                name,
+                ty,
+                move |_caller, params: &[Val], results: &mut [Val]| {
+                    let in_params: Vec<utils::Val> =
+                        params.iter().cloned().map(into_utils_val).collect();
+                    let mut out: Vec<utils::Val> = result_tys
+                        .iter()
+                        .copied()
+                        .map(utils::Val::default_for_ty)
+                        .collect();
+                    func(&in_params, &mut out);
+                    for (dst, src) in results.iter_mut().zip(out) {
+                        *dst = from_utils_val(src);
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let mut store = self.store();
-        let engine = store.engine();
-        let module = wasmi::Module::new(engine, wasm).unwrap();
-        let linker = wasmi::Linker::new(engine);
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let WasmiInstance { linker } = *self;
+        let engine = linker.engine().clone();
+        let mut store = <wasmi::Store<()>>::new(&engine, ());
+        let module = wasmi::Module::new(&engine, wasm).unwrap();
         let instance = linker
             .instantiate(&mut store, &module)
             .unwrap()
             .start(&mut store)
             .unwrap();
-        Box::new(WasmiRuntime {
+        Box::new(WasmiModule {
             store,
             instance,
             params: Vec::new(),
             results: Vec::new(),
         })
     }
-
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
-        let engine = wasmi::Engine::default();
-        let mut store = <wasmi::Store<()>>::new(&engine, ());
-        let mut linker = wasmi::Linker::new(store.engine());
-        linker
-            .func_wrap("env", "clock_ms", move || elapsed_ms() as i32)
-            .unwrap();
-        let module = wasmi::Module::new(store.engine(), wasm).unwrap();
-        let result = linker
-            .instantiate(&mut store, &module)
-            .unwrap()
-            .ensure_no_start(&mut store)
-            .unwrap()
-            .get_typed_func::<(), wasmi::core::F32>(&mut store, "run")
-            .unwrap()
-            .call(&mut store, ())
-            .unwrap();
-        result.into()
-    }
 }
 
-impl WasmiV032 {
-    fn store(&self) -> wasmi::Store<()> {
-        let mut config = wasmi::Config::default();
-        config.wasm_tail_call(true);
-        let engine = wasmi::Engine::new(&config);
-        <wasmi::Store<()>>::new(&engine, ())
-    }
+fn make_engine() -> wasmi::Engine {
+    let mut config = wasmi::Config::default();
+    config.wasm_tail_call(true);
+    wasmi::Engine::new(&config)
 }
 
-impl BenchInstance for WasmiRuntime {
+impl ModuleInstance for WasmiModule {
     fn call(
         &mut self,
         name: &str,
@@ -96,7 +118,7 @@ impl BenchInstance for WasmiRuntime {
     }
 }
 
-impl WasmiRuntime {
+impl WasmiModule {
     fn prepare_params(&mut self, params: &[utils::Val]) {
         self.params.clear();
         self.params
@@ -117,6 +139,15 @@ impl WasmiRuntime {
             let src = core::mem::replace(&mut self.results[i], Val::default(ty));
             *result = into_utils_val(src);
         }
+    }
+}
+
+fn to_wasmi_valtype(ty: utils::ValType) -> wasmi::core::ValType {
+    match ty {
+        utils::ValType::I32 => wasmi::core::ValType::I32,
+        utils::ValType::I64 => wasmi::core::ValType::I64,
+        utils::ValType::F32 => wasmi::core::ValType::F32,
+        utils::ValType::F64 => wasmi::core::ValType::F64,
     }
 }
 
