@@ -26,11 +26,6 @@ impl Runtime for Tinywasm {
         "tinywasm"
     }
 
-    fn compile(&self, _id: CompileTestId, wasm: &[u8]) -> bool {
-        tinywasm::parse_bytes(wasm).unwrap();
-        true
-    }
-
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         if !self.can_run(id) {
             return None;

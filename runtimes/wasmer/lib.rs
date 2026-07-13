@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{self as utils};
 use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 use wasmer::Type as ValType;
 use wasmer::Value as Val;
@@ -39,15 +39,6 @@ impl Runtime for Wasmer {
             WasmerCompiler::Cranelift => "wasmer.cranelift",
             WasmerCompiler::Singlepass => "wasmer.singlepass",
         }
-    }
-
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
-        if !self.can_run(id.into()) {
-            return false;
-        }
-        let engine = make_engine(self.compiler);
-        wasmer::Module::new(&engine, wasm).unwrap();
-        true
     }
 
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {

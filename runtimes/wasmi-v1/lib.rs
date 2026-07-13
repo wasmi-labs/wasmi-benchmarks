@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasmi::CompilationMode;
 use wasmi::{Func, Val};
@@ -44,15 +44,6 @@ impl Runtime for Wasmi {
             (CompilationMode::Lazy, Validation::Checked) => "wasmi-v1.lazy.checked",
             (CompilationMode::Lazy, Validation::Unchecked) => "wasmi-v1.lazy.unchecked",
         }
-    }
-
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
-        if !self.can_run(id.into()) {
-            return false;
-        }
-        let engine = make_engine(self.compilation_mode);
-        make_module(self.validation, &engine, wasm);
-        true
     }
 
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {

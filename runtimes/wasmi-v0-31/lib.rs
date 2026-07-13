@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use wasmi::Func;
 use wasmi::Value as Val;
@@ -23,12 +23,6 @@ struct WasmiModule {
 impl Runtime for WasmiV031 {
     fn id(&self) -> &'static str {
         "wasmi-v0.31"
-    }
-
-    fn compile(&self, _id: CompileTestId, wasm: &[u8]) -> bool {
-        let engine = make_engine();
-        wasmi::Module::new(&engine, wasm).unwrap();
-        true
     }
 
     fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {

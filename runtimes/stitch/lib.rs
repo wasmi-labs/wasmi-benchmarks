@@ -24,15 +24,6 @@ impl Runtime for Stitch {
         "stitch"
     }
 
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
-        if !self.can_run(id.into()) {
-            return false;
-        }
-        let engine = Engine::new();
-        Module::new(&engine, wasm).unwrap();
-        true
-    }
-
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         if !self.can_run(id) {
             return None;

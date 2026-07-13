@@ -14,20 +14,6 @@ pub trait Runtime {
     /// Returns the unique ID of the Wasm runtime and its configuration as string.
     fn id(&self) -> &'static str;
 
-    /// Compiles the `wasm` using the Wasm runtime and its configuration.
-    ///
-    /// # Returns
-    ///
-    /// - Returns `true` if `self` can compile the test with identity `id`.
-    /// - Returns `false` otherwise.
-    ///
-    /// # Note
-    ///
-    /// This is a temporary method used by the compilation benchmarks. It will be
-    /// removed once those are migrated to instantiation benchmarks that go through
-    /// [`Runtime::setup`] and [`RuntimeInstance::load`] like the execution benchmarks.
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool;
-
     /// Sets up and returns a [`RuntimeInstance`] if `self` can run `id`.
     ///
     /// Otherwise returns `None`.

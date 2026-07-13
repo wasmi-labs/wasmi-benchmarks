@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, CompileTestId, ExecuteTestId};
+use benchmark_utils::{self as utils, ExecuteTestId};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasm3::CompilationMode;
 use wasm3::{Func, Val};
@@ -28,15 +28,6 @@ impl Runtime for Wasm3 {
             CompilationMode::Eager => "wasm3.eager",
             CompilationMode::Lazy => "wasm3.lazy",
         }
-    }
-
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
-        if !self.can_run(id.into()) {
-            return false;
-        }
-        let engine = make_engine(self.compilation_mode);
-        wasm3::Module::new(&engine, wasm).unwrap();
-        true
     }
 
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
