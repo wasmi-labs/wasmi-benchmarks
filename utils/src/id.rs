@@ -72,8 +72,8 @@ impl fmt::Display for ExecuteTestId {
         let s = match self {
             ExecuteTestId::CounterLocal => "counter-local",
             ExecuteTestId::CounterParam => "counter-param",
-            ExecuteTestId::FibonacciIter => "fibonacci-rec",
-            ExecuteTestId::FibonacciRec => "fibonacci-iter",
+            ExecuteTestId::FibonacciIter => "fibonacci-iter",
+            ExecuteTestId::FibonacciRec => "fibonacci-rec",
             ExecuteTestId::FibonacciTail => "fibonacci-tail",
             ExecuteTestId::Primes => "primes",
             ExecuteTestId::MatrixMultiply => "matmul",
