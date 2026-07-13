@@ -31,10 +31,29 @@ impl Runtime for Tinywasm {
         true
     }
 
-    fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        if !self.can_run(id) {
+            return None;
+        }
         Some(Box::new(TinywasmInstance {
             linker: utils::Linker::new(),
         }))
+    }
+}
+
+impl Tinywasm {
+    fn can_run(&self, id: TestId) -> bool {
+        // Tinywasm traps ("trap: unreachable") while instantiating these clang-built WASI command
+        // modules, so they are excluded from the instantiation benchmarks.
+        !matches!(
+            id,
+            TestId::Compile(
+                CompileTestId::Bz2
+                    | CompileTestId::Spidermonkey
+                    | CompileTestId::PulldownCmark
+                    | CompileTestId::Ffmpeg
+            )
+        )
     }
 }
 

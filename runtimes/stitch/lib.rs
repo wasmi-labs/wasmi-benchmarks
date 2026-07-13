@@ -70,20 +70,10 @@ impl RuntimeInstance for StitchInstance {
         let mut linker = Linker::new();
         for (module, name, ty, func) in self.linker.funcs() {
             // Stitch only exposes the typed `Func::wrap` constructor (no untyped/dynamic host
-            // function API), so the runtime-neutral signature is matched against the concrete Rust
-            // closure types it needs. The benchmark suite only links `env.clock_ms: () -> i32`
-            // (for Coremark), so only that signature is supported here. Host functions are bound to
-            // a `Store`, so they are (re)built here against the fresh store on every instantiation.
-            let host = match (ty.params(), ty.results()) {
-                ([], [utils::ValType::I32]) => Func::wrap(&mut store, move || -> i32 {
-                    let mut out = [utils::Val::I32(0)];
-                    func(&[], &mut out);
-                    out[0].unwrap_i32()
-                }),
-                _ => unimplemented!(
-                    "the stitch adapter only supports the `() -> i32` host function signature used by Coremark"
-                ),
-            };
+            // function API), so `wrap_host_func` matches the runtime-neutral signature against the
+            // concrete Rust closure types it needs. Host functions are bound to a `Store`, so they
+            // are (re)built here against the fresh store on every instantiation.
+            let host = wrap_host_func(&mut store, ty, func);
             linker.define(module, name, ExternVal::Func(host));
         }
         let module = Module::new(store.engine(), wasm).unwrap();
@@ -136,6 +126,97 @@ impl StitchModule {
         for (i, result) in results.iter_mut().enumerate() {
             *result = into_utils_val(self.results[i]);
         }
+    }
+}
+
+/// Invokes a recorded host `func` that produces no results.
+fn call(func: utils::HostFunc, params: &[utils::Val]) {
+    func(params, &mut []);
+}
+
+/// Invokes a recorded host `func` that produces a single `i32` result.
+fn ret_i32(func: utils::HostFunc, params: &[utils::Val]) -> i32 {
+    let mut out = [utils::Val::I32(0)];
+    func(params, &mut out);
+    out[0].unwrap_i32()
+}
+
+/// Builds a stitch [`Func`] from a runtime-neutral signature and host `func` pointer.
+///
+/// Stitch only offers the typed `Func::wrap` constructor, so every signature imported by the
+/// benchmark inputs is enumerated here. Any unsupported signature hits the catch-all `unimplemented`.
+fn wrap_host_func(store: &mut Store, ty: &utils::FuncType, func: utils::HostFunc) -> Func {
+    use utils::Val::{I32 as V32, I64 as V64};
+    use utils::ValType::{I32, I64};
+    match (ty.params(), ty.results()) {
+        ([], []) => Func::wrap(store, move || call(func, &[])),
+        ([], [I32]) => Func::wrap(store, move || -> i32 { ret_i32(func, &[]) }),
+        ([I32], []) => Func::wrap(store, move |a: i32| call(func, &[V32(a)])),
+        ([I32], [I32]) => Func::wrap(store, move |a: i32| -> i32 { ret_i32(func, &[V32(a)]) }),
+        ([I32, I32], []) => Func::wrap(store, move |a: i32, b: i32| call(func, &[V32(a), V32(b)])),
+        ([I32, I32], [I32]) => Func::wrap(store, move |a: i32, b: i32| -> i32 {
+            ret_i32(func, &[V32(a), V32(b)])
+        }),
+        ([I32, I32, I32], []) => Func::wrap(store, move |a: i32, b: i32, c: i32| {
+            call(func, &[V32(a), V32(b), V32(c)])
+        }),
+        ([I32, I32, I32], [I32]) => Func::wrap(store, move |a: i32, b: i32, c: i32| -> i32 {
+            ret_i32(func, &[V32(a), V32(b), V32(c)])
+        }),
+        ([I32, I32, I32, I32], []) => Func::wrap(store, move |a: i32, b: i32, c: i32, d: i32| {
+            call(func, &[V32(a), V32(b), V32(c), V32(d)])
+        }),
+        ([I32, I32, I32, I32], [I32]) => {
+            Func::wrap(store, move |a: i32, b: i32, c: i32, d: i32| -> i32 {
+                ret_i32(func, &[V32(a), V32(b), V32(c), V32(d)])
+            })
+        }
+        ([I32, I32, I32, I32, I32], [I32]) => Func::wrap(
+            store,
+            move |a: i32, b: i32, c: i32, d: i32, e: i32| -> i32 {
+                ret_i32(func, &[V32(a), V32(b), V32(c), V32(d), V32(e)])
+            },
+        ),
+        ([I32, I32, I32, I32, I32, I32], [I32]) => Func::wrap(
+            store,
+            move |a: i32, b: i32, c: i32, d: i32, e: i32, f: i32| -> i32 {
+                ret_i32(func, &[V32(a), V32(b), V32(c), V32(d), V32(e), V32(f)])
+            },
+        ),
+        ([I32, I64, I32], [I32]) => Func::wrap(store, move |a: i32, b: i64, c: i32| -> i32 {
+            ret_i32(func, &[V32(a), V64(b), V32(c)])
+        }),
+        ([I32, I64, I32, I32], [I32]) => {
+            Func::wrap(store, move |a: i32, b: i64, c: i32, d: i32| -> i32 {
+                ret_i32(func, &[V32(a), V64(b), V32(c), V32(d)])
+            })
+        }
+        ([I32, I32, I32, I64, I32], [I32]) => Func::wrap(
+            store,
+            move |a: i32, b: i32, c: i32, d: i64, e: i32| -> i32 {
+                ret_i32(func, &[V32(a), V32(b), V32(c), V64(d), V32(e)])
+            },
+        ),
+        ([I32, I32, I32, I32, I32, I64, I64, I32, I32], [I32]) => Func::wrap(
+            store,
+            move |a: i32, b: i32, c: i32, d: i32, e: i32, f: i64, g: i64, h: i32, i: i32| -> i32 {
+                ret_i32(
+                    func,
+                    &[
+                        V32(a),
+                        V32(b),
+                        V32(c),
+                        V32(d),
+                        V32(e),
+                        V64(f),
+                        V64(g),
+                        V32(h),
+                        V32(i),
+                    ],
+                )
+            },
+        ),
+        _ => unimplemented!("the stitch adapter does not support host function signature {ty:?}"),
     }
 }
 
