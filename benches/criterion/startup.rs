@@ -132,7 +132,7 @@ fn required_imports(id: StartupTestId) -> Vec<(&'static str, &'static str, FuncT
     }
 }
 
-fn instantiate_benchmark(c: &mut Criterion, encoding: InputEncoding, id: StartupTestId) {
+fn instantiate_benchmark(c: &mut Criterion, id: StartupTestId, encoding: InputEncoding) {
     let wasm = read_benchmark_file(encoding, id.into());
     let imports = required_imports(id);
     let mut g = c.benchmark_group(format!("startup/{id}"));
@@ -154,29 +154,29 @@ fn instantiate_benchmark(c: &mut Criterion, encoding: InputEncoding, id: Startup
 }
 
 pub fn bench_bz2(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Bz2)
+    instantiate_benchmark(c, StartupTestId::Bz2, InputEncoding::Wasm)
 }
 
 pub fn bench_pulldown_cmark(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::PulldownCmark)
+    instantiate_benchmark(c, StartupTestId::PulldownCmark, InputEncoding::Wasm)
 }
 
 pub fn bench_spidermonkey(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Spidermonkey)
+    instantiate_benchmark(c, StartupTestId::Spidermonkey, InputEncoding::Wasm)
 }
 
 pub fn bench_ffmpeg(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Ffmpeg)
+    instantiate_benchmark(c, StartupTestId::Ffmpeg, InputEncoding::Wasm)
 }
 
 pub fn bench_coremark_minimal(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::CoreMark)
+    instantiate_benchmark(c, StartupTestId::CoreMark, InputEncoding::Wasm)
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Argon2)
+    instantiate_benchmark(c, StartupTestId::Argon2, InputEncoding::Wasm)
 }
 
 pub fn bench_erc20(c: &mut Criterion) {
-    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Erc20)
+    instantiate_benchmark(c, StartupTestId::Erc20, InputEncoding::Wasm)
 }
