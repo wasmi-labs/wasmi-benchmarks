@@ -3,17 +3,22 @@ use benchmark_utils::{InputEncoding, read_benchmark_file};
 use criterion::Criterion;
 use wasmi_benchmarks::vms_under_test;
 
-fn compile_benchmark(c: &mut Criterion, name: &str, encoding: InputEncoding, id: CompileTestId) {
+fn compile_benchmark(
+    c: &mut Criterion,
+    name: &str,
+    encoding: InputEncoding,
+    test_id: CompileTestId,
+) {
     let wasm = read_benchmark_file(encoding, name);
     let mut g = c.benchmark_group(format!("compile/{name}"));
     for vm in vms_under_test() {
-        if !vm.can_run(id.into()) {
-            continue;
-        }
-        let id = format!("{}", vm.id());
-        g.bench_function(&id, |b| {
+        let bench_id = vm.id().to_string();
+        g.bench_function(&bench_id, |b| {
+            if !vm.compile(test_id, &wasm[..]) {
+                return;
+            }
             b.iter(|| {
-                vm.compile(&wasm[..]);
+                vm.compile(test_id, &wasm[..]);
             });
         });
     }
