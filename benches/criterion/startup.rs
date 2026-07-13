@@ -134,13 +134,13 @@ fn required_imports(id: StartupTestId) -> Vec<(&'static str, &'static str, FuncT
 
 fn instantiate_benchmark(
     c: &mut Criterion,
-    name: &str,
+    file_name: &str,
     encoding: InputEncoding,
     id: StartupTestId,
 ) {
-    let wasm = read_benchmark_file(encoding, name);
+    let wasm = read_benchmark_file(encoding, file_name);
     let imports = required_imports(id);
-    let mut g = c.benchmark_group(format!("startup/{name}"));
+    let mut g = c.benchmark_group(format!("startup/{file_name}"));
     for vm in vms_under_test() {
         let Some(mut rt) = vm.setup(id.into()) else {
             continue;
