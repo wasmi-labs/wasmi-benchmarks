@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, TestId};
+use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasmi::CompilationMode;
 use wasmi::{Func, Val};
 
@@ -16,14 +16,21 @@ pub enum Validation {
     Unchecked,
 }
 
-struct WasmiRuntime {
+/// A concrete Wasmi runtime with its linker, produced by [`Wasmi::setup`].
+struct WasmiInstance {
+    linker: wasmi::Linker<()>,
+    validation: Validation,
+}
+
+/// An instantiated Wasmi module, produced by [`WasmiInstance::load`].
+struct WasmiModule {
     store: wasmi::Store<()>,
     instance: wasmi::Instance,
     params: Vec<Val>,
     results: Vec<Val>,
 }
 
-impl BenchRuntime for Wasmi {
+impl Runtime for Wasmi {
     fn id(&self) -> &'static str {
         match (self.compilation_mode, self.validation) {
             (CompilationMode::Eager, Validation::Checked) => "wasmi-v2.eager.checked",
@@ -39,6 +46,28 @@ impl BenchRuntime for Wasmi {
         }
     }
 
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
+        if !self.can_run(id.into()) {
+            return false;
+        }
+        let engine = make_engine(self.compilation_mode);
+        make_module(self.validation, &engine, wasm);
+        true
+    }
+
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        if !self.can_run(id) {
+            return None;
+        }
+        let linker = wasmi::Linker::new(&make_engine(self.compilation_mode));
+        Some(Box::new(WasmiInstance {
+            linker,
+            validation: self.validation,
+        }))
+    }
+}
+
+impl Wasmi {
     fn can_run(&self, id: TestId) -> bool {
         match id {
             TestId::Execute(_) => {
@@ -48,62 +77,77 @@ impl BenchRuntime for Wasmi {
             _ => true,
         }
     }
+}
 
-    fn compile(&self, wasm: &[u8]) {
-        let store = self.store();
-        self.module(store.engine(), wasm);
+impl RuntimeInstance for WasmiInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+        let ty = wasmi::FuncType::new(
+            ty.params().iter().copied().map(to_wasmi_valtype),
+            ty.results().iter().copied().map(to_wasmi_valtype),
+        );
+        self.linker
+            .func_new(
+                module,
+                name,
+                ty,
+                move |_caller, params: &[Val], results: &mut [Val]| {
+                    let in_params: Vec<utils::Val> =
+                        params.iter().cloned().map(into_utils_val).collect();
+                    let mut out: Vec<utils::Val> = result_tys
+                        .iter()
+                        .copied()
+                        .map(utils::Val::default_for_ty)
+                        .collect();
+                    func(&in_params, &mut out);
+                    for (dst, src) in results.iter_mut().zip(out) {
+                        *dst = from_utils_val(src);
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let mut store = self.store();
-        let engine = store.engine();
-        let module = self.module(engine, wasm);
-        let linker = wasmi::Linker::new(engine);
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let WasmiInstance { linker, validation } = *self;
+        let engine = linker.engine().clone();
+        let mut store = <wasmi::Store<()>>::new(&engine, ());
+        let module = make_module(validation, &engine, wasm);
         let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
-        Box::new(WasmiRuntime {
+        Box::new(WasmiModule {
             store,
             instance,
             params: Vec::new(),
             results: Vec::new(),
         })
     }
-
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
-        let mut store = <wasmi::Store<()>>::default();
-        let mut linker = wasmi::Linker::new(store.engine());
-        linker.func_wrap("env", "clock_ms", elapsed_ms).unwrap();
-        let module = wasmi::Module::new(store.engine(), wasm).unwrap();
-        linker
-            .instantiate_and_start(&mut store, &module)
-            .unwrap()
-            .get_typed_func::<(), f32>(&mut store, "run")
-            .unwrap()
-            .call(&mut store, ())
-            .unwrap()
-    }
 }
 
-impl Wasmi {
-    fn store(&self) -> wasmi::Store<()> {
-        let mut config = wasmi::Config::default();
-        config.wasm_tail_call(true);
-        config.compilation_mode(self.compilation_mode);
-        let engine = wasmi::Engine::new(&config);
-        <wasmi::Store<()>>::new(&engine, ())
-    }
+fn make_engine(compilation_mode: CompilationMode) -> wasmi::Engine {
+    let mut config = wasmi::Config::default();
+    config.wasm_tail_call(true);
+    config.compilation_mode(compilation_mode);
+    wasmi::Engine::new(&config)
+}
 
-    fn module(&self, engine: &wasmi::Engine, wasm: &[u8]) -> wasmi::Module {
-        match self.validation {
-            Validation::Checked => wasmi::Module::new(engine, wasm).unwrap(),
-            Validation::Unchecked => {
-                // SAFETY: We only use properly valid Wasm in our benchmarks.
-                unsafe { wasmi::Module::new_unchecked(engine, wasm).unwrap() }
-            }
+fn make_module(validation: Validation, engine: &wasmi::Engine, wasm: &[u8]) -> wasmi::Module {
+    match validation {
+        Validation::Checked => wasmi::Module::new(engine, wasm).unwrap(),
+        Validation::Unchecked => {
+            // SAFETY: We only use properly valid Wasm in our benchmarks.
+            unsafe { wasmi::Module::new_unchecked(engine, wasm).unwrap() }
         }
     }
 }
 
-impl BenchInstance for WasmiRuntime {
+impl ModuleInstance for WasmiModule {
     fn call(
         &mut self,
         name: &str,
@@ -123,7 +167,7 @@ impl BenchInstance for WasmiRuntime {
     }
 }
 
-impl WasmiRuntime {
+impl WasmiModule {
     fn prepare_params(&mut self, params: &[utils::Val]) {
         self.params.clear();
         self.params
@@ -144,6 +188,15 @@ impl WasmiRuntime {
             let src = core::mem::replace(&mut self.results[i], Val::default_for_ty(ty));
             *result = into_utils_val(src);
         }
+    }
+}
+
+fn to_wasmi_valtype(ty: utils::ValType) -> wasmi::ValType {
+    match ty {
+        utils::ValType::I32 => wasmi::ValType::I32,
+        utils::ValType::I64 => wasmi::ValType::I64,
+        utils::ValType::F32 => wasmi::ValType::F32,
+        utils::ValType::F64 => wasmi::ValType::F64,
     }
 }
 
