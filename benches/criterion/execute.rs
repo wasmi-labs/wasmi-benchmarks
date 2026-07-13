@@ -6,28 +6,22 @@ use criterion::Criterion;
 use wasmi_benchmarks::vms_under_test;
 
 /// Generic utility benchmark function for Wasm functions of type: T -> T
-fn execute_benchmark<T>(
-    c: &mut Criterion,
-    name: &str,
-    input: T,
-    encoding: InputEncoding,
-    id: ExecuteTestId,
-) where
+fn execute_benchmark<T>(c: &mut Criterion, input: T, encoding: InputEncoding, id: ExecuteTestId)
+where
     T: Into<Val> + Copy + fmt::Display,
 {
-    execute_benchmark_with_val(c, name, input.into(), encoding, id)
+    execute_benchmark_with_val(c, input.into(), encoding, id)
 }
 
 /// Non-generic utility benchmark function for Wasm functions of type: T -> T
 fn execute_benchmark_with_val(
     c: &mut Criterion,
-    name: &str,
     input: Val,
     encoding: InputEncoding,
     id: ExecuteTestId,
 ) {
-    let wasm = read_benchmark_file(encoding, name);
-    let mut g = c.benchmark_group(format!("execute/{name}"));
+    let wasm = read_benchmark_file(encoding, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
     for vm in vms_under_test() {
         let Some(rt) = vm.setup(id.into()) else {
             continue;
@@ -51,7 +45,6 @@ fn execute_benchmark_with_val(
 pub fn bench_counter_local(c: &mut Criterion) {
     execute_benchmark::<i32>(
         c,
-        "counter-local",
         1_000_000,
         InputEncoding::Wat,
         ExecuteTestId::CounterLocal,
@@ -61,7 +54,6 @@ pub fn bench_counter_local(c: &mut Criterion) {
 pub fn bench_counter_param(c: &mut Criterion) {
     execute_benchmark::<i32>(
         c,
-        "counter-param",
         1_000_000,
         InputEncoding::Wat,
         ExecuteTestId::CounterParam,
@@ -69,19 +61,12 @@ pub fn bench_counter_param(c: &mut Criterion) {
 }
 
 pub fn bench_fibonacci_rec(c: &mut Criterion) {
-    execute_benchmark::<i64>(
-        c,
-        "fibonacci-rec",
-        30,
-        InputEncoding::Wat,
-        ExecuteTestId::FibonacciRec,
-    )
+    execute_benchmark::<i64>(c, 30, InputEncoding::Wat, ExecuteTestId::FibonacciRec)
 }
 
 pub fn bench_fibonacci_iter(c: &mut Criterion) {
     execute_benchmark::<i64>(
         c,
-        "fibonacci-iter",
         2_000_000,
         InputEncoding::Wat,
         ExecuteTestId::FibonacciIter,
@@ -91,7 +76,6 @@ pub fn bench_fibonacci_iter(c: &mut Criterion) {
 pub fn bench_fibonacci_tail(c: &mut Criterion) {
     execute_benchmark::<i64>(
         c,
-        "fibonacci-tail",
         1_000_000,
         InputEncoding::Wat,
         ExecuteTestId::FibonacciTail,
@@ -99,35 +83,17 @@ pub fn bench_fibonacci_tail(c: &mut Criterion) {
 }
 
 pub fn bench_primes(c: &mut Criterion) {
-    execute_benchmark::<i64>(
-        c,
-        "primes",
-        1_000,
-        InputEncoding::Wat,
-        ExecuteTestId::Primes,
-    )
+    execute_benchmark::<i64>(c, 1_000, InputEncoding::Wat, ExecuteTestId::Primes)
 }
 
 pub fn bench_matrix_multiply(c: &mut Criterion) {
-    execute_benchmark::<i64>(
-        c,
-        "matmul",
-        200,
-        InputEncoding::Wat,
-        ExecuteTestId::MatrixMultiply,
-    )
+    execute_benchmark::<i64>(c, 200, InputEncoding::Wat, ExecuteTestId::MatrixMultiply)
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    execute_benchmark::<i64>(c, "argon2", 1, InputEncoding::Wasm, ExecuteTestId::Argon2)
+    execute_benchmark::<i64>(c, 1, InputEncoding::Wasm, ExecuteTestId::Argon2)
 }
 
 pub fn bench_bulk_ops(c: &mut Criterion) {
-    execute_benchmark::<i64>(
-        c,
-        "bulk-ops",
-        5_000,
-        InputEncoding::Wat,
-        ExecuteTestId::BulkOps,
-    )
+    execute_benchmark::<i64>(c, 5_000, InputEncoding::Wat, ExecuteTestId::BulkOps)
 }

@@ -1,4 +1,7 @@
-use benchmark_utils::{ExecuteTestId, FuncType, InputEncoding, Val, ValType, read_benchmark_file};
+use benchmark_utils::{
+    ExecuteTestId, FuncType, InputEncoding, StartupTestId, TestId, Val, ValType,
+    read_benchmark_file,
+};
 use std::collections::BTreeMap;
 use wasmi_benchmarks::vms_under_test;
 
@@ -19,7 +22,10 @@ fn clock_ms(_params: &[Val], results: &mut [Val]) {
 }
 
 fn main() {
-    let coremark_wasm = read_benchmark_file(InputEncoding::Wasm, "coremark-minimal");
+    let coremark_wasm = read_benchmark_file(
+        InputEncoding::Wasm,
+        TestId::Startup(StartupTestId::CoreMark),
+    );
     let mut scores = <BTreeMap<String, f32>>::new();
     for vm in vms_under_test() {
         let Some(mut rt) = vm.setup(ExecuteTestId::CoreMark.into()) else {

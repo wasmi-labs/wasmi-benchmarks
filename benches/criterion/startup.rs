@@ -132,15 +132,10 @@ fn required_imports(id: StartupTestId) -> Vec<(&'static str, &'static str, FuncT
     }
 }
 
-fn instantiate_benchmark(
-    c: &mut Criterion,
-    file_name: &str,
-    encoding: InputEncoding,
-    id: StartupTestId,
-) {
-    let wasm = read_benchmark_file(encoding, file_name);
+fn instantiate_benchmark(c: &mut Criterion, encoding: InputEncoding, id: StartupTestId) {
+    let wasm = read_benchmark_file(encoding, id.into());
     let imports = required_imports(id);
-    let mut g = c.benchmark_group(format!("startup/{file_name}"));
+    let mut g = c.benchmark_group(format!("startup/{id}"));
     for vm in vms_under_test() {
         let Some(mut rt) = vm.setup(id.into()) else {
             continue;
@@ -159,44 +154,29 @@ fn instantiate_benchmark(
 }
 
 pub fn bench_bz2(c: &mut Criterion) {
-    instantiate_benchmark(c, "bz2", InputEncoding::Wasm, StartupTestId::Bz2)
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Bz2)
 }
 
 pub fn bench_pulldown_cmark(c: &mut Criterion) {
-    instantiate_benchmark(
-        c,
-        "pulldown-cmark",
-        InputEncoding::Wasm,
-        StartupTestId::PulldownCmark,
-    )
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::PulldownCmark)
 }
 
 pub fn bench_spidermonkey(c: &mut Criterion) {
-    instantiate_benchmark(
-        c,
-        "spidermonkey",
-        InputEncoding::Wasm,
-        StartupTestId::Spidermonkey,
-    )
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Spidermonkey)
 }
 
 pub fn bench_ffmpeg(c: &mut Criterion) {
-    instantiate_benchmark(c, "ffmpeg", InputEncoding::Wasm, StartupTestId::Ffmpeg)
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Ffmpeg)
 }
 
 pub fn bench_coremark_minimal(c: &mut Criterion) {
-    instantiate_benchmark(
-        c,
-        "coremark-minimal",
-        InputEncoding::Wasm,
-        StartupTestId::CoreMark,
-    )
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::CoreMark)
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    instantiate_benchmark(c, "argon2", InputEncoding::Wasm, StartupTestId::Argon2)
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Argon2)
 }
 
 pub fn bench_erc20(c: &mut Criterion) {
-    instantiate_benchmark(c, "erc20", InputEncoding::Wasm, StartupTestId::Erc20)
+    instantiate_benchmark(c, InputEncoding::Wasm, StartupTestId::Erc20)
 }
