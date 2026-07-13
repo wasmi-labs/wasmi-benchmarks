@@ -1,7 +1,9 @@
 #![crate_type = "dylib"]
 
+mod linker;
 mod val;
 
+pub use self::linker::{HostFunc, Linker};
 pub use self::val::{FuncType, Val, ValType};
 use core::fmt;
 
