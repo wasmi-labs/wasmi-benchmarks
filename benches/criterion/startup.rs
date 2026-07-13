@@ -1,4 +1,4 @@
-use benchmark_utils::{CompileTestId, FuncType, InputEncoding, Val, ValType, read_benchmark_file};
+use benchmark_utils::{FuncType, InputEncoding, StartupTestId, Val, ValType, read_benchmark_file};
 use criterion::Criterion;
 use wasmi_benchmarks::vms_under_test;
 
@@ -19,7 +19,7 @@ fn func_ty(params: &[ValType], results: &[ValType]) -> FuncType {
 /// Every module imports functions only (no memory/table/global imports), so linking these host
 /// function stubs via [`RuntimeInstance::link_func`](benchmark_utils::RuntimeInstance::link_func) is
 /// enough to instantiate.
-fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncType)> {
+fn required_imports(id: StartupTestId) -> Vec<(&'static str, &'static str, FuncType)> {
     use ValType::{I32, I64};
     // Signature shorthands shared across the WASI-heavy modules.
     let unit = || func_ty(&[], &[]);
@@ -39,9 +39,9 @@ fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncT
     let path_open = || func_ty(&[I32, I32, I32, I32, I32, I64, I64, I32, I32], &[I32]);
     let wasi = "wasi_snapshot_preview1";
     match id {
-        CompileTestId::Argon2 => vec![],
-        CompileTestId::CoreMark => vec![("env", "clock_ms", func_ty(&[], &[I32]))],
-        CompileTestId::Erc20 => vec![
+        StartupTestId::Argon2 => vec![],
+        StartupTestId::CoreMark => vec![("env", "clock_ms", func_ty(&[], &[I32]))],
+        StartupTestId::Erc20 => vec![
             ("__unstable__", "seal_get_storage", iiii_i()),
             ("__unstable__", "seal_set_storage", iiii_i()),
             ("seal0", "seal_value_transferred", ii()),
@@ -51,7 +51,7 @@ fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncT
             ("seal0", "seal_return", iii()),
             ("seal0", "seal_hash_blake2_256", iii()),
         ],
-        CompileTestId::Bz2 => vec![
+        StartupTestId::Bz2 => vec![
             ("bench", "start", unit()),
             ("bench", "end", unit()),
             (wasi, "proc_exit", i()),
@@ -67,7 +67,7 @@ fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncT
             (wasi, "fd_seek", ilii_i()),
             (wasi, "path_open", path_open()),
         ],
-        CompileTestId::PulldownCmark => vec![
+        StartupTestId::PulldownCmark => vec![
             ("bench", "start", unit()),
             ("bench", "end", unit()),
             (wasi, "proc_exit", i()),
@@ -82,7 +82,7 @@ fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncT
             (wasi, "fd_write", iiii_i()),
             (wasi, "path_open", path_open()),
         ],
-        CompileTestId::Spidermonkey => vec![
+        StartupTestId::Spidermonkey => vec![
             ("bench", "start", unit()),
             ("bench", "end", unit()),
             (wasi, "proc_exit", i()),
@@ -104,7 +104,7 @@ fn required_imports(id: CompileTestId) -> Vec<(&'static str, &'static str, FuncT
             (wasi, "fd_seek", ilii_i()),
             (wasi, "path_open", path_open()),
         ],
-        CompileTestId::Ffmpeg => vec![
+        StartupTestId::Ffmpeg => vec![
             (wasi, "proc_exit", i()),
             (wasi, "fd_close", i_i()),
             (wasi, "args_get", ii_i()),
@@ -136,11 +136,11 @@ fn instantiate_benchmark(
     c: &mut Criterion,
     name: &str,
     encoding: InputEncoding,
-    id: CompileTestId,
+    id: StartupTestId,
 ) {
     let wasm = read_benchmark_file(encoding, name);
     let imports = required_imports(id);
-    let mut g = c.benchmark_group(format!("instantiate/{name}"));
+    let mut g = c.benchmark_group(format!("startup/{name}"));
     for vm in vms_under_test() {
         let Some(mut rt) = vm.setup(id.into()) else {
             continue;
@@ -159,7 +159,7 @@ fn instantiate_benchmark(
 }
 
 pub fn bench_bz2(c: &mut Criterion) {
-    instantiate_benchmark(c, "bz2", InputEncoding::Wasm, CompileTestId::Bz2)
+    instantiate_benchmark(c, "bz2", InputEncoding::Wasm, StartupTestId::Bz2)
 }
 
 pub fn bench_pulldown_cmark(c: &mut Criterion) {
@@ -167,7 +167,7 @@ pub fn bench_pulldown_cmark(c: &mut Criterion) {
         c,
         "pulldown-cmark",
         InputEncoding::Wasm,
-        CompileTestId::PulldownCmark,
+        StartupTestId::PulldownCmark,
     )
 }
 
@@ -176,12 +176,12 @@ pub fn bench_spidermonkey(c: &mut Criterion) {
         c,
         "spidermonkey",
         InputEncoding::Wasm,
-        CompileTestId::Spidermonkey,
+        StartupTestId::Spidermonkey,
     )
 }
 
 pub fn bench_ffmpeg(c: &mut Criterion) {
-    instantiate_benchmark(c, "ffmpeg", InputEncoding::Wasm, CompileTestId::Ffmpeg)
+    instantiate_benchmark(c, "ffmpeg", InputEncoding::Wasm, StartupTestId::Ffmpeg)
 }
 
 pub fn bench_coremark_minimal(c: &mut Criterion) {
@@ -189,14 +189,14 @@ pub fn bench_coremark_minimal(c: &mut Criterion) {
         c,
         "coremark-minimal",
         InputEncoding::Wasm,
-        CompileTestId::CoreMark,
+        StartupTestId::CoreMark,
     )
 }
 
 pub fn bench_argon2(c: &mut Criterion) {
-    instantiate_benchmark(c, "argon2", InputEncoding::Wasm, CompileTestId::Argon2)
+    instantiate_benchmark(c, "argon2", InputEncoding::Wasm, StartupTestId::Argon2)
 }
 
 pub fn bench_erc20(c: &mut Criterion) {
-    instantiate_benchmark(c, "erc20", InputEncoding::Wasm, CompileTestId::Erc20)
+    instantiate_benchmark(c, "erc20", InputEncoding::Wasm, StartupTestId::Erc20)
 }

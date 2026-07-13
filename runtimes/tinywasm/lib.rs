@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, CompileTestId};
+use benchmark_utils::{self as utils, StartupTestId};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
@@ -43,10 +43,10 @@ impl Tinywasm {
         !matches!(
             id,
             TestId::Compile(
-                CompileTestId::Bz2
-                    | CompileTestId::Spidermonkey
-                    | CompileTestId::PulldownCmark
-                    | CompileTestId::Ffmpeg
+                StartupTestId::Bz2
+                    | StartupTestId::Spidermonkey
+                    | StartupTestId::PulldownCmark
+                    | StartupTestId::Ffmpeg
             )
         )
     }

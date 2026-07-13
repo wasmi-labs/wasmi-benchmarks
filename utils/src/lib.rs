@@ -81,12 +81,12 @@ pub trait BenchInstance {
 
 #[derive(Copy, Clone)]
 pub enum TestId {
-    Compile(CompileTestId),
+    Compile(StartupTestId),
     Execute(ExecuteTestId),
 }
 
-impl From<CompileTestId> for TestId {
-    fn from(value: CompileTestId) -> Self {
+impl From<StartupTestId> for TestId {
+    fn from(value: StartupTestId) -> Self {
         Self::Compile(value)
     }
 }
@@ -98,7 +98,7 @@ impl From<ExecuteTestId> for TestId {
 }
 
 #[derive(Copy, Clone)]
-pub enum CompileTestId {
+pub enum StartupTestId {
     Erc20,
     Bz2,
     PulldownCmark,

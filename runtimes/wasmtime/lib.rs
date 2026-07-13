@@ -3,7 +3,7 @@
 
 use benchmark_utils as utils;
 use benchmark_utils::{
-    CompileTestId, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
+    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId,
 };
 use wasmtime::{Func, Val, ValType};
 

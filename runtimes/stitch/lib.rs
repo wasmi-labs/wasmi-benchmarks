@@ -2,7 +2,7 @@
 
 use benchmark_utils as utils;
 use benchmark_utils::{
-    CompileTestId, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
+    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId,
 };
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val, ValType};
 
@@ -37,7 +37,7 @@ impl Runtime for Stitch {
 impl Stitch {
     fn can_run(&self, id: TestId) -> bool {
         match id {
-            TestId::Compile(id) => !matches!(id, CompileTestId::Ffmpeg),
+            TestId::Compile(id) => !matches!(id, StartupTestId::Ffmpeg),
             TestId::Execute(id) => {
                 !matches!(id, ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2)
             }

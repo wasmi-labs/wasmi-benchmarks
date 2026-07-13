@@ -54,11 +54,11 @@ cargo bench
 
 Filter benchmarks via
 
-- `compile`: for compilation benchmarks.
+- `startup`: for startup (compile + instantiate) benchmarks.
 - `execute`: for execution benchmarks.
 - The runtime `ID`, e.g. `wasmi-v0.31` or `wasm3`.
 - The runtime configuration on top of the runtime `ID`, e.g. `wasmi-v0.32.lazy`.
-- Single test names, e.g. `counter` (execute) or `ffmpeg` (compile)
+- Single test names, e.g. `counter` (execute) or `ffmpeg` (startup)
 
 Examples
 
@@ -92,7 +92,7 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | | `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
 | | | |
-| `compile` | | |
+| `startup` | | |
 | | `bz2` | Medium-sized compression library with huge function bodies. (WASI required) |
 | | `pulldown-cmark` | Medium-sized markdown renderer. (WASI required) |
 | | `spidermonkey` | The firefox Javascript execution engine. (large, WASI required) |
