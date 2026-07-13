@@ -2179,6 +2179,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wamr"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "wamr-rust-sdk",
+ "wamr-sys",
+]
+
+[[package]]
 name = "rt-wasm3"
 version = "0.0.0"
 dependencies = [
@@ -2739,6 +2749,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "wamr-rust-sdk"
+version = "1.0.0"
+source = "git+https://github.com/robbepop/wamr-rust-sdk.git?branch=rf-no-wamrc#fb83c586bb1a476ffb2f8fdb9ea739788819e201"
+dependencies = [
+ "wamr-sys",
+]
+
+[[package]]
+name = "wamr-sys"
+version = "1.0.0"
+source = "git+https://github.com/robbepop/wamr-rust-sdk.git?branch=rf-no-wamrc#fb83c586bb1a476ffb2f8fdb9ea739788819e201"
+dependencies = [
+ "bindgen 0.72.1",
+ "cc",
+ "cmake",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3075,6 +3103,7 @@ dependencies = [
  "plotters",
  "rt-stitch",
  "rt-tinywasm",
+ "rt-wamr",
  "rt-wasm3",
  "rt-wasmer",
  "rt-wasmi-v0-31",

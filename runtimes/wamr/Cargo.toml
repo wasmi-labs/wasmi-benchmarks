@@ -1,0 +1,13 @@
+[package]
+name = "rt-wamr"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+wamr-rust-sdk = { git = "https://github.com/robbepop/wamr-rust-sdk.git", branch = "rf-no-wamrc" }
+wamr-sys = { git = "https://github.com/robbepop/wamr-rust-sdk.git", branch = "rf-no-wamrc" }

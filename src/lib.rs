@@ -25,6 +25,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     });
     #[cfg(feature = "stitch")]
     rts.push(rt_stitch::Stitch);
+    #[cfg(feature = "wamr")]
+    rts.push(rt_wamr::Wamr);
     #[cfg(feature = "wasmtime-cranelift")]
     rts.push(rt_wasmtime::Wasmtime {
         strategy: rt_wasmtime::Strategy::Cranelift,

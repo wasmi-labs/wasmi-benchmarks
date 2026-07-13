@@ -6,7 +6,8 @@ runs:
     - name: Install Dependencies
       # - libfontconfig1-dev: required for plotters
       # - ninja-build: required for Wasmer's WAMR backend
+      # - cmake: required to build the WAMR runtime (rt-wamr) from source
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev ninja-build
+        sudo apt-get install -y libfontconfig1-dev ninja-build cmake
