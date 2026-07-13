@@ -1,24 +1,51 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId};
-use core::slice;
+use benchmark_utils::{
+    CompileTestId, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
+};
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val, ValType};
 
 pub struct Stitch;
 
-struct StitchRuntime {
+struct StitchInstance {
+    store: Store,
+    linker: Linker,
+}
+
+struct StitchModule {
     store: Store,
     instance: Instance,
     params: Vec<Val>,
     results: Vec<Val>,
 }
 
-impl BenchRuntime for Stitch {
+impl Runtime for Stitch {
     fn id(&self) -> &'static str {
         "stitch"
     }
 
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
+        if !self.can_run(id.into()) {
+            return false;
+        }
+        let engine = Engine::new();
+        Module::new(&engine, wasm).unwrap();
+        true
+    }
+
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        if !self.can_run(id) {
+            return None;
+        }
+        Some(Box::new(StitchInstance {
+            store: Store::new(Engine::new()),
+            linker: Linker::new(),
+        }))
+    }
+}
+
+impl Stitch {
     fn can_run(&self, id: TestId) -> bool {
         match id {
             TestId::Compile(id) => !matches!(id, CompileTestId::Ffmpeg),
@@ -27,48 +54,47 @@ impl BenchRuntime for Stitch {
             }
         }
     }
+}
 
-    fn compile(&self, wasm: &[u8]) {
-        let engine = Engine::new();
-        Module::new(&engine, wasm).unwrap();
+impl RuntimeInstance for StitchInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        // Stitch only exposes the typed `Func::wrap` constructor (no untyped/dynamic host
+        // function API), so the runtime-neutral signature is matched against the concrete Rust
+        // closure types it needs. The benchmark suite only links `env.clock_ms: () -> i32`
+        // (for Coremark), so only that signature is supported here.
+        let host = match (ty.params(), ty.results()) {
+            ([], [utils::ValType::I32]) => Func::wrap(&mut self.store, move || -> i32 {
+                let mut out = [utils::Val::I32(0)];
+                func(&[], &mut out);
+                out[0].unwrap_i32()
+            }),
+            _ => unimplemented!(
+                "the stitch adapter only supports the `() -> i32` host function signature used by Coremark"
+            ),
+        };
+        self.linker.define(module, name, ExternVal::Func(host));
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let engine = Engine::new();
-        let mut store = Store::new(engine);
-        let engine = store.engine();
-        let module = Module::new(engine, wasm).unwrap();
-        let linker = Linker::new();
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let StitchInstance { mut store, linker } = *self;
+        let module = Module::new(store.engine(), wasm).unwrap();
         let instance = linker.instantiate(&mut store, &module).unwrap();
-        Box::new(StitchRuntime {
+        Box::new(StitchModule {
             store,
             instance,
             params: Vec::new(),
             results: Vec::new(),
         })
     }
-
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
-        let engine = Engine::new();
-        let mut store = Store::new(engine);
-        let engine = store.engine();
-        let module = Module::new(engine, wasm).unwrap();
-        let mut linker = Linker::new();
-        linker.define(
-            "env",
-            "clock_ms",
-            ExternVal::Func(Func::wrap(&mut store, elapsed_ms)),
-        );
-        let instance = linker.instantiate(&mut store, &module).unwrap();
-        let func = instance.exported_func("run").unwrap();
-        let mut result = Val::F32(0.0);
-        func.call(&mut store, &[], slice::from_mut(&mut result))
-            .unwrap();
-        result.to_f32().unwrap()
-    }
 }
 
-impl BenchInstance for StitchRuntime {
+impl ModuleInstance for StitchModule {
     fn call(
         &mut self,
         name: &str,
@@ -88,7 +114,7 @@ impl BenchInstance for StitchRuntime {
     }
 }
 
-impl StitchRuntime {
+impl StitchModule {
     fn prepare_params(&mut self, params: &[utils::Val]) {
         self.params.clear();
         self.params
