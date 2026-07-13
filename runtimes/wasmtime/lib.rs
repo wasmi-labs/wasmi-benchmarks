@@ -1,9 +1,12 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils as utils;
-use benchmark_utils::{BenchInstance, BenchRuntime, CompileTestId, ExecuteTestId, TestId};
+use benchmark_utils::{
+    CompileTestId, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
+};
 use wasmtime::{Func, Val, ValType};
 
+#[derive(Debug, Copy, Clone)]
 pub enum Strategy {
     Cranelift,
     Winch,
@@ -14,14 +17,20 @@ pub struct Wasmtime {
     pub strategy: Strategy,
 }
 
-struct WasmtimeRuntime {
+/// A concrete Wasmtime runtime with its linker, produced by [`Wasmtime::setup`].
+struct WasmtimeInstance {
+    linker: wasmtime::Linker<()>,
+}
+
+/// An instantiated Wasmtime module, produced by [`WasmtimeInstance::load`].
+struct WasmtimeModule {
     store: wasmtime::Store<()>,
     instance: wasmtime::Instance,
     params: Vec<Val>,
     results: Vec<Val>,
 }
 
-impl BenchRuntime for Wasmtime {
+impl Runtime for Wasmtime {
     fn id(&self) -> &'static str {
         match self.strategy {
             Strategy::Cranelift => "wasmtime.cranelift",
@@ -30,6 +39,25 @@ impl BenchRuntime for Wasmtime {
         }
     }
 
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
+        if !self.can_run(id.into()) {
+            return false;
+        }
+        let engine = make_engine(self.strategy);
+        wasmtime::Module::new(&engine, wasm).unwrap();
+        true
+    }
+
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        if !self.can_run(id) {
+            return None;
+        }
+        let linker = wasmtime::Linker::new(&make_engine(self.strategy));
+        Some(Box::new(WasmtimeInstance { linker }))
+    }
+}
+
+impl Wasmtime {
     fn can_run(&self, id: TestId) -> bool {
         match self.strategy {
             Strategy::Cranelift => match id {
@@ -52,63 +80,76 @@ impl BenchRuntime for Wasmtime {
             },
         }
     }
+}
 
-    fn compile(&self, wasm: &[u8]) {
-        let store = self.store();
-        wasmtime::Module::new(store.engine(), wasm).unwrap();
+impl RuntimeInstance for WasmtimeInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+        let ty = wasmtime::FuncType::new(
+            self.linker.engine(),
+            ty.params().iter().copied().map(to_wasmtime_valtype),
+            ty.results().iter().copied().map(to_wasmtime_valtype),
+        );
+        self.linker
+            .func_new(
+                module,
+                name,
+                ty,
+                move |_caller, params: &[Val], results: &mut [Val]| {
+                    let in_params: Vec<utils::Val> =
+                        params.iter().copied().map(into_utils_val).collect();
+                    let mut out: Vec<utils::Val> = result_tys
+                        .iter()
+                        .copied()
+                        .map(utils::Val::default_for_ty)
+                        .collect();
+                    func(&in_params, &mut out);
+                    for (dst, src) in results.iter_mut().zip(out) {
+                        *dst = from_utils_val(src);
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
     }
 
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance> {
-        let mut store = self.store();
-        let engine = store.engine();
-        let module = wasmtime::Module::new(engine, wasm).unwrap();
-        let linker = wasmtime::Linker::new(engine);
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let WasmtimeInstance { linker } = *self;
+        let engine = linker.engine().clone();
+        let mut store = <wasmtime::Store<()>>::new(&engine, ());
+        let module = wasmtime::Module::new(&engine, wasm).unwrap();
         let instance = linker.instantiate(&mut store, &module).unwrap();
-        Box::new(WasmtimeRuntime {
+        Box::new(WasmtimeModule {
             store,
             instance,
             params: Vec::new(),
             results: Vec::new(),
         })
     }
-
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32 {
-        let mut store = self.store();
-        let mut linker = wasmtime::Linker::new(store.engine());
-        linker
-            .func_wrap("env", "clock_ms", elapsed_ms)
-            .expect("Wasmtime: failed to define `clock_ms` host function");
-        let module = wasmtime::Module::new(store.engine(), wasm)
-            .expect("Wasmtime: failed to compile and validate coremark Wasm binary");
-        linker
-            .instantiate(&mut store, &module)
-            .expect("Wasmtime: failed to instantiate coremark Wasm module")
-            .get_typed_func::<(), f32>(&mut store, "run")
-            .expect("Wasmtime: could not find \"run\" function export")
-            .call(&mut store, ())
-            .expect("Wasmtime: failed to execute \"run\" function")
-    }
 }
 
-impl Wasmtime {
-    fn store(&self) -> wasmtime::Store<()> {
-        let mut config = wasmtime::Config::default();
-        if matches!(self.strategy, Strategy::Cranelift) {
-            config.wasm_tail_call(true);
-        }
-        config.strategy(match self.strategy {
-            Strategy::Cranelift | Strategy::Pulley => wasmtime::Strategy::Cranelift,
-            Strategy::Winch => wasmtime::Strategy::Winch,
-        });
-        if matches!(self.strategy, Strategy::Pulley) {
-            config.target("pulley64").unwrap();
-        }
-        let engine = wasmtime::Engine::new(&config).unwrap();
-        <wasmtime::Store<()>>::new(&engine, ())
+fn make_engine(strategy: Strategy) -> wasmtime::Engine {
+    let mut config = wasmtime::Config::default();
+    if matches!(strategy, Strategy::Cranelift) {
+        config.wasm_tail_call(true);
     }
+    config.strategy(match strategy {
+        Strategy::Cranelift | Strategy::Pulley => wasmtime::Strategy::Cranelift,
+        Strategy::Winch => wasmtime::Strategy::Winch,
+    });
+    if matches!(strategy, Strategy::Pulley) {
+        config.target("pulley64").unwrap();
+    }
+    wasmtime::Engine::new(&config).unwrap()
 }
 
-impl BenchInstance for WasmtimeRuntime {
+impl ModuleInstance for WasmtimeModule {
     fn call(
         &mut self,
         name: &str,
@@ -128,7 +169,7 @@ impl BenchInstance for WasmtimeRuntime {
     }
 }
 
-impl WasmtimeRuntime {
+impl WasmtimeModule {
     fn prepare_params(&mut self, params: &[utils::Val]) {
         self.params.clear();
         self.params
@@ -150,6 +191,15 @@ impl WasmtimeRuntime {
             *result = into_utils_val(src);
         }
         Ok(())
+    }
+}
+
+fn to_wasmtime_valtype(ty: utils::ValType) -> ValType {
+    match ty {
+        utils::ValType::I32 => ValType::I32,
+        utils::ValType::I64 => ValType::I64,
+        utils::ValType::F32 => ValType::F32,
+        utils::ValType::F64 => ValType::F64,
     }
 }
 
