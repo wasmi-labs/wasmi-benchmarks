@@ -1,6 +1,7 @@
 use benchmark_utils::ExecuteTestId;
 use benchmark_utils::{InputEncoding, Val, read_benchmark_file, wat2wasm};
 use core::fmt;
+use core::slice;
 use criterion::Criterion;
 use wasmi_benchmarks::vms_under_test;
 
@@ -28,18 +29,20 @@ fn execute_benchmark_with_val(
     let wasm = read_benchmark_file(encoding, name);
     let mut g = c.benchmark_group(format!("execute/{name}"));
     for vm in vms_under_test() {
-        if !vm.can_run(id.into()) {
+        let Some(rt) = vm.setup(id.into()) else {
             continue;
-        }
-        let id = format!("{}/{}", vm.id(), input);
-        g.bench_function(&id, |b| {
-            let wasm = wat2wasm(&wasm[..]);
-            let mut runtime = vm.load(&wasm[..]);
-            let input_ty = input.ty();
-            let inputs = [input.into()];
-            let mut results = [Val::default_for_ty(input_ty)];
+        };
+        let bench_id = format!("{}/{}", vm.id(), input);
+        // `load` consumes the runtime instance, so it runs once here rather than inside
+        // the `bench_function` closure (which is `FnMut` and only times `call` via `b.iter`).
+        let wasm = wat2wasm(&wasm[..]);
+        let mut instance = rt.instantiate(&wasm[..]);
+        g.bench_function(&bench_id, |b| {
+            let mut result = Val::default_for_ty(input.ty());
             b.iter(|| {
-                runtime.call("run", &inputs[..], &mut results[..]).unwrap();
+                instance
+                    .call("run", slice::from_ref(&input), slice::from_mut(&mut result))
+                    .unwrap();
             });
         });
     }
