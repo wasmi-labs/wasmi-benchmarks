@@ -1,4 +1,5 @@
 #![crate_type = "dylib"]
+#![cfg(any(feature = "cranelift", feature = "winch", feature = "pulley"))]
 
 use benchmark_utils as utils;
 use benchmark_utils::{
@@ -39,12 +40,15 @@ impl Runtime for Wasmtime {
         }
     }
 
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
+    fn compile(&self, id: CompileTestId, _wasm: &[u8]) -> bool {
         if !self.can_run(id.into()) {
             return false;
         }
-        let engine = make_engine(self.strategy);
-        wasmtime::Module::new(&engine, wasm).unwrap();
+        #[cfg(any(feature = "cranelift", feature = "winch"))]
+        {
+            let engine = make_engine(self.strategy);
+            wasmtime::Module::new(&engine, wasm).unwrap();
+        }
         true
     }
 

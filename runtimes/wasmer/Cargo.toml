@@ -15,4 +15,8 @@ wasmer-compiler-cranelift = "7.2.0"
 [dependencies.wasmer]
 version = "7.2.0"
 default-features = false
-features = ["compiler", "singlepass", "cranelift"]
+features = ["compiler"]
+
+[features]
+singlepass = ["wasmer/singlepass"]
+cranelift = ["wasmer/cranelift"]

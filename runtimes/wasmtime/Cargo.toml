@@ -13,4 +13,9 @@ anyhow = { workspace = true }
 [dependencies.wasmtime]
 version = "46.0.0"
 default-features = false
-features = ["winch", "cranelift", "pulley", "runtime", "anyhow"]
+features = ["runtime", "anyhow"]
+
+[features]
+cranelift = ["wasmtime/cranelift"]
+winch = ["wasmtime/winch"]
+pulley = ["wasmtime/pulley", "wasmtime/cranelift"]
