@@ -16,7 +16,7 @@ The following Wasm runtimes and configurations are included.
 | [Wasmer] | `wasmer` | `cranelift`, `singlepass`, `wamr` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
 | [Stitch] | `stitch` | | New experimental and very fast zero-dependencies Wasm interpreter. |
 
-Ideally we had more Wasm runtimes, e.g. [WAMR], [Toywasm] and [Wain] but those had no proper Rust bindings or sufficiently flexible APIs respectively.
+Ideally we had more Wasm runtimes, e.g. [Toywasm] and [Wain] but those had no proper Rust bindings or sufficiently flexible APIs respectively.
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi (recent)]: https://github.com/wasmi-labs/wasmi
