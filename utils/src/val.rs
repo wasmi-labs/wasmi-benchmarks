@@ -47,6 +47,36 @@ impl Val {
     }
 }
 
+/// The type signature of a Wasm function: its parameter and result types.
+#[derive(Debug, Clone)]
+pub struct FuncType {
+    params: Box<[ValType]>,
+    results: Box<[ValType]>,
+}
+
+impl FuncType {
+    /// Creates a new [`FuncType`] from its `params` and `results` types.
+    pub fn new(
+        params: impl IntoIterator<Item = ValType>,
+        results: impl IntoIterator<Item = ValType>,
+    ) -> Self {
+        Self {
+            params: params.into_iter().collect(),
+            results: results.into_iter().collect(),
+        }
+    }
+
+    /// Returns the parameter types of the [`FuncType`].
+    pub fn params(&self) -> &[ValType] {
+        &self.params
+    }
+
+    /// Returns the result types of the [`FuncType`].
+    pub fn results(&self) -> &[ValType] {
+        &self.results
+    }
+}
+
 /// A Wasm type.
 #[derive(Debug, Copy, Clone)]
 pub enum ValType {

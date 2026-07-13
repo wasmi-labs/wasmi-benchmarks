@@ -2,7 +2,7 @@
 
 mod val;
 
-pub use self::val::{Val, ValType};
+pub use self::val::{FuncType, Val, ValType};
 use core::fmt;
 
 /// A Wasm runtime that is capable of being benchmarked.
