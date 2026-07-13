@@ -42,7 +42,7 @@ impl Tinywasm {
         // modules, so they are excluded from the instantiation benchmarks.
         !matches!(
             id,
-            TestId::Compile(
+            TestId::Startup(
                 StartupTestId::Bz2
                     | StartupTestId::Spidermonkey
                     | StartupTestId::PulldownCmark

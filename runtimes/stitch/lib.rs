@@ -37,7 +37,7 @@ impl Runtime for Stitch {
 impl Stitch {
     fn can_run(&self, id: TestId) -> bool {
         match id {
-            TestId::Compile(id) => !matches!(id, StartupTestId::Ffmpeg),
+            TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
             TestId::Execute(id) => {
                 !matches!(id, ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2)
             }
