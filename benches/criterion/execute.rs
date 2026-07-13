@@ -33,11 +33,11 @@ fn execute_benchmark_with_val(
             continue;
         };
         let bench_id = format!("{}/{}", vm.id(), input);
-        // `load` consumes the runtime instance, so it runs once here rather than inside
-        // the `bench_function` closure (which is `FnMut` and only times `call` via `b.iter`).
-        let wasm = wat2wasm(&wasm[..]);
-        let mut instance = rt.instantiate(&wasm[..]);
         g.bench_function(&bench_id, |b| {
+            // `load` consumes the runtime instance, so it runs once here rather than inside
+            // the `bench_function` closure (which is `FnMut` and only times `call` via `b.iter`).
+            let wasm = wat2wasm(&wasm[..]);
+            let mut instance = rt.instantiate(&wasm[..]);
             let mut result = Val::default_for_ty(input.ty());
             b.iter(|| {
                 instance
