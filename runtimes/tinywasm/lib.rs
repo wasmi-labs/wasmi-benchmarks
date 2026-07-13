@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use benchmark_utils::{self as utils, CompileTestId};
-use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
+use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
 pub struct Tinywasm;
@@ -27,28 +27,16 @@ impl Runtime for Tinywasm {
         "tinywasm"
     }
 
-    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
-        if !self.can_run(id.into()) {
-            return false;
-        }
+    fn compile(&self, _id: CompileTestId, wasm: &[u8]) -> bool {
         tinywasm::parse_bytes(wasm).unwrap();
         true
     }
 
-    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
-        if !self.can_run(id) {
-            return None;
-        }
+    fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         Some(Box::new(TinywasmInstance {
             store: tinywasm::Store::default(),
             imports: tinywasm::Imports::new(),
         }))
-    }
-}
-
-impl Tinywasm {
-    fn can_run(&self, id: TestId) -> bool {
-        !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
     }
 }
 
