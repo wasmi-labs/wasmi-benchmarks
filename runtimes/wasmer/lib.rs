@@ -104,6 +104,7 @@ impl RuntimeInstance for WasmerInstance {
 
 fn make_store(compiler: WasmerCompiler) -> wasmer::Store {
     match compiler {
+        #[cfg(feature = "cranelift")]
         WasmerCompiler::Cranelift => {
             let builder =
                 wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
@@ -112,11 +113,14 @@ fn make_store(compiler: WasmerCompiler) -> wasmer::Store {
             let engine = builder.set_features(Some(features)).engine();
             wasmer::Store::new(engine)
         }
+        #[cfg(feature = "singlepass")]
         WasmerCompiler::Singlepass => {
             let builder =
                 wasmer::sys::EngineBuilder::new(wasmer_compiler_singlepass::Singlepass::new());
             wasmer::Store::new(builder)
         }
+        #[allow(unreachable_patterns)]
+        _ => unreachable!("the selected wasmer backend is not enabled"),
     }
 }
 
