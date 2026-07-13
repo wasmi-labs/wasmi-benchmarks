@@ -15,13 +15,15 @@ pub struct Wasmer {
     pub compiler: WasmerCompiler,
 }
 
-/// A concrete Wasmer runtime with its store and imports, produced by [`Wasmer::setup`].
+/// A concrete Wasmer runtime with its engine and recorded host functions, produced by
+/// [`Wasmer::setup`].
 ///
-/// Wasmer binds host functions to a [`Store`](wasmer::Store), so the store is created up front
-/// and the module that [`RuntimeInstance::load`] instantiates runs in this same store.
+/// Wasmer binds host functions to a [`Store`](wasmer::Store), so rather than holding a live store
+/// the recorded host functions are replayed into a fresh store (built from the reusable `engine`)
+/// on every instantiation.
 struct WasmerInstance {
-    store: wasmer::Store,
-    imports: wasmer::Imports,
+    engine: wasmer::Engine,
+    linker: utils::Linker,
 }
 
 /// An instantiated Wasmer module, produced by [`WasmerInstance::load`].
@@ -43,8 +45,8 @@ impl Runtime for Wasmer {
         if !self.can_run(id.into()) {
             return false;
         }
-        let store = make_store(self.compiler);
-        wasmer::Module::new(&store, wasm).unwrap();
+        let engine = make_engine(self.compiler);
+        wasmer::Module::new(&engine, wasm).unwrap();
         true
     }
 
@@ -53,8 +55,8 @@ impl Runtime for Wasmer {
             return None;
         }
         Some(Box::new(WasmerInstance {
-            store: make_store(self.compiler),
-            imports: wasmer::Imports::new(),
+            engine: make_engine(self.compiler),
+            linker: utils::Linker::new(),
         }))
     }
 }
@@ -73,25 +75,31 @@ impl RuntimeInstance for WasmerInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
-        let params: Vec<ValType> = ty.params().iter().copied().map(to_wasmer_type).collect();
-        let results: Vec<ValType> = ty.results().iter().copied().map(to_wasmer_type).collect();
-        let ty = wasmer::FunctionType::new(params, results);
-        let host = wasmer::Function::new(&mut self.store, ty, move |args: &[Val]| {
-            let in_params: Vec<utils::Val> = args.iter().cloned().map(into_utils_val).collect();
-            let mut out: Vec<utils::Val> = result_tys
-                .iter()
-                .copied()
-                .map(utils::Val::default_for_ty)
-                .collect();
-            func(&in_params, &mut out);
-            Ok(out.into_iter().map(from_utils_val).collect())
-        });
-        self.imports.define(module, name, host);
+        self.linker.define(module, name, ty, func);
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let WasmerInstance { mut store, imports } = *self;
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        // Note: Wasmer binds host functions to a `Store`, so the recorded functions are (re)built against
+        //       a fresh store (from the reusable engine) and imports on every instantiation.
+        let mut store = wasmer::Store::new(self.engine.clone());
+        let mut imports = wasmer::Imports::new();
+        for (module, name, ty, func) in self.linker.funcs() {
+            let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+            let params: Vec<ValType> = ty.params().iter().copied().map(to_wasmer_type).collect();
+            let results: Vec<ValType> = ty.results().iter().copied().map(to_wasmer_type).collect();
+            let ty = wasmer::FunctionType::new(params, results);
+            let host = wasmer::Function::new(&mut store, ty, move |args: &[Val]| {
+                let in_params: Vec<utils::Val> = args.iter().cloned().map(into_utils_val).collect();
+                let mut out: Vec<utils::Val> = result_tys
+                    .iter()
+                    .copied()
+                    .map(utils::Val::default_for_ty)
+                    .collect();
+                func(&in_params, &mut out);
+                Ok(out.into_iter().map(from_utils_val).collect())
+            });
+            imports.define(module, name, host);
+        }
         let module = wasmer::Module::new(&store, wasm).unwrap();
         let instance = wasmer::Instance::new(&mut store, &module, &imports).unwrap();
         Box::new(WasmerModule {
@@ -102,7 +110,7 @@ impl RuntimeInstance for WasmerInstance {
     }
 }
 
-fn make_store(compiler: WasmerCompiler) -> wasmer::Store {
+fn make_engine(compiler: WasmerCompiler) -> wasmer::Engine {
     match compiler {
         #[cfg(feature = "cranelift")]
         WasmerCompiler::Cranelift => {
@@ -110,14 +118,13 @@ fn make_store(compiler: WasmerCompiler) -> wasmer::Store {
                 wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
             let mut features = wasmer::sys::Features::new();
             features.tail_call(true);
-            let engine = builder.set_features(Some(features)).engine();
-            wasmer::Store::new(engine)
+            builder.set_features(Some(features)).engine().into()
         }
         #[cfg(feature = "singlepass")]
         WasmerCompiler::Singlepass => {
             let builder =
                 wasmer::sys::EngineBuilder::new(wasmer_compiler_singlepass::Singlepass::new());
-            wasmer::Store::new(builder)
+            builder.engine().into()
         }
         #[allow(unreachable_patterns)]
         _ => unreachable!("the selected wasmer backend is not enabled"),

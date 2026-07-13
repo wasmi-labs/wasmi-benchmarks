@@ -9,8 +9,7 @@ use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, V
 pub struct Stitch;
 
 struct StitchInstance {
-    store: Store,
-    linker: Linker,
+    linker: utils::Linker,
 }
 
 struct StitchModule {
@@ -39,8 +38,7 @@ impl Runtime for Stitch {
             return None;
         }
         Some(Box::new(StitchInstance {
-            store: Store::new(Engine::new()),
-            linker: Linker::new(),
+            linker: utils::Linker::new(),
         }))
     }
 }
@@ -64,25 +62,30 @@ impl RuntimeInstance for StitchInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        // Stitch only exposes the typed `Func::wrap` constructor (no untyped/dynamic host
-        // function API), so the runtime-neutral signature is matched against the concrete Rust
-        // closure types it needs. The benchmark suite only links `env.clock_ms: () -> i32`
-        // (for Coremark), so only that signature is supported here.
-        let host = match (ty.params(), ty.results()) {
-            ([], [utils::ValType::I32]) => Func::wrap(&mut self.store, move || -> i32 {
-                let mut out = [utils::Val::I32(0)];
-                func(&[], &mut out);
-                out[0].unwrap_i32()
-            }),
-            _ => unimplemented!(
-                "the stitch adapter only supports the `() -> i32` host function signature used by Coremark"
-            ),
-        };
-        self.linker.define(module, name, ExternVal::Func(host));
+        self.linker.define(module, name, ty, func);
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let StitchInstance { mut store, linker } = *self;
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let mut store = Store::new(Engine::new());
+        let mut linker = Linker::new();
+        for (module, name, ty, func) in self.linker.funcs() {
+            // Stitch only exposes the typed `Func::wrap` constructor (no untyped/dynamic host
+            // function API), so the runtime-neutral signature is matched against the concrete Rust
+            // closure types it needs. The benchmark suite only links `env.clock_ms: () -> i32`
+            // (for Coremark), so only that signature is supported here. Host functions are bound to
+            // a `Store`, so they are (re)built here against the fresh store on every instantiation.
+            let host = match (ty.params(), ty.results()) {
+                ([], [utils::ValType::I32]) => Func::wrap(&mut store, move || -> i32 {
+                    let mut out = [utils::Val::I32(0)];
+                    func(&[], &mut out);
+                    out[0].unwrap_i32()
+                }),
+                _ => unimplemented!(
+                    "the stitch adapter only supports the `() -> i32` host function signature used by Coremark"
+                ),
+            };
+            linker.define(module, name, ExternVal::Func(host));
+        }
         let module = Module::new(store.engine(), wasm).unwrap();
         let instance = linker.instantiate(&mut store, &module).unwrap();
         Box::new(StitchModule {

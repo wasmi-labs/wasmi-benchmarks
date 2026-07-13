@@ -40,7 +40,7 @@ impl Runtime for Wasmtime {
         }
     }
 
-    fn compile(&self, id: CompileTestId, _wasm: &[u8]) -> bool {
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool {
         if !self.can_run(id.into()) {
             return false;
         }
@@ -123,12 +123,11 @@ impl RuntimeInstance for WasmtimeInstance {
             .unwrap();
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let WasmtimeInstance { linker } = *self;
-        let engine = linker.engine().clone();
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let engine = self.linker.engine().clone();
         let mut store = <wasmtime::Store<()>>::new(&engine, ());
         let module = wasmtime::Module::new(&engine, wasm).unwrap();
-        let instance = linker.instantiate(&mut store, &module).unwrap();
+        let instance = self.linker.instantiate(&mut store, &module).unwrap();
         Box::new(WasmtimeModule {
             store,
             instance,

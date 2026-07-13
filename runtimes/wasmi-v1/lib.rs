@@ -115,12 +115,14 @@ impl RuntimeInstance for WasmiInstance {
             .unwrap();
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let WasmiInstance { linker, validation } = *self;
-        let engine = linker.engine().clone();
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let engine = self.linker.engine().clone();
         let mut store = <wasmi::Store<()>>::new(&engine, ());
-        let module = make_module(validation, &engine, wasm);
-        let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
+        let module = make_module(self.validation, &engine, wasm);
+        let instance = self
+            .linker
+            .instantiate_and_start(&mut store, &module)
+            .unwrap();
         Box::new(WasmiModule {
             store,
             instance,

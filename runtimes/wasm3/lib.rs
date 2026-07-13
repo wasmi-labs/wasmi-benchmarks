@@ -96,12 +96,14 @@ impl RuntimeInstance for Wasm3Instance {
             .unwrap();
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let Wasm3Instance { linker } = *self;
-        let engine = linker.engine().clone();
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let engine = self.linker.engine().clone();
         let mut store = <wasm3::Store<()>>::new(&engine, ());
         let module = wasm3::Module::new(&engine, wasm).unwrap();
-        let instance = linker.instantiate_and_start(&mut store, &module).unwrap();
+        let instance = self
+            .linker
+            .instantiate_and_start(&mut store, &module)
+            .unwrap();
         Box::new(Wasm3Module {
             store,
             instance,

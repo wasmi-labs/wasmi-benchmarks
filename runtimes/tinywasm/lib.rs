@@ -6,13 +6,12 @@ use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
 pub struct Tinywasm;
 
-/// A concrete Tinywasm runtime with its store and imports, produced by [`Tinywasm::setup`].
+/// A concrete Tinywasm runtime with its recorded host functions, produced by [`Tinywasm::setup`].
 ///
-/// Tinywasm binds host functions to a [`Store`](tinywasm::Store), so the store is created up
-/// front and the module that [`RuntimeInstance::load`] instantiates runs in this same store.
+/// Tinywasm binds host functions to a [`Store`](tinywasm::Store), so rather than holding a live
+/// store the recorded host functions are replayed into a fresh store on every instantiation.
 struct TinywasmInstance {
-    store: tinywasm::Store,
-    imports: tinywasm::Imports,
+    linker: utils::Linker,
 }
 
 /// An instantiated Tinywasm module, produced by [`TinywasmInstance::load`].
@@ -34,8 +33,7 @@ impl Runtime for Tinywasm {
 
     fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         Some(Box::new(TinywasmInstance {
-            store: tinywasm::Store::default(),
-            imports: tinywasm::Imports::new(),
+            linker: utils::Linker::new(),
         }))
     }
 }
@@ -48,29 +46,33 @@ impl RuntimeInstance for TinywasmInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        let result_tys: Vec<utils::ValType> = ty.results().to_vec();
-        let params: Vec<WasmType> = ty.params().iter().copied().map(to_wasm_type).collect();
-        let results: Vec<WasmType> = ty.results().iter().copied().map(to_wasm_type).collect();
-        let ty = TinyFuncType::new(&params, &results);
-        let host = tinywasm::HostFunction::from_untyped(
-            &mut self.store,
-            &ty,
-            move |_ctx, args: &[Val]| {
-                let in_params: Vec<utils::Val> = args.iter().copied().map(into_utils_val).collect();
-                let mut out: Vec<utils::Val> = result_tys
-                    .iter()
-                    .copied()
-                    .map(utils::Val::default_for_ty)
-                    .collect();
-                func(&in_params, &mut out);
-                Ok(out.into_iter().map(from_utils_val).collect())
-            },
-        );
-        self.imports.define(module, name, host);
+        self.linker.define(module, name, ty, func);
     }
 
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        let TinywasmInstance { mut store, imports } = *self;
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        // Tinywasm binds host functions to a `Store`, so the recorded functions are (re)built
+        // against a fresh store and imports on every instantiation.
+        let mut store = tinywasm::Store::default();
+        let mut imports = tinywasm::Imports::new();
+        for (module, name, ty, func) in self.linker.funcs() {
+            let result_tys: Vec<utils::ValType> = ty.results().to_vec();
+            let params: Vec<WasmType> = ty.params().iter().copied().map(to_wasm_type).collect();
+            let results: Vec<WasmType> = ty.results().iter().copied().map(to_wasm_type).collect();
+            let ty = TinyFuncType::new(&params, &results);
+            let host =
+                tinywasm::HostFunction::from_untyped(&mut store, &ty, move |_ctx, args: &[Val]| {
+                    let in_params: Vec<utils::Val> =
+                        args.iter().copied().map(into_utils_val).collect();
+                    let mut out: Vec<utils::Val> = result_tys
+                        .iter()
+                        .copied()
+                        .map(utils::Val::default_for_ty)
+                        .collect();
+                    func(&in_params, &mut out);
+                    Ok(out.into_iter().map(from_utils_val).collect())
+                });
+            imports.define(module, name, host);
+        }
         let module = tinywasm::parse_bytes(wasm).unwrap();
         let instance =
             tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();

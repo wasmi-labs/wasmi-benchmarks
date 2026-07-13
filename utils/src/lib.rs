@@ -49,8 +49,8 @@ pub trait RuntimeInstance {
         func: fn(params: &[Val], results: &mut [Val]),
     );
 
-    /// Consumes `self` to instantiate the `wasm` module with previously linked functions.
-    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance>;
+    /// Instantiates the `wasm` module with previously linked functions.
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance>;
 }
 
 /// A module instance of a WebAssembly (Wasm) runtime.
