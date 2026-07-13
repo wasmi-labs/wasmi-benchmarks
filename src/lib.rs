@@ -1,9 +1,9 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::BenchRuntime;
+use benchmark_utils::Runtime;
 
 /// Returns the Wasm runtimes with a set of configurations to test.
-pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
+pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     let mut rts = Rts::default();
     #[cfg(feature = "wasmi-v0-31")]
     rts.push(rt_wasmi_v0_31::WasmiV031);
@@ -49,14 +49,14 @@ pub fn vms_under_test() -> Vec<Box<dyn BenchRuntime>> {
 }
 
 #[derive(Default)]
-struct Rts(Vec<Box<dyn BenchRuntime>>);
+struct Rts(Vec<Box<dyn Runtime>>);
 
 impl Rts {
-    fn push(&mut self, rt: impl BenchRuntime + 'static) {
+    fn push(&mut self, rt: impl Runtime + 'static) {
         self.0.push(Box::new(rt));
     }
 
-    fn into_vec(self) -> Vec<Box<dyn BenchRuntime>> {
+    fn into_vec(self) -> Vec<Box<dyn Runtime>> {
         self.0
     }
 }
