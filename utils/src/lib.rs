@@ -5,6 +5,62 @@ mod val;
 pub use self::val::{FuncType, Val, ValType};
 use core::fmt;
 
+/// A WebAssembly runtime description.
+///
+/// Represents a Wasm runtime with a specific configuration.
+pub trait Runtime {
+    /// Returns the unique ID of the Wasm runtime and its configuration as string.
+    fn id(&self) -> &'static str;
+
+    /// Compiles the `wasm` using the Wasm runtime and its configuration.
+    ///
+    /// # Returns
+    ///
+    /// - Returns `true` if `self` can compile the test with identity `id`.
+    /// - Returns `false` otherwise.
+    ///
+    /// # Note
+    ///
+    /// This is a temporary method used by the compilation benchmarks. It will be
+    /// removed once those are migrated to instantiation benchmarks that go through
+    /// [`Runtime::setup`] and [`RuntimeInstance::load`] like the execution benchmarks.
+    fn compile(&self, id: CompileTestId, wasm: &[u8]) -> bool;
+
+    /// Sets up and returns a [`RuntimeInstance`] if `self` can run `id`.
+    ///
+    /// Otherwise returns `None`.
+    fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>>;
+}
+
+/// A concrete instance of a WebAssembly (Wasm) runtime.
+pub trait RuntimeInstance {
+    /// Defines the host `func` with signature `ty` in the runtime's linker under `module::name`.
+    ///
+    /// # Note
+    ///
+    /// Must be called before [`Self::load`].
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: FuncType,
+        func: fn(params: &[Val], results: &mut [Val]),
+    );
+
+    /// Consumes `self` to instantiate the `wasm` module with previously linked functions.
+    fn instantiate(self: Box<Self>, wasm: &[u8]) -> Box<dyn ModuleInstance>;
+}
+
+/// A module instance of a WebAssembly (Wasm) runtime.
+pub trait ModuleInstance {
+    /// Calls the function exported by `name` with `params` and writes the results back into `results`.
+    ///
+    /// # Note
+    ///
+    /// It is the callers responsibility to provide `params` and `results` buffers big enough to satisfy the called function.
+    fn call(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
+}
+
 /// A Wasm runtime that is capable of being benchmarked.
 pub trait BenchRuntime {
     /// Returns the unique ID of the Wasm runtime and its configuration as string.
