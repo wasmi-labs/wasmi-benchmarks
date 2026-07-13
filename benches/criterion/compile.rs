@@ -55,7 +55,7 @@ pub fn bench_coremark_minimal(c: &mut Criterion) {
         c,
         "coremark-minimal",
         InputEncoding::Wasm,
-        CompileTestId::CoreMarkMinimal,
+        CompileTestId::CoreMark,
     )
 }
 

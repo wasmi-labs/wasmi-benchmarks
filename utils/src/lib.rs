@@ -116,7 +116,7 @@ pub enum CompileTestId {
     PulldownCmark,
     Spidermonkey,
     Ffmpeg,
-    CoreMarkMinimal,
+    CoreMark,
     Argon2,
 }
 
