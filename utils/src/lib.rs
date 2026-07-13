@@ -49,36 +49,6 @@ pub trait ModuleInstance {
     fn call(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
 }
 
-/// A Wasm runtime that is capable of being benchmarked.
-pub trait BenchRuntime {
-    /// Returns the unique ID of the Wasm runtime and its configuration as string.
-    fn id(&self) -> &'static str;
-
-    /// Returns `true` if `self` can run the test with the given `id`.
-    fn can_run(&self, id: TestId) -> bool;
-
-    /// Compiles the `wasm` using the Wasm runtime and its configuration.
-    fn compile(&self, wasm: &[u8]);
-
-    /// Loads a Wasm module instance using the Wasm runtime and its configuration.
-    ///
-    /// The returned Wasm module instance can then be used to issue calls.
-    fn load(&self, wasm: &[u8]) -> Box<dyn BenchInstance>;
-
-    /// Runs the given Coremark Wasm test and returns the result.
-    fn coremark(&self, wasm: &[u8], elapsed_ms: fn() -> u32) -> f32;
-}
-
-/// The module instance of a Wasm runtime that is capable of being benchmarked.
-pub trait BenchInstance {
-    /// Calls the function exported by `name` with `params` and writes the results back into `results`.
-    ///
-    /// # Note
-    ///
-    /// It is the callers responsibility to provide `params` and `results` buffers big enough to satisfy the called function.
-    fn call(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
-}
-
 #[derive(Copy, Clone)]
 pub enum TestId {
     Startup(StartupTestId),
