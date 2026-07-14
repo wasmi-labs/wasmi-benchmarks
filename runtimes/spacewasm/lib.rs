@@ -126,8 +126,6 @@ impl SpaceWasm {
             ),
             TestId::Startup(id) => !matches!(
                 id,
-                | StartupTestId::Bz2
-                | StartupTestId::PulldownCmark
                 | StartupTestId::Spidermonkey
                 | StartupTestId::Ffmpeg
             ),
@@ -171,7 +169,7 @@ impl RuntimeInstance for SpaceWasmInstance {
             .expect("rt-spacewasm: failed to allocate Wasm memory allocator")
             .into_wasm_memory_allocator();
         let module = Module::new::<MAX_CODE_PAGES, MAX_CONTROL_FRAMES, MAX_STACK_DEPTH>(
-            "bench",
+            "benchmark-input-wasm-module",
             &mut SliceStream::new(wasm),
             &mut store,
             &mut code_builder,
