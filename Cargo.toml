@@ -106,3 +106,16 @@ wasmi-v0-31 = ["dep:rt-wasmi-v0-31"]
 wasmi-v0-32 = ["dep:rt-wasmi-v0-32"]
 wasmi-v1 = ["dep:rt-wasmi-v1"]
 wasmi-v2 = ["dep:rt-wasmi-v2"]
+
+# Enable all interpreter Wasm runtimes.
+interpreters = [
+    "default",
+    "wasmtime-pulley",
+]
+# Enable all JIT Wasm runtimes.
+jits = [
+    "wasmtime-cranelift",
+    "wasmtime-winch",
+    "wasmer-cranelift",
+    "wasmer-singlepass",
+]
