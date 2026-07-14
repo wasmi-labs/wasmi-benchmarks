@@ -15,7 +15,7 @@ use std::sync::{Mutex, OnceLock};
 
 use benchmark_utils as utils;
 use benchmark_utils::{
-    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId,
+    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
 };
 
 use std::alloc::Layout;
@@ -59,7 +59,7 @@ unsafe impl Allocator for SystemAllocator {
 spacewasm::global_allocator!(SystemAllocator, SystemAllocator);
 
 /// Number of 256-word IR pages the compiler may emit for a single module.
-const MAX_CODE_PAGES: usize = 16_384;
+const MAX_CODE_PAGES: usize = 65_536;
 /// Compile-time bound on control-flow nesting depth accepted by the validator.
 const MAX_CONTROL_FRAMES: usize = 1024;
 /// Compile-time bound on operand-stack depth accepted by the validator.
@@ -124,7 +124,7 @@ impl SpaceWasm {
                     | ExecuteTestId::BulkOps
                     | ExecuteTestId::Argon2
             ),
-            TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
+            _ => true,
         }
     }
 }
