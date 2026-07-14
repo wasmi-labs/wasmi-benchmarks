@@ -3,9 +3,7 @@
 //! Adapter for NASA's [SpaceWasm] interpreter (`github.com/nasa/spacewasm`).
 //!
 //! SpaceWasm is a `no_std`, Wasm 1.0 (MVP) interpreter. It has no configuration knobs, so — like
-//! Stitch — the adapter exposes a single [`SpaceWasm`] runtime. The MVP-only support means the
-//! tail-call benchmark is skipped (see [`SpaceWasm::can_run`]); every other test case is expected
-//! to work.
+//! Stitch — the adapter exposes a single [`SpaceWasm`] runtime.
 //!
 //! [SpaceWasm]: https://github.com/nasa/spacewasm
 
