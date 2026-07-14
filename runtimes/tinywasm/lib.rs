@@ -14,7 +14,7 @@ struct TinywasmInstance {
     linker: utils::Linker,
 }
 
-/// An instantiated Tinywasm module, produced by [`TinywasmInstance::load`].
+/// An instantiated Tinywasm module, produced by [`TinywasmInstance::instantiate`].
 struct TinywasmModule {
     store: tinywasm::Store,
     instance: tinywasm::ModuleInstance,
