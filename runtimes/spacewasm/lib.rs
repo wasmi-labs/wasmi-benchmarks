@@ -126,11 +126,10 @@ impl SpaceWasm {
             ),
             TestId::Startup(id) => !matches!(
                 id,
-                StartupTestId::Argon2
-                    | StartupTestId::Bz2
-                    | StartupTestId::PulldownCmark
-                    | StartupTestId::Spidermonkey
-                    | StartupTestId::Ffmpeg
+                | StartupTestId::Bz2
+                | StartupTestId::PulldownCmark
+                | StartupTestId::Spidermonkey
+                | StartupTestId::Ffmpeg
             ),
         }
     }
@@ -177,7 +176,7 @@ impl RuntimeInstance for SpaceWasmInstance {
             &mut store,
             &mut code_builder,
             allocator,
-            CompilerOptions::default(),
+            CompilerOptions { allow_memory_grow: true },
         )
         .expect("rt-spacewasm: failed to compile and validate the Wasm module");
         let (text, _) = code_builder
