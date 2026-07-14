@@ -18,8 +18,9 @@ The following Wasm runtimes and configurations are included.
 | [Stitch] | `stitch` | | Experimental and very fast zero-dependencies Wasm interpreter. |
 | [WAMR] | `wamr` | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
 | [Toywasm] | `toywasm` | | Feature-rich in-place WebAssembly interpreter. |
+| [SpaceWasm] | `spacewasm` | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 
-**Missing Wasm runtimes:** [SpaceWasm], [Wain], [WasmEdge], [V8]
+**Missing Wasm runtimes:** [Wain], [WasmEdge], [V8]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9

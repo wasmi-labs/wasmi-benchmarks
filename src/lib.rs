@@ -25,6 +25,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     });
     #[cfg(feature = "stitch")]
     rts.push(rt_stitch::Stitch);
+    #[cfg(feature = "spacewasm")]
+    rts.push(rt_spacewasm::SpaceWasm);
     #[cfg(feature = "wamr")]
     rts.push(rt_wamr::Wamr);
     #[cfg(feature = "toywasm")]

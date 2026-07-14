@@ -1,0 +1,13 @@
+[package]
+name = "rt-spacewasm"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+spacewasm = { git = "https://github.com/nasa/spacewasm.git" }
+spacewasm_util = { git = "https://github.com/nasa/spacewasm.git" }

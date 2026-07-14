@@ -2161,6 +2161,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-spacewasm"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "spacewasm",
+ "spacewasm_util",
+]
+
+[[package]]
 name = "rt-stitch"
 version = "0.0.0"
 dependencies = [
@@ -2465,6 +2475,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "spacewasm"
+version = "0.0.0"
+source = "git+https://github.com/nasa/spacewasm.git#e24cf09355a90497148eb5029fdb8e3400bd63e3"
+dependencies = [
+ "libm",
+]
+
+[[package]]
+name = "spacewasm_util"
+version = "0.0.0"
+source = "git+https://github.com/nasa/spacewasm.git#e24cf09355a90497148eb5029fdb8e3400bd63e3"
+dependencies = [
+ "spacewasm",
 ]
 
 [[package]]
@@ -3130,6 +3156,7 @@ dependencies = [
  "benchmark-utils",
  "criterion",
  "plotters",
+ "rt-spacewasm",
  "rt-stitch",
  "rt-tinywasm",
  "rt-toywasm",
