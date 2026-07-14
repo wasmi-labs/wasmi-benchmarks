@@ -14,9 +14,7 @@ use std::ops::ControlFlow;
 use std::sync::{Mutex, OnceLock};
 
 use benchmark_utils as utils;
-use benchmark_utils::{
-    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
-};
+use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 
 use std::alloc::Layout;
 
@@ -119,9 +117,7 @@ impl SpaceWasm {
         match id {
             TestId::Execute(id) => !matches!(
                 id,
-                ExecuteTestId::FibonacciTail
-                    | ExecuteTestId::CounterParam
-                    | ExecuteTestId::BulkOps
+                ExecuteTestId::FibonacciTail | ExecuteTestId::CounterParam | ExecuteTestId::BulkOps
             ),
             _ => true,
         }
