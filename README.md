@@ -22,7 +22,8 @@ The following Wasm runtimes and configurations are included.
 **Missing Wasm runtimes:** [SpaceWasm], [Wain], [WasmEdge], [V8]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
-[Wasmi (recent)]: https://github.com/wasmi-labs/wasmi
+[Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9
+[Wasmi v2]: https://github.com/wasmi-labs/wasmi/tree/v2.0.0-beta.7
 [WAMR]: https://github.com/bytecodealliance/wasm-micro-runtime
 [Toywasm]: https://github.com/yamt/toywasm
 [Wain]: https://github.com/rhysd/wain
