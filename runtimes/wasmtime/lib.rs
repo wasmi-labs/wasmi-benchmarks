@@ -54,7 +54,7 @@ impl Wasmtime {
         match self.strategy {
             Strategy::Cranelift => match id {
                 // Note: ffmpeg takes too long to compile for Cranelift
-                TestId::Compile(CompileTestId::Ffmpeg) => false,
+                TestId::Startup(StartupTestId::Ffmpeg) => false,
                 _ => true,
             },
             Strategy::Winch => match id {
@@ -67,7 +67,7 @@ impl Wasmtime {
             },
             Strategy::Pulley => match id {
                 // Note: ffmpeg takes too long to compile for Pulley
-                TestId::Compile(CompileTestId::Ffmpeg) => false,
+                TestId::Startup(StartupTestId::Ffmpeg) => false,
                 _ => true,
             },
         }
