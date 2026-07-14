@@ -28,7 +28,7 @@ rt-wasmi-v2 = { path = "runtimes/wasmi-v2", optional = true }
 rt-stitch = { path = "runtimes/stitch", optional = true }
 rt-spacewasm = { path = "runtimes/spacewasm", optional = true }
 rt-tinywasm = { path = "runtimes/tinywasm", optional = true }
-rt-wasmer = { path = "runtimes/wasmer", optional = true }
+rt-wasmer = { path = "runtimes/wasmer", optional = true, default-features = false }
 rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
 rt-wasm3 = { path = "runtimes/wasm3", optional = true }
 rt-wamr = { path = "runtimes/wamr", optional = true }

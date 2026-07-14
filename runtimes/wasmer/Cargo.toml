@@ -18,5 +18,6 @@ default-features = false
 features = ["compiler"]
 
 [features]
+default = ["singlepass"]
 singlepass = ["wasmer/singlepass", "dep:wasmer-compiler-singlepass"]
 cranelift = ["wasmer/cranelift", "dep:wasmer-compiler-cranelift"]
