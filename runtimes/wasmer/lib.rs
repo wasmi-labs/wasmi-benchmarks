@@ -26,7 +26,7 @@ struct WasmerInstance {
     linker: utils::Linker,
 }
 
-/// An instantiated Wasmer module, produced by [`WasmerInstance::load`].
+/// An instantiated Wasmer module, produced by [`WasmerInstance::instantiate`].
 struct WasmerModule {
     store: wasmer::Store,
     instance: wasmer::Instance,

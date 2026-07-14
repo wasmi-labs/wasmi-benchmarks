@@ -23,7 +23,7 @@ struct WasmtimeInstance {
     linker: wasmtime::Linker<()>,
 }
 
-/// An instantiated Wasmtime module, produced by [`WasmtimeInstance::load`].
+/// An instantiated Wasmtime module, produced by [`WasmtimeInstance::instantiate`].
 struct WasmtimeModule {
     store: wasmtime::Store<()>,
     instance: wasmtime::Instance,

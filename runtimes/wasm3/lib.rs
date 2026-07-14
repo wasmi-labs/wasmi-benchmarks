@@ -14,7 +14,7 @@ struct Wasm3Instance {
     linker: wasm3::Linker<()>,
 }
 
-/// An instantiated Wasm3 module, produced by [`Wasm3Instance::load`].
+/// An instantiated Wasm3 module, produced by [`Wasm3Instance::instantiate`].
 struct Wasm3Module {
     store: wasm3::Store<()>,
     instance: wasm3::Instance,

@@ -22,7 +22,7 @@ struct WasmiInstance {
     validation: Validation,
 }
 
-/// An instantiated Wasmi module, produced by [`WasmiInstance::load`].
+/// An instantiated Wasmi module, produced by [`WasmiInstance::instantiate`].
 struct WasmiModule {
     store: wasmi::Store<()>,
     instance: wasmi::Instance,
