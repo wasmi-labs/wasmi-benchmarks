@@ -59,11 +59,11 @@ unsafe impl Allocator for SystemAllocator {
 spacewasm::global_allocator!(SystemAllocator, SystemAllocator);
 
 /// Number of 256-word IR pages the compiler may emit for a single module.
-const MAX_CODE_PAGES: usize = 4096;
+const MAX_CODE_PAGES: usize = 16_384;
 /// Compile-time bound on control-flow nesting depth accepted by the validator.
 const MAX_CONTROL_FRAMES: usize = 1024;
 /// Compile-time bound on operand-stack depth accepted by the validator.
-const MAX_STACK_DEPTH: usize = 4096;
+const MAX_STACK_DEPTH: usize = 16_384;
 /// Runtime interpreter stack size, in 32-bit words (fits within one allocator page).
 const STACK_SIZE: usize = 1 << 16;
 /// Capacity of the store's Wasm module table. We only ever load a single benchmark module.
@@ -124,11 +124,7 @@ impl SpaceWasm {
                     | ExecuteTestId::BulkOps
                     | ExecuteTestId::Argon2
             ),
-            TestId::Startup(id) => !matches!(
-                id,
-                | StartupTestId::Spidermonkey
-                | StartupTestId::Ffmpeg
-            ),
+            TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
         }
     }
 }
