@@ -6,19 +6,19 @@ This includes execution and compilation benchmarks for the Wasmi interpreter and
 
 The following Wasm runtimes and configurations are included.
 
-| Runtime | ID | Configurations | Note |
+| Runtime | Kind | Configurations | Description |
 |:-------:|:---------------|:-----|:---|
-| [Wasmi v0.31] | `wasmi-v0.31` | | The old version of the Wasmi Wasm stack-machine interpreter. |
-| [Wasmi v1] | `wasmi-v1` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The Wasmi v1 interpreter.  |
-| [Wasmi v2] | `wasmi-v2` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
-| [Wasmtime] | `wasmtime` | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. |
-| [Wasmer] | `wasmer` | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
-| [WAMR] | `wamr` | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
-| [Wasm3] | `wasm3` | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
-| [Stitch] | `stitch` | | Experimental and very fast zero-dependencies Wasm interpreter. |
-| [Tinywasm] | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
-| [Toywasm] | `toywasm` | | Feature-rich in-place WebAssembly interpreter. |
-| [SpaceWasm] | `spacewasm` | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
+| [`wasmi-v0.31`][Wasmi v0.31] | Interpreter | | The old version of the Wasmi Wasm stack-machine interpreter. |
+| [`wasmi-v1`][Wasmi v1] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The Wasmi v1 interpreter.  |
+| [`wasmi-v2`][Wasmi v2] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
+| [`wasmtime`][Wasmtime] | JIT, Interpreter | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. |
+| [`wasmer`][Wasmer] | JIT | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
+| [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
+| [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
+| [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
+| [`tinywasm`][Tinywasm] | Interpreter | | Very tiny zero-dependencies Wasm interpreter. |
+| [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter. |
+| [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 
 **Missing Wasm runtimes:** [Wain], [WasmEdge], [V8]
 
