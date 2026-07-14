@@ -17,7 +17,7 @@ The following Wasm runtimes and configurations are included.
 | [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
 | [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
 | [`tinywasm`][Tinywasm] | Interpreter | | Small Wasm interpreter written in pure stable Rust. |
-| [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter. |
+| [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter with low memory usage. |
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 | [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
 
