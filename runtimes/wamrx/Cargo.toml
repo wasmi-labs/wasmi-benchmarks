@@ -1,0 +1,12 @@
+[package]
+name = "rt-wamrx"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+wamrx = { version = "0.2", features = ["tail-call"] }

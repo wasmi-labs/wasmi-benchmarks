@@ -1,0 +1,146 @@
+#![crate_type = "dylib"]
+
+use benchmark_utils::{self as utils};
+use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
+use wamrx::{Engine, Func, FuncType, Instance, Linker, Module, Val, ValType};
+
+pub struct Wamrx;
+
+struct WamrxInstance {
+    engine: Engine,
+    linker: Linker,
+}
+
+struct WamrxModule {
+    instance: Instance,
+    params: Vec<Val>,
+    results: Vec<Val>,
+}
+
+impl Runtime for Wamrx {
+    fn id(&self) -> &'static str {
+        "wamrx"
+    }
+
+    fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
+        let engine = Engine::new().unwrap();
+        let linker = Linker::new(&engine);
+        Some(Box::new(WamrxInstance { engine, linker }))
+    }
+}
+
+impl RuntimeInstance for WamrxInstance {
+    fn link_func(
+        &mut self,
+        module: &str,
+        name: &str,
+        ty: benchmark_utils::FuncType,
+        func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    ) {
+        let ty = FuncType::new(
+            ty.params().iter().copied().map(to_wamrx_valtype),
+            ty.results().iter().copied().map(to_wamrx_valtype),
+        );
+        let trampoline = move |params: &[Val], results: &mut [Val]| {
+            let utils_params: Vec<utils::Val> =
+                params.iter().copied().map(into_utils_val).collect();
+            let mut utils_results: Vec<utils::Val> =
+                results.iter().copied().map(into_utils_val).collect();
+            func(&utils_params[..], &mut utils_results[..]);
+            for (dst, src) in results.iter_mut().zip(utils_results) {
+                *dst = from_utils_val(src);
+            }
+        };
+        self.linker
+            .define_func(module, name, ty, trampoline)
+            .unwrap();
+    }
+
+    fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
+        let engine = self.engine.clone();
+        let module = Module::new(&engine, wasm).unwrap();
+        let instance = self.linker.instantiate(module).unwrap();
+        Box::new(WamrxModule {
+            instance,
+            params: Vec::new(),
+            results: Vec::new(),
+        })
+    }
+}
+
+impl ModuleInstance for WamrxModule {
+    fn call(
+        &mut self,
+        name: &str,
+        params: &[utils::Val],
+        results: &mut [utils::Val],
+    ) -> anyhow::Result<()> {
+        let func = self.instance.get_func(name)?;
+        assert_eq!(params.len(), func.ty().params().len());
+        assert_eq!(results.len(), func.ty().results().len());
+        Self::prepare_params(&mut self.params, params);
+        Self::prepare_results(&mut self.results, &func);
+        func.call(&self.params[..], &mut self.results[..])?;
+        self.write_back_results(results);
+        Ok(())
+    }
+}
+
+impl WamrxModule {
+    fn prepare_params(dst: &mut Vec<Val>, src: &[utils::Val]) {
+        dst.clear();
+        dst.extend(src.iter().copied().map(from_utils_val));
+    }
+
+    fn prepare_results(dst: &mut Vec<Val>, func: &Func) {
+        dst.clear();
+        for ty in func.ty().results() {
+            dst.push(default_for_ty(*ty))
+        }
+    }
+
+    fn write_back_results(&mut self, results: &mut [utils::Val]) {
+        assert_eq!(results.len(), self.results.len());
+        for (i, result) in results.iter_mut().enumerate() {
+            let ty = self.results[i].ty();
+            let src = core::mem::replace(&mut self.results[i], default_for_ty(ty));
+            *result = into_utils_val(src);
+        }
+    }
+}
+
+fn default_for_ty(ty: ValType) -> Val {
+    match ty {
+        ValType::I32 => Val::I32(0),
+        ValType::I64 => Val::I64(0),
+        ValType::F32 => Val::F32(0.0),
+        ValType::F64 => Val::F64(0.0),
+    }
+}
+
+fn to_wamrx_valtype(ty: utils::ValType) -> ValType {
+    match ty {
+        utils::ValType::I32 => ValType::I32,
+        utils::ValType::I64 => ValType::I64,
+        utils::ValType::F32 => ValType::F32,
+        utils::ValType::F64 => ValType::F64,
+    }
+}
+
+fn from_utils_val(val: utils::Val) -> Val {
+    match val {
+        utils::Val::I32(val) => Val::I32(val),
+        utils::Val::I64(val) => Val::I64(val),
+        utils::Val::F32(val) => Val::F32(val),
+        utils::Val::F64(val) => Val::F64(val),
+    }
+}
+
+fn into_utils_val(val: Val) -> utils::Val {
+    match val {
+        Val::I32(val) => utils::Val::I32(val),
+        Val::I64(val) => utils::Val::I64(val),
+        Val::F32(val) => utils::Val::F32(val),
+        Val::F64(val) => utils::Val::F64(val),
+    }
+}

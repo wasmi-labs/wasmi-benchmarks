@@ -2208,6 +2208,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wamrx"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "wamrx",
+]
+
+[[package]]
 name = "rt-wasm3"
 version = "0.0.0"
 dependencies = [
@@ -2822,6 +2831,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "wamrx"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "63afc01044350cf5fdb1e8ec7cde80bceed6b07fc34bdad6a1142bcc0ccd82e9"
+dependencies = [
+ "wamrx-sys",
+]
+
+[[package]]
+name = "wamrx-sys"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a841b50d7402b92cbbc4da50a4eb513e265f0f66e186b26bbc3724b367b97a40"
+dependencies = [
+ "bindgen 0.72.1",
+ "cmake",
+]
+
+[[package]]
 name = "wasi"
 version = "0.11.1+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3161,6 +3189,7 @@ dependencies = [
  "rt-tinywasm",
  "rt-toywasm",
  "rt-wamr",
+ "rt-wamrx",
  "rt-wasm3",
  "rt-wasmer",
  "rt-wasmi-v0-31",
