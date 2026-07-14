@@ -8,8 +8,9 @@ The following Wasm runtimes and configurations are included.
 
 | Runtime | ID | Configurations | Note |
 |:-------:|:---------------|:-----|:---|
-| [Wasmi v0.31] | `wasmi-v0.31` | | The old version of the Wasmi Wasm interpreter. |
-| [Wasmi (recent)] | `wasmi` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | New Wasmi Wasm interpreter version with major updates. |
+| [Wasmi v0.31] | `wasmi-v0.31` | | The old version of the Wasmi Wasm stack-machine interpreter. |
+| [Wasmi v1] | `wasmi-v1` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The Wasmi v1 interpreter.  |
+| [Wasmi v2] | `wasmi-v2` | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
 | [Tinywasm] | `tinywasm` | | Very tiny zero-dependencies Wasm interpreter. |
 | [Wasm3] | `wasm3` | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
 | [Wasmtime] | `wasmtime` | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. Winch only works on `x86` platforms. |
