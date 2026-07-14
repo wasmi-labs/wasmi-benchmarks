@@ -1,0 +1,13 @@
+[package]
+name = "rt-wasmedge"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+wasmedge = { package = "wasmedge-sys", version = "0.19.4", features = ["standalone"] }
+wasmedge-types = { version = "0.6" }

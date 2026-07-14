@@ -51,6 +51,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_wasmer::Wasmer {
         compiler: rt_wasmer::WasmerCompiler::Singlepass,
     });
+    #[cfg(feature = "wasmedge")]
+    rts.push(rt_wasmedge::WasmEdge);
     rts.into_vec()
 }
 
