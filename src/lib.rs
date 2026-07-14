@@ -27,8 +27,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_stitch::Stitch);
     #[cfg(feature = "spacewasm")]
     rts.push(rt_spacewasm::SpaceWasm);
-    #[cfg(feature = "wamrx")]
-    rts.push(rt_wamrx::Wamrx);
+    #[cfg(feature = "wamr")]
+    rts.push(rt_wamr::Wamr);
     #[cfg(feature = "toywasm")]
     rts.push(rt_toywasm::Toywasm);
     #[cfg(feature = "wasmtime-cranelift")]

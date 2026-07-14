@@ -2,34 +2,34 @@
 
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
-use wamrx::{Engine, Func, FuncType, Instance, Linker, Module, Val, ValType};
+use wamr::{Engine, Func, FuncType, Instance, Linker, Module, Val, ValType};
 
-pub struct Wamrx;
+pub struct Wamr;
 
-struct WamrxInstance {
+struct WamrInstance {
     engine: Engine,
     linker: Linker,
 }
 
-struct WamrxModule {
+struct WamrModule {
     instance: Instance,
     params: Vec<Val>,
     results: Vec<Val>,
 }
 
-impl Runtime for Wamrx {
+impl Runtime for Wamr {
     fn id(&self) -> &'static str {
-        "wamrx"
+        "wamr"
     }
 
     fn setup(&self, _id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         let engine = Engine::new().unwrap();
         let linker = Linker::new(&engine);
-        Some(Box::new(WamrxInstance { engine, linker }))
+        Some(Box::new(WamrInstance { engine, linker }))
     }
 }
 
-impl RuntimeInstance for WamrxInstance {
+impl RuntimeInstance for WamrInstance {
     fn link_func(
         &mut self,
         module: &str,
@@ -38,8 +38,8 @@ impl RuntimeInstance for WamrxInstance {
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
         let ty = FuncType::new(
-            ty.params().iter().copied().map(to_wamrx_valtype),
-            ty.results().iter().copied().map(to_wamrx_valtype),
+            ty.params().iter().copied().map(to_wamr_valtype),
+            ty.results().iter().copied().map(to_wamr_valtype),
         );
         let trampoline = move |params: &[Val], results: &mut [Val]| {
             let utils_params: Vec<utils::Val> =
@@ -60,7 +60,7 @@ impl RuntimeInstance for WamrxInstance {
         let engine = self.engine.clone();
         let module = Module::new(&engine, wasm).unwrap();
         let instance = self.linker.instantiate(module).unwrap();
-        Box::new(WamrxModule {
+        Box::new(WamrModule {
             instance,
             params: Vec::new(),
             results: Vec::new(),
@@ -68,7 +68,7 @@ impl RuntimeInstance for WamrxInstance {
     }
 }
 
-impl ModuleInstance for WamrxModule {
+impl ModuleInstance for WamrModule {
     fn call(
         &mut self,
         name: &str,
@@ -86,7 +86,7 @@ impl ModuleInstance for WamrxModule {
     }
 }
 
-impl WamrxModule {
+impl WamrModule {
     fn prepare_params(dst: &mut Vec<Val>, src: &[utils::Val]) {
         dst.clear();
         dst.extend(src.iter().copied().map(from_utils_val));
@@ -118,7 +118,7 @@ fn default_for_ty(ty: ValType) -> Val {
     }
 }
 
-fn to_wamrx_valtype(ty: utils::ValType) -> ValType {
+fn to_wamr_valtype(ty: utils::ValType) -> ValType {
     match ty {
         utils::ValType::I32 => ValType::I32,
         utils::ValType::I64 => ValType::I64,

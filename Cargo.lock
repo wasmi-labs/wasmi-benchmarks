@@ -2198,7 +2198,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rt-wamrx"
+name = "rt-wamr"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -2479,7 +2479,7 @@ dependencies = [
 [[package]]
 name = "spacewasm"
 version = "0.0.0"
-source = "git+https://github.com/nasa/spacewasm.git#e24cf09355a90497148eb5029fdb8e3400bd63e3"
+source = "git+https://github.com/nasa/spacewasm.git#5020cdfd8d5f11af56483fe2e944f668c41f8a4b"
 dependencies = [
  "libm",
 ]
@@ -2487,16 +2487,16 @@ dependencies = [
 [[package]]
 name = "spacewasm_util"
 version = "0.0.0"
-source = "git+https://github.com/nasa/spacewasm.git#e24cf09355a90497148eb5029fdb8e3400bd63e3"
+source = "git+https://github.com/nasa/spacewasm.git#5020cdfd8d5f11af56483fe2e944f668c41f8a4b"
 dependencies = [
  "spacewasm",
 ]
 
 [[package]]
 name = "spin"
-version = "0.9.8"
+version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+checksum = "3763264f6b73151db08c50ff20d7d8a0b8796e021cdea7ceedad07b80155fa0e"
 
 [[package]]
 name = "stable_deref_trait"
@@ -2778,9 +2778,9 @@ checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
 
 [[package]]
 name = "uuid"
-version = "1.23.4"
+version = "1.23.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf80a72845275afea99e7f2b434723d3bc7e38470fcd1c7ed39a599c73319a53"
+checksum = "ea5fab0d6c3c01ae70085a09cb03d4c7a1d6314e2b3e075392783396d724ca0a"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -3160,7 +3160,7 @@ dependencies = [
  "rt-stitch",
  "rt-tinywasm",
  "rt-toywasm",
- "rt-wamrx",
+ "rt-wamr",
  "rt-wasm3",
  "rt-wasmer",
  "rt-wasmi-v0-31",
@@ -3837,6 +3837,6 @@ dependencies = [
 
 [[package]]
 name = "zmij"
-version = "1.0.21"
+version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8848ee67ecc8aedbaf3e4122217aff892639231befc6a1b58d29fff4c2cabaa"
+checksum = "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b"
