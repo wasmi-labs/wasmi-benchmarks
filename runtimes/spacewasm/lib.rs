@@ -170,7 +170,9 @@ impl RuntimeInstance for SpaceWasmInstance {
             &mut store,
             &mut code_builder,
             allocator,
-            CompilerOptions { allow_memory_grow: true },
+            CompilerOptions {
+                allow_memory_grow: true,
+            },
         )
         .expect("rt-spacewasm: failed to compile and validate the Wasm module");
         let (text, _) = code_builder
