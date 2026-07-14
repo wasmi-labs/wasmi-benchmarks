@@ -2179,6 +2179,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-toywasm"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "toywasmx",
+]
+
+[[package]]
 name = "rt-wamr"
 version = "0.0.0"
 dependencies = [
@@ -2650,6 +2659,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "toywasmx"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e522467410470f90d5338e8002101fa23c9d5304b035cc5d1f8ddcc6726cebd"
+dependencies = [
+ "anyhow",
+ "toywasmx-sys",
+]
+
+[[package]]
+name = "toywasmx-sys"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e0329a6b90862d92a1f77a1e26a434e6fdfff24fd603d3bbdc1a433c94cb5e9"
+dependencies = [
+ "bindgen 0.72.1",
+ "cc",
+]
+
+[[package]]
 name = "tracing"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3103,6 +3132,7 @@ dependencies = [
  "plotters",
  "rt-stitch",
  "rt-tinywasm",
+ "rt-toywasm",
  "rt-wamr",
  "rt-wasm3",
  "rt-wasmer",

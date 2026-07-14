@@ -7,7 +7,8 @@ runs:
       # - libfontconfig1-dev: required for plotters
       # - ninja-build: required for Wasmer's WAMR backend
       # - cmake: required to build the WAMR runtime (rt-wamr) from source
+      # - clang / libclang-dev: required by bindgen when building toywasmx-sys (rt-toywasm)
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig1-dev ninja-build cmake
+        sudo apt-get install -y libfontconfig1-dev ninja-build cmake clang libclang-dev

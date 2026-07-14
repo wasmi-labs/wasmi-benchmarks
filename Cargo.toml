@@ -31,6 +31,7 @@ rt-wasmer = { path = "runtimes/wasmer", optional = true }
 rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
 rt-wasm3 = { path = "runtimes/wasm3", optional = true }
 rt-wamr = { path = "runtimes/wamr", optional = true }
+rt-toywasm = { path = "runtimes/toywasm", optional = true }
 
 criterion = { workspace = true }
 wat = { workspace = true }
@@ -75,7 +76,7 @@ lto = "thin"
 codegen-units = 4
 
 [features]
-default = ["wasmi-v0-31", "wasmi-v0-32", "wasmi-v1", "wasmi-v2", "stitch", "wasm3", "tinywasm", "wamr"]
+default = ["wasmi-v0-31", "wasmi-v0-32", "wasmi-v1", "wasmi-v2", "stitch", "wasm3", "tinywasm", "wamr", "toywasm"]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer", "rt-wasmer/singlepass"]
 wasmer-cranelift = ["dep:rt-wasmer", "rt-wasmer/cranelift"]
@@ -85,6 +86,7 @@ wasmtime-winch = ["dep:rt-wasmtime", "rt-wasmtime/winch"]
 wasmtime-pulley = ["dep:rt-wasmtime", "rt-wasmtime/pulley"]
 wasm3 = ["dep:rt-wasm3"]
 wamr = ["dep:rt-wamr"]
+toywasm = ["dep:rt-toywasm"]
 stitch = ["dep:rt-stitch"]
 tinywasm = ["dep:rt-tinywasm"]
 wasmi-v0-31 = ["dep:rt-wasmi-v0-31"]

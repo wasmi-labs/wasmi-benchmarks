@@ -1,0 +1,12 @@
+[package]
+name = "rt-toywasm"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+toywasmx = { package = "toywasmx", version = "0.1", features = ["tail-call"] }
