@@ -19,8 +19,9 @@ The following Wasm runtimes and configurations are included.
 | [`tinywasm`][Tinywasm] | Interpreter | | Very tiny zero-dependencies Wasm interpreter. |
 | [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter. |
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
+| [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
 
-**Missing Wasm runtimes:** [Wain], [WasmEdge], [V8]
+**Missing Wasm runtimes:** [Wain], [V8]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9
