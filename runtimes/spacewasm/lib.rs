@@ -122,7 +122,6 @@ impl SpaceWasm {
                 ExecuteTestId::FibonacciTail
                     | ExecuteTestId::CounterParam
                     | ExecuteTestId::BulkOps
-                    | ExecuteTestId::Argon2
             ),
             _ => true,
         }
