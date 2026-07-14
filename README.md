@@ -18,7 +18,7 @@ The following Wasm runtimes and configurations are included.
 | [WAMR] | `wamr` | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
 | [Toywasm] | `toywasm` | | Feature-rich in-place WebAssembly interpreter. |
 
-Ideally we had more Wasm runtimes, e.g. [Toywasm] and [Wain] but those had no proper Rust bindings or sufficiently flexible APIs respectively.
+**Missing Wasm runtimes:** [SpaceWasm], [Wain], [WasmEdge], [V8]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi (recent)]: https://github.com/wasmi-labs/wasmi
@@ -30,6 +30,9 @@ Ideally we had more Wasm runtimes, e.g. [Toywasm] and [Wain] but those had no pr
 [Wasmtime]: https://github.com/bytecodealliance/wasmtime
 [Wasmer]: https://github.com/wasmerio/wasmer
 [Stitch]: https://github.com/makepad/stitch
+[SpaceWasm]: https://github.com/nasa/spacewasm
+[WasmEdge]: https://github.com/wasmedge/wasmedge
+[V8]: https://github.com/v8/v8
 
 ### Configuration Explanation
 
