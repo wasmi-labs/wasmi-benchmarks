@@ -2198,16 +2198,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rt-wamr"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "benchmark-utils",
- "wamr-rust-sdk",
- "wamr-sys",
-]
-
-[[package]]
 name = "rt-wamrx"
 version = "0.0.0"
 dependencies = [
@@ -2813,24 +2803,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "wamr-rust-sdk"
-version = "1.0.0"
-source = "git+https://github.com/robbepop/wamr-rust-sdk.git?branch=rf-no-wamrc#fb83c586bb1a476ffb2f8fdb9ea739788819e201"
-dependencies = [
- "wamr-sys",
-]
-
-[[package]]
-name = "wamr-sys"
-version = "1.0.0"
-source = "git+https://github.com/robbepop/wamr-rust-sdk.git?branch=rf-no-wamrc#fb83c586bb1a476ffb2f8fdb9ea739788819e201"
-dependencies = [
- "bindgen 0.72.1",
- "cc",
- "cmake",
-]
-
-[[package]]
 name = "wamrx"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3188,7 +3160,6 @@ dependencies = [
  "rt-stitch",
  "rt-tinywasm",
  "rt-toywasm",
- "rt-wamr",
  "rt-wamrx",
  "rt-wasm3",
  "rt-wasmer",
