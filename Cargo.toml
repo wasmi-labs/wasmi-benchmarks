@@ -57,7 +57,7 @@ lto = "fat"
 codegen-units = 1
 
 [profile.dev]
-opt-level = 1 # required for the stitch Wasm runtime's LLVM's sibling calls optimization
+opt-level = 2 # required for the stitch Wasm runtime's LLVM's sibling calls optimization
 
 [profile.wasm]
 # The profile used to build Rust based benchmark inputs to WebAssembly.
