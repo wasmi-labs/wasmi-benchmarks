@@ -14,7 +14,7 @@ The following Wasm runtimes and configurations are included.
 | [`wasmtime`][Wasmtime] | JIT, Interpreter | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. |
 | [`wasmer`][Wasmer] | JIT | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
 | [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
-| [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A very fast well-established Wasm interpreter. |
+| [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A fast and well-established Wasm interpreter. |
 | [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
 | [`tinywasm`][Tinywasm] | Interpreter | | Small Wasm interpreter written in pure stable Rust. |
 | [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter with low memory usage. |
