@@ -2,8 +2,28 @@ use benchmark_utils::ExecuteTestId;
 use benchmark_utils::{InputEncoding, Val, read_benchmark_file, wat2wasm};
 use core::fmt;
 use core::slice;
-use criterion::Criterion;
+use criterion::{Criterion, criterion_group};
+use std::time::Duration;
 use wasmi_benchmarks::vms_under_test;
+
+criterion_group!(
+    name = bench_execute;
+    config = Criterion::default()
+        .sample_size(10)
+        .measurement_time(Duration::from_millis(2000))
+        .warm_up_time(Duration::from_millis(1000));
+    targets =
+        bench_counter_local,
+        bench_counter_param,
+        bench_counter_global,
+        bench_fibonacci_rec,
+        bench_fibonacci_iter,
+        bench_fibonacci_tail,
+        bench_primes,
+        bench_matrix_multiply,
+        bench_argon2,
+        bench_bulk_ops,
+);
 
 /// Generic utility benchmark function for Wasm functions of type: T -> T
 fn execute_benchmark<T>(c: &mut Criterion, id: ExecuteTestId, input: T, encoding: InputEncoding)

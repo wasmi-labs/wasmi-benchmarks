@@ -1,6 +1,23 @@
 use benchmark_utils::{FuncType, InputEncoding, StartupTestId, Val, ValType, read_benchmark_file};
-use criterion::Criterion;
+use criterion::{Criterion, criterion_group};
+use std::time::Duration;
 use wasmi_benchmarks::vms_under_test;
+
+criterion_group!(
+    name = bench_startup;
+    config = Criterion::default()
+        .sample_size(10)
+        .measurement_time(Duration::from_millis(2000))
+        .warm_up_time(Duration::from_millis(1000));
+    targets =
+        bench_bz2,
+        bench_pulldown_cmark,
+        bench_spidermonkey,
+        bench_ffmpeg,
+        bench_coremark_minimal,
+        bench_argon2,
+        bench_erc20,
+);
 
 /// Inert host function stub used for all linked imports.
 ///
