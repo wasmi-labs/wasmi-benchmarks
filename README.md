@@ -91,8 +91,9 @@ The Wasmi benchmarking test suite provides the following test cases:
 |:----:|:---------:|:------|
 | | | |
 | `execute` | | |
-| | `counter-local` | Simple loop that counts a single local up to some number. |
-| | `counter-param` | Simple loop that counts up to some number via a control parameter. |
+| | `counter-local` | Simple loop that counts a single local down from some number. |
+| | `counter-param` | Simple loop that counts down from some number via a control parameter. |
+| | `counter-global` | Simple loop that counts a global down from some number. |
 | | `fibonacci-rec` | Recursive fibonacci calculation. Call-intense workload. |
 | | `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
 | | `fibonacci-tail` | Tail-call based fibonacci calculation. |
