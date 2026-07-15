@@ -7,7 +7,6 @@ default-run = "coremark"
 
 [workspace]
 members = [
-    "benches/res/rust/*",
     "utils",
 ]
 
