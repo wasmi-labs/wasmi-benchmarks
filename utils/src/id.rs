@@ -21,8 +21,8 @@ impl From<ExecuteTestId> for TestId {
 impl fmt::Display for TestId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TestId::Startup(id) => id.fmt(f),
-            TestId::Execute(id) => id.fmt(f),
+            Self::Startup(id) => id.fmt(f),
+            Self::Execute(id) => id.fmt(f),
         }
     }
 }
@@ -41,13 +41,13 @@ pub enum StartupTestId {
 impl fmt::Display for StartupTestId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            StartupTestId::Erc20 => "erc20",
-            StartupTestId::Bz2 => "bz2",
-            StartupTestId::PulldownCmark => "pulldown-cmark",
-            StartupTestId::Spidermonkey => "spidermonkey",
-            StartupTestId::Ffmpeg => "ffmpeg",
-            StartupTestId::CoreMark => "coremark",
-            StartupTestId::Argon2 => "argon2",
+            Self::Erc20 => "erc20",
+            Self::Bz2 => "bz2",
+            Self::PulldownCmark => "pulldown-cmark",
+            Self::Spidermonkey => "spidermonkey",
+            Self::Ffmpeg => "ffmpeg",
+            Self::CoreMark => "coremark",
+            Self::Argon2 => "argon2",
         };
         f.write_str(s)
     }
@@ -71,17 +71,17 @@ pub enum ExecuteTestId {
 impl fmt::Display for ExecuteTestId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            ExecuteTestId::CounterLocal => "counter-local",
-            ExecuteTestId::CounterParam => "counter-param",
-            ExecuteTestId::CounterGlobal => "counter-global",
-            ExecuteTestId::FibonacciIter => "fibonacci-iter",
-            ExecuteTestId::FibonacciRec => "fibonacci-rec",
-            ExecuteTestId::FibonacciTail => "fibonacci-tail",
-            ExecuteTestId::Primes => "primes",
-            ExecuteTestId::MatrixMultiply => "matmul",
-            ExecuteTestId::Argon2 => "argon2",
-            ExecuteTestId::BulkOps => "bulk-ops",
-            ExecuteTestId::CoreMark => "coremark",
+            Self::CounterLocal => "counter-local",
+            Self::CounterParam => "counter-param",
+            Self::CounterGlobal => "counter-global",
+            Self::FibonacciIter => "fibonacci-iter",
+            Self::FibonacciRec => "fibonacci-rec",
+            Self::FibonacciTail => "fibonacci-tail",
+            Self::Primes => "primes",
+            Self::MatrixMultiply => "matmul",
+            Self::Argon2 => "argon2",
+            Self::BulkOps => "bulk-ops",
+            Self::CoreMark => "coremark",
         };
         f.write_str(s)
     }
