@@ -81,12 +81,7 @@ pub fn bench_counter_param(c: &mut Criterion) {
 }
 
 pub fn bench_counter_global(c: &mut Criterion) {
-    execute_benchmark::<i32>(
-        c,
-        ExecuteTestId::CounterGlobal,
-        500_000,
-        InputEncoding::Wat,
-    )
+    execute_benchmark::<i32>(c, ExecuteTestId::CounterGlobal, 500_000, InputEncoding::Wat)
 }
 
 pub fn bench_fibonacci_rec(c: &mut Criterion) {
