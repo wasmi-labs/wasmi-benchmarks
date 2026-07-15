@@ -38,9 +38,10 @@ impl Stitch {
     fn can_run(&self, id: TestId) -> bool {
         match id {
             TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
-            TestId::Execute(id) => {
-                !matches!(id, ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2)
-            }
+            TestId::Execute(id) => !matches!(
+                id,
+                ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2 | ExecuteTestId::Sort
+            ),
         }
     }
 }

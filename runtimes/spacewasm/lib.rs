@@ -115,7 +115,10 @@ impl SpaceWasm {
         match id {
             TestId::Execute(id) => !matches!(
                 id,
-                ExecuteTestId::FibonacciTail | ExecuteTestId::CounterParam | ExecuteTestId::BulkOps
+                ExecuteTestId::FibonacciTail
+                    | ExecuteTestId::CounterParam
+                    | ExecuteTestId::BulkOps
+                    | ExecuteTestId::Sort
             ),
             _ => true,
         }

@@ -19,6 +19,7 @@ criterion_group!(
         bench_fibonacci_rec,
         bench_fibonacci_iter,
         bench_fibonacci_tail,
+        bench_sort,
         bench_primes,
         bench_matrix_multiply,
         bench_argon2,
@@ -120,4 +121,32 @@ fn bench_argon2(c: &mut Criterion) {
 
 fn bench_bulk_ops(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::BulkOps, 5_000, InputEncoding::Wat)
+}
+
+fn bench_sort(c: &mut Criterion) {
+    let id = ExecuteTestId::Sort;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len: i32 = 1_000_000;
+        let bench_id = format!("{}/{}", vm.id(), len);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let mut data = Val::I32(0);
+            instance
+                .call("setup", &[len.into()], slice::from_mut(&mut data))
+                .unwrap();
+            b.iter(|| {
+                instance
+                    .call("run", slice::from_ref(&data), &mut [])
+                    .unwrap();
+            });
+            instance
+                .call("teardown", slice::from_ref(&data), &mut [])
+                .unwrap();
+        });
+    }
 }
