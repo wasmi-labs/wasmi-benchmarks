@@ -14,6 +14,7 @@ criterion_group!(
     targets =
         execute::bench_counter_local,
         execute::bench_counter_param,
+        execute::bench_counter_global,
         execute::bench_fibonacci_rec,
         execute::bench_fibonacci_iter,
         execute::bench_fibonacci_tail,

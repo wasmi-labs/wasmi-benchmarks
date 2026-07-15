@@ -57,6 +57,7 @@ impl fmt::Display for StartupTestId {
 pub enum ExecuteTestId {
     CounterLocal,
     CounterParam,
+    CounterGlobal,
     FibonacciIter,
     FibonacciRec,
     FibonacciTail,
@@ -72,6 +73,7 @@ impl fmt::Display for ExecuteTestId {
         let s = match self {
             ExecuteTestId::CounterLocal => "counter-local",
             ExecuteTestId::CounterParam => "counter-param",
+            ExecuteTestId::CounterGlobal => "counter-global",
             ExecuteTestId::FibonacciIter => "fibonacci-iter",
             ExecuteTestId::FibonacciRec => "fibonacci-rec",
             ExecuteTestId::FibonacciTail => "fibonacci-tail",
