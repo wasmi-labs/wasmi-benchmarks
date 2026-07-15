@@ -1,0 +1,3 @@
+[submodule "res/rust"]
+	path = res/rust
+	url = https://github.com/wasmi-labs/rust-benchmarks.git
