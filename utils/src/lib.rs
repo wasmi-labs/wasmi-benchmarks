@@ -8,6 +8,7 @@ pub use self::id::{ExecuteTestId, StartupTestId, TestId};
 pub use self::linker::{HostFunc, Linker};
 pub use self::val::{FuncType, Val, ValType};
 use core::fmt;
+use std::fs;
 
 /// A WebAssembly runtime description.
 ///
@@ -63,18 +64,21 @@ pub enum InputEncoding {
     Wat,
     /// The input is encoded as `.wasm` binary.
     Wasm,
+    /// The input is a `.wasm` binary compiled from Rust.
+    RustCompiledWasm,
 }
 
 impl fmt::Display for InputEncoding {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            InputEncoding::Wat => "wat".fmt(f),
-            InputEncoding::Wasm => "wasm".fmt(f),
+            Self::Wat => "wat".fmt(f),
+            Self::Wasm => "wasm".fmt(f),
+            Self::RustCompiledWasm => "rust".fmt(f),
         }
     }
 }
 
-/// Returns the bytes of the named benchmark file with the given `encoding`.
+/// Returns the `.wasm` bytes of the benchmark file for `id` with `encoding`.
 ///
 /// # Panics
 ///
@@ -82,14 +86,26 @@ impl fmt::Display for InputEncoding {
 /// - If the file contents cannot be decoded as either `.wat` or `.wasm`.
 /// - If the `.wat` file format cannot be encoded into the `.wasm` format.
 pub fn read_benchmark_file(encoding: InputEncoding, id: TestId) -> Vec<u8> {
-    let path = format!("res/{encoding}/{id}.{encoding}");
-    let wasm_or_wat = std::fs::read(&path).unwrap_or_else(|error| {
-        panic!("failed to read benchmark input:\n\tpath = {path}\n\terror = {error}")
-    });
+    let wasm_or_wat = fetch_benchmark_file(encoding, id);
     match encoding {
         InputEncoding::Wasm => wasm_or_wat,
-        InputEncoding::Wat => wat::parse_bytes(&wasm_or_wat[..])
+        InputEncoding::Wat | InputEncoding::RustCompiledWasm => wat::parse_bytes(&wasm_or_wat[..])
             .unwrap_or_else(|error| panic!("failed to convert `.wat` to `.wasm`: {error}"))
             .to_vec(),
     }
+}
+
+/// Fetches the benchmark `.wat` or `.wasm` file for `id` with `encoding`.
+fn fetch_benchmark_file(encoding: InputEncoding, id: TestId) -> Vec<u8> {
+    let path = match encoding {
+        InputEncoding::Wat | InputEncoding::Wasm => {
+            format!("res/{encoding}/{id}.{encoding}")
+        }
+        InputEncoding::RustCompiledWasm => {
+            format!("res/{encoding}/cases/{id}/out.wasm")
+        }
+    };
+    fs::read(&path).unwrap_or_else(|error| {
+        panic!("failed to fetch benchmark input:\n\tpath = {path}\n\terror = {error}")
+    })
 }
