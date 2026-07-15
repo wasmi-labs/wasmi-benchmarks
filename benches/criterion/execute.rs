@@ -62,7 +62,7 @@ fn execute_benchmark_with_val(
     }
 }
 
-pub fn bench_counter_local(c: &mut Criterion) {
+fn bench_counter_local(c: &mut Criterion) {
     execute_benchmark::<i32>(
         c,
         ExecuteTestId::CounterLocal,
@@ -71,7 +71,7 @@ pub fn bench_counter_local(c: &mut Criterion) {
     )
 }
 
-pub fn bench_counter_param(c: &mut Criterion) {
+fn bench_counter_param(c: &mut Criterion) {
     execute_benchmark::<i32>(
         c,
         ExecuteTestId::CounterParam,
@@ -80,15 +80,15 @@ pub fn bench_counter_param(c: &mut Criterion) {
     )
 }
 
-pub fn bench_counter_global(c: &mut Criterion) {
+fn bench_counter_global(c: &mut Criterion) {
     execute_benchmark::<i32>(c, ExecuteTestId::CounterGlobal, 500_000, InputEncoding::Wat)
 }
 
-pub fn bench_fibonacci_rec(c: &mut Criterion) {
+fn bench_fibonacci_rec(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::FibonacciRec, 30, InputEncoding::Wat)
 }
 
-pub fn bench_fibonacci_iter(c: &mut Criterion) {
+fn bench_fibonacci_iter(c: &mut Criterion) {
     execute_benchmark::<i64>(
         c,
         ExecuteTestId::FibonacciIter,
@@ -97,7 +97,7 @@ pub fn bench_fibonacci_iter(c: &mut Criterion) {
     )
 }
 
-pub fn bench_fibonacci_tail(c: &mut Criterion) {
+fn bench_fibonacci_tail(c: &mut Criterion) {
     execute_benchmark::<i64>(
         c,
         ExecuteTestId::FibonacciTail,
@@ -106,18 +106,18 @@ pub fn bench_fibonacci_tail(c: &mut Criterion) {
     )
 }
 
-pub fn bench_primes(c: &mut Criterion) {
+fn bench_primes(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::Primes, 1_000, InputEncoding::Wat)
 }
 
-pub fn bench_matrix_multiply(c: &mut Criterion) {
+fn bench_matrix_multiply(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::MatrixMultiply, 200, InputEncoding::Wat)
 }
 
-pub fn bench_argon2(c: &mut Criterion) {
+fn bench_argon2(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::Argon2, 1, InputEncoding::Wasm)
 }
 
-pub fn bench_bulk_ops(c: &mut Criterion) {
+fn bench_bulk_ops(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::BulkOps, 5_000, InputEncoding::Wat)
 }

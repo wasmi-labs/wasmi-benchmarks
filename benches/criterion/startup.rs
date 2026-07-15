@@ -170,30 +170,30 @@ fn instantiate_benchmark(c: &mut Criterion, id: StartupTestId, encoding: InputEn
     }
 }
 
-pub fn bench_bz2(c: &mut Criterion) {
+fn bench_bz2(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::Bz2, InputEncoding::Wasm)
 }
 
-pub fn bench_pulldown_cmark(c: &mut Criterion) {
+fn bench_pulldown_cmark(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::PulldownCmark, InputEncoding::Wasm)
 }
 
-pub fn bench_spidermonkey(c: &mut Criterion) {
+fn bench_spidermonkey(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::Spidermonkey, InputEncoding::Wasm)
 }
 
-pub fn bench_ffmpeg(c: &mut Criterion) {
+fn bench_ffmpeg(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::Ffmpeg, InputEncoding::Wasm)
 }
 
-pub fn bench_coremark_minimal(c: &mut Criterion) {
+fn bench_coremark_minimal(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::CoreMark, InputEncoding::Wasm)
 }
 
-pub fn bench_argon2(c: &mut Criterion) {
+fn bench_argon2(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::Argon2, InputEncoding::Wasm)
 }
 
-pub fn bench_erc20(c: &mut Criterion) {
+fn bench_erc20(c: &mut Criterion) {
     instantiate_benchmark(c, StartupTestId::Erc20, InputEncoding::Wasm)
 }
