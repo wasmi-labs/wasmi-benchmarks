@@ -3298,9 +3298,9 @@ checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
 
 [[package]]
 name = "toywasmx"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e522467410470f90d5338e8002101fa23c9d5304b035cc5d1f8ddcc6726cebd"
+checksum = "ff668e48dfb2e56a15911276c41dcd722d90fca2700ab90eea084dd7eccfbc81"
 dependencies = [
  "anyhow",
  "toywasmx-sys",
@@ -3308,9 +3308,9 @@ dependencies = [
 
 [[package]]
 name = "toywasmx-sys"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e0329a6b90862d92a1f77a1e26a434e6fdfff24fd603d3bbdc1a433c94cb5e9"
+checksum = "1c4a74dbe3eaa8a7f6b414e755deecec7b2ee8d026cb032fb0408730a1ff345e"
 dependencies = [
  "bindgen 0.72.1",
  "cc",

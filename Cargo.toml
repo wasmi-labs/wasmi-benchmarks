@@ -87,6 +87,7 @@ default = [
     "wamr",
     "tinywasm",
     "spacewasm",
+    "toywasm",
 ]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer", "rt-wasmer/singlepass"]
@@ -115,7 +116,6 @@ interpreters = [
     "wasmi-v1",
     "wasmtime-pulley",
     "wasmedge",
-    "toywasm",
 ]
 # Enable all JIT Wasm runtimes.
 jits = [
