@@ -39,6 +39,8 @@ jobs:
               uses: ./.github/actions/install-dependencies
             - name: System Information
               run: lscpu
+            - name: Fetch Git Submodules
+              run: git submodule update --init --recursive
             - name: Install Cargo Criterion (tool)
               run: cargo install cargo-criterion || true
             - name: Compile Benchmarks
@@ -60,6 +62,8 @@ jobs:
               uses: ./.github/actions/install-dependencies
             - name: System Information
               run: lscpu
+            - name: Fetch Git Submodules
+              run: git submodule update --init --recursive
             - name: Install Cargo Criterion (tool)
               run: cargo install cargo-criterion || true
             - name: Compile Benchmarks
