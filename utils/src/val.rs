@@ -102,6 +102,15 @@ impl fmt::Display for ValType {
     }
 }
 
+#[derive(Debug)]
+pub struct TypeMismatch;
+
+impl fmt::Display for TypeMismatch {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("mismatched types in conversion from `Val` to a primitive type")
+    }
+}
+
 macro_rules! impl_val {
     ( $( $camel:ident($snake:ident) = { fn $unwrap:ident }),* $(,)? ) => {
         $(
@@ -109,6 +118,18 @@ macro_rules! impl_val {
                 #[inline]
                 fn from(value: ::core::primitive::$snake) -> Self {
                     Self::$camel(value)
+                }
+            }
+
+            impl TryFrom<Val> for ::core::primitive::$snake {
+                type Error = TypeMismatch;
+
+                #[inline]
+                fn try_from(value: Val) -> Result<Self, Self::Error> {
+                    match value {
+                        Val::$camel(value) => Ok(value),
+                        _ => Err(TypeMismatch),
+                    }
                 }
             }
         )*
