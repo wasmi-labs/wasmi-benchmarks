@@ -81,9 +81,6 @@ codegen-units = 4
 
 [features]
 default = [
-    "wasmi-v0-31",
-    "wasmi-v0-32",
-    "wasmi-v1",
     "wasmi-v2",
     "stitch",
     "spacewasm",
