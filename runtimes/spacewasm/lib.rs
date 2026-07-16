@@ -118,15 +118,6 @@ impl SpaceWasm {
                 ExecuteTestId::FibonacciTail
                     | ExecuteTestId::CounterParam
                     | ExecuteTestId::BulkOps
-                    | ExecuteTestId::Sort
-                    | ExecuteTestId::PrimeSieve
-                    | ExecuteTestId::MatrixMultiply
-                    | ExecuteTestId::Nbody
-                    | ExecuteTestId::Argon2
-                    | ExecuteTestId::TinyKeccak
-                    | ExecuteTestId::Mandelbrot
-                    | ExecuteTestId::Spectralnorm
-                    | ExecuteTestId::Compression
             ),
             TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
         }
