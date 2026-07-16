@@ -40,15 +40,7 @@ impl Tinywasm {
     fn can_run(&self, id: TestId) -> bool {
         !matches!(
             id,
-            | TestId::Execute(ExecuteTestId::Compression)
-            // Tinywasm traps ("trap: unreachable") while instantiating these clang-built WASI command
-            // modules, so they are excluded from the instantiation benchmarks.
-            | TestId::Startup(
-                StartupTestId::Bz2
-                    | StartupTestId::Spidermonkey
-                    | StartupTestId::PulldownCmark
-                    | StartupTestId::Ffmpeg
-            )
+            TestId::Execute(ExecuteTestId::Compression)
         )
     }
 }
