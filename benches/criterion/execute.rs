@@ -5,6 +5,7 @@ use core::slice;
 use criterion::{Criterion, criterion_group};
 use std::time::Duration;
 use wasmi_benchmarks::vms_under_test;
+use std::fs;
 
 criterion_group!(
     name = bench_execute;
@@ -27,6 +28,7 @@ criterion_group!(
         bench_tiny_keccak,
         bench_mandelbrot,
         bench_spectralnorm,
+        bench_execute_compression,
 
         bench_primes,
         bench_bulk_ops,
@@ -295,6 +297,36 @@ fn bench_spectralnorm(c: &mut Criterion) {
             });
             let output = instance.call_typed::<i32, f64>("output", data).unwrap();
             assert_eq!(output, 1.2742241159529095);
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_execute_compression(c: &mut Criterion) {
+    let id = ExecuteTestId::Compression;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    let uncompressed_input = fs::read_to_string("res/rust/res/alice29.txt").unwrap();
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len_input = uncompressed_input.len() as i32;
+        let bench_id = format!("{}/{}", vm.id(), len_input);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", len_input).unwrap();
+            // let input_ptr = instance.call_typed::<i32, i32>("input_ptr", data).unwrap();
+            // // Copy test data inside the wasm memory.
+            // let memory = instance.get_memory("memory").unwrap();
+            // memory
+            //     .write(input_ptr as usize, uncompressed_input.as_bytes())
+            //     .unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            let len_compressed = instance.call_typed::<i32, i64>("len_compressed", data).unwrap();
+            assert_eq!(len_compressed, 151_925);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }

@@ -106,6 +106,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `tiny_keccak`| Tiny Rust implementation of Keccak crptography hashing. |
 | `mandelbrot` | Classic Rust mandelbrot implementation. |
 | `spectralnorm` | Compute intense benchmarks involving floats. |
+| `compression`| Compresses some input using the `miniz_oxide` crate. |
 | `primes` | Calculates all primes until some number. |
 | `bulk-ops` | Tests performance of `memory.{copy,fill}` from the Wasm [`bulk-memory-operations`] proposal. |
 

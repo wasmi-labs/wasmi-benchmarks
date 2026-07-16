@@ -72,6 +72,7 @@ pub enum ExecuteTestId {
     TinyKeccak,
     Mandelbrot,
     Spectralnorm,
+    Compression,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -94,6 +95,7 @@ impl fmt::Display for ExecuteTestId {
             Self::TinyKeccak => "tiny_keccak",
             Self::Mandelbrot => "mandelbrot",
             Self::Spectralnorm => "spectralnorm",
+            Self::Compression => "compression",
         };
         f.write_str(s)
     }
