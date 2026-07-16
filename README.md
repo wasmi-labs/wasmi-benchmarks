@@ -101,7 +101,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `sort`   | Executes Rust's standard [`sort_unstable`] on integers. |
 | `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
 | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
-| `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
+| `matrix_mul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
 
