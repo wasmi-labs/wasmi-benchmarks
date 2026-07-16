@@ -2,11 +2,13 @@
 
 mod id;
 mod linker;
+mod typed_call;
 mod val;
 
 pub use self::id::{ExecuteTestId, StartupTestId, TestId};
 pub use self::linker::{HostFunc, Linker};
-pub use self::val::{FuncType, Val, ValType};
+pub use self::typed_call::{CallTyped, WasmParams, WasmResults, WasmValue};
+pub use self::val::{FuncType, TypeMismatch, Val, ValType};
 use core::fmt;
 use std::fs;
 

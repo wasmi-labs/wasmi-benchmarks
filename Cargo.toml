@@ -47,6 +47,9 @@ serde_json = "1.0.117"
 plotters = "0.3.7"
 anyhow = "1"
 
+[dev-dependencies]
+anyhow = { workspace = true }
+
 [[bench]]
 name = "criterion"
 harness = false
