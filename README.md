@@ -86,35 +86,41 @@ cargo bench wasm3.eager
 
 ## Test Cases
 
-The Wasmi benchmarking test suite provides the following test cases:
+### Execution Benchmarks
 
-| Mode | Test Case | Notes |
-|:----:|:---------:|:------|
-| | | |
-| `execute` | | |
-| | `counter-local` | Simple loop that counts a single local down from some number. |
-| | `counter-param` | Simple loop that counts down from some number via a control parameter. |
-| | `counter-global` | Simple loop that counts a global down from some number. |
-| | `fibonacci-rec` | Recursive fibonacci calculation. Call-intense workload. |
-| | `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
-| | `fibonacci-tail` | Tail-call based fibonacci calculation. |
-| | `sort`   | Executes Rust's standard [`sort_unstable`](https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable) on integers. |
-| | `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
-| | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
-| | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
-| | `argon2` | Password hashing library. Compute- and memory intense workload. |
-| | `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
-| | | |
-| `startup` | | |
-| | `bz2` | Medium-sized compression library with huge function bodies. (WASI required) |
-| | `pulldown-cmark` | Medium-sized markdown renderer. (WASI required) |
-| | `spidermonkey` | The firefox Javascript execution engine. (large, WASI required) |
-| | `ffmpeg` | Huge multimedia library. (WASI required) |
-| | `coremark` | CoreMark benchmarking compilation. (kinda small, no WASI) |
-| | `argon2` | Password hashing library. (small, no WASI) |
-| | `erc20` | ink! based ERC-20 implementation. (tiny, no WASI) |
+Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
+
+| Test Case | Description |
+|:--|:--|
+| `counter-local` | Simple loop that counts a single local down from some number. |
+| `counter-param` | Simple loop that counts down from some number via a control parameter. |
+| `counter-global` | Simple loop that counts a global down from some number. |
+| `fibonacci-rec` | Recursive fibonacci calculation. Call-intense workload. |
+| `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
+| `fibonacci-tail` | Tail-call based fibonacci calculation. |
+| `sort`   | Executes Rust's standard [`sort_unstable`] on integers. |
+| `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
+| `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
+| `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
+| `argon2` | Password hashing library. Compute- and memory intense workload. |
+| `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
+
+### Startup Benchmarks
+
+Tests the startup performance of the Wasm runtime, prefixed by `startup/`.
+
+| Test Case | Description |
+|:--|:--|
+| `bz2` | Medium-sized compression library with huge function bodies. (WASI required) |
+| `pulldown-cmark` | Medium-sized markdown renderer. (WASI required) |
+| `spidermonkey` | The firefox Javascript execution engine. (large, WASI required) |
+| `ffmpeg` | Huge multimedia library. (WASI required) |
+| `coremark` | CoreMark benchmarking compilation. (kinda small, no WASI) |
+| `argon2` | Password hashing library. (small, no WASI) |
+| `erc20` | ink! based ERC-20 implementation. (tiny, no WASI) |
 
 [`bulk-memory-operations`]: https://github.com/WebAssembly/bulk-memory-operations
+[`sort_unstable`]: https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable
 
 ## Coremark
 
