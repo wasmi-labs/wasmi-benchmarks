@@ -98,6 +98,8 @@ The Wasmi benchmarking test suite provides the following test cases:
 | | `fibonacci-rec` | Recursive fibonacci calculation. Call-intense workload. |
 | | `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
 | | `fibonacci-tail` | Tail-call based fibonacci calculation. |
+| | `sort`   | Executes Rust's standard [`sort_unstable`](https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable) on integers. |
+| | `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
 | | `primes` | Calculates all primes until some number. Uses linear memory for storing known primes. |
 | | `matmul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | | `argon2` | Password hashing library. Compute- and memory intense workload. |
