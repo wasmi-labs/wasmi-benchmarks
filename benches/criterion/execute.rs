@@ -1,4 +1,4 @@
-use benchmark_utils::ExecuteTestId;
+use benchmark_utils::{CallTyped as _, ExecuteTestId};
 use benchmark_utils::{InputEncoding, Val, read_benchmark_file, wat2wasm};
 use core::fmt;
 use core::slice;
@@ -136,18 +136,11 @@ fn bench_sort(c: &mut Criterion) {
         let bench_id = format!("{}/{}", vm.id(), len);
         g.bench_function(&bench_id, |b| {
             let mut instance = rt.instantiate(&wasm[..]);
-            let mut data = Val::I32(0);
-            instance
-                .call("setup", &[len.into()], slice::from_mut(&mut data))
-                .unwrap();
+            let data = instance.call_typed::<i32, i32>("setup", len).unwrap();
             b.iter(|| {
-                instance
-                    .call("run", slice::from_ref(&data), &mut [])
-                    .unwrap();
+                instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            instance
-                .call("teardown", slice::from_ref(&data), &mut [])
-                .unwrap();
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }
 }
@@ -164,36 +157,17 @@ fn bench_execute_prime_sieve(c: &mut Criterion) {
         let bench_id = format!("{}/{}", vm.id(), len);
         g.bench_function(&bench_id, |b| {
             let mut instance = rt.instantiate(&wasm[..]);
-            let mut data = Val::I32(0);
-            instance
-                .call("setup", &[len.into()], slice::from_mut(&mut data))
-                .unwrap();
+            let data = instance.call_typed::<i64, i32>("setup", len).unwrap();
             b.iter(|| {
-                instance
-                    .call("run", slice::from_ref(&data), &mut [])
-                    .unwrap();
+                instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            let mut len_primes = Val::I64(0);
-            let mut largest_prime = Val::I64(0);
-            instance
-                .call(
-                    "len_primes",
-                    slice::from_ref(&data),
-                    slice::from_mut(&mut len_primes),
-                )
+            let len_primes = instance.call_typed::<i32, i64>("len_primes", data).unwrap();
+            let largest_prime = instance
+                .call_typed::<i32, i64>("largest_prime", data)
                 .unwrap();
-            instance
-                .call(
-                    "largest_prime",
-                    slice::from_ref(&data),
-                    slice::from_mut(&mut largest_prime),
-                )
-                .unwrap();
-            assert_eq!(len_primes.unwrap_i64(), 664579);
-            assert_eq!(largest_prime.unwrap_i64(), 9999991);
-            instance
-                .call("teardown", slice::from_ref(&data), &mut [])
-                .unwrap();
+            assert_eq!(len_primes, 664579);
+            assert_eq!(largest_prime, 9999991);
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }
 }
