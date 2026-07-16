@@ -69,6 +69,7 @@ pub enum ExecuteTestId {
     Sort,
     PrimeSieve,
     Nbody,
+    TinyKeccak,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -88,6 +89,7 @@ impl fmt::Display for ExecuteTestId {
             Self::Sort => "sort",
             Self::PrimeSieve => "prime_sieve",
             Self::Nbody => "nbody",
+            Self::TinyKeccak => "tiny_keccak",
         };
         f.write_str(s)
     }

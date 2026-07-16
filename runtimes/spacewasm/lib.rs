@@ -123,6 +123,7 @@ impl SpaceWasm {
                     | ExecuteTestId::MatrixMultiply
                     | ExecuteTestId::Nbody
                     | ExecuteTestId::Argon2
+                    | ExecuteTestId::TinyKeccak
             ),
             TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
         }

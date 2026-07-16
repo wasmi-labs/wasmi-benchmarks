@@ -46,6 +46,7 @@ impl Stitch {
                     | ExecuteTestId::PrimeSieve
                     | ExecuteTestId::MatrixMultiply
                     | ExecuteTestId::Nbody
+                    | ExecuteTestId::TinyKeccak
             ),
         }
     }

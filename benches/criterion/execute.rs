@@ -23,9 +23,10 @@ criterion_group!(
         bench_execute_prime_sieve,
         bench_matrix_multiply,
         bench_nbody,
+        bench_argon2,
+        bench_tiny_keccak,
 
         bench_primes,
-        bench_argon2,
         bench_bulk_ops,
 );
 
@@ -226,6 +227,26 @@ fn bench_argon2(c: &mut Criterion) {
             });
             let output = instance.call_typed::<i32, i64>("output", data).unwrap();
             assert_eq!(output, 0x4CDBBC7DE0EAA94);
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_tiny_keccak(c: &mut Criterion) {
+    let id = ExecuteTestId::TinyKeccak;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let bench_id = vm.id().to_string();
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<(), i32>("setup", ()).unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }
