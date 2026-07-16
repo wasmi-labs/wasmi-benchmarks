@@ -110,6 +110,9 @@ wasmedge = ["dep:rt-wasmedge"]
 # Enable all interpreter Wasm runtimes.
 interpreters = [
     "default",
+    "wasmi-v0-31",
+    "wasmi-v0-32",
+    "wasmi-v1",
     "wasmtime-pulley",
     "wasmedge",
     "toywasm",
