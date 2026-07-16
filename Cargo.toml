@@ -82,11 +82,11 @@ codegen-units = 4
 [features]
 default = [
     "wasmi-v2",
-    "stitch",
-    "spacewasm",
     "wasm3",
-    "tinywasm",
+    "stitch",
     "wamr",
+    "tinywasm",
+    "spacewasm",
 ]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer", "rt-wasmer/singlepass"]
