@@ -21,7 +21,7 @@ The following Wasm runtimes and configurations are included.
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 | [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
 
-**Missing Wasm runtimes:** [Wain], [V8]
+**Missing Wasm runtimes:** [Wain], [V8], [DLR-wasm-interpreter]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9
@@ -37,6 +37,7 @@ The following Wasm runtimes and configurations are included.
 [SpaceWasm]: https://github.com/nasa/spacewasm
 [WasmEdge]: https://github.com/wasmedge/wasmedge
 [V8]: https://github.com/v8/v8
+[DLR-wasm-interpreter]: https://github.com/DLR-FT/wasm-interpreter
 
 ### Configuration Explanation
 
