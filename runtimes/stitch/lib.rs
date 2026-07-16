@@ -48,6 +48,7 @@ impl Stitch {
                     | ExecuteTestId::Nbody
                     | ExecuteTestId::TinyKeccak
                     | ExecuteTestId::Mandelbrot
+                    | ExecuteTestId::Spectralnorm
             ),
         }
     }

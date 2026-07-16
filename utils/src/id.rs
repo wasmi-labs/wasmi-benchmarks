@@ -71,6 +71,7 @@ pub enum ExecuteTestId {
     Nbody,
     TinyKeccak,
     Mandelbrot,
+    Spectralnorm,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -92,6 +93,7 @@ impl fmt::Display for ExecuteTestId {
             Self::Nbody => "nbody",
             Self::TinyKeccak => "tiny_keccak",
             Self::Mandelbrot => "mandelbrot",
+            Self::Spectralnorm => "spectralnorm",
         };
         f.write_str(s)
     }

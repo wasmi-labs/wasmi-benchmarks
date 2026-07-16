@@ -26,6 +26,7 @@ criterion_group!(
         bench_argon2,
         bench_tiny_keccak,
         bench_mandelbrot,
+        bench_spectralnorm,
 
         bench_primes,
         bench_bulk_ops,
@@ -271,6 +272,29 @@ fn bench_mandelbrot(c: &mut Criterion) {
             });
             let output = instance.call_typed::<i32, i64>("output", data).unwrap();
             assert_eq!(output, 5_595_328);
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_spectralnorm(c: &mut Criterion) {
+    let id = ExecuteTestId::Spectralnorm;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let n: i32 = 500;
+        let bench_id = format!("{}/{}", vm.id(), n);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", n).unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            let output = instance.call_typed::<i32, f64>("output", data).unwrap();
+            assert_eq!(output, 1.2742241159529095);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }

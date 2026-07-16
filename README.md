@@ -105,6 +105,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | `tiny_keccak`| Tiny Rust implementation of Keccak crptography hashing. |
 | `mandelbrot` | Classic Rust mandelbrot implementation. |
+| `spectralnorm` | Compute intense benchmarks involving floats. |
 | `primes` | Calculates all primes until some number. |
 | `bulk-ops` | Tests performance of `memory.{copy,fill}` from the Wasm [`bulk-memory-operations`] proposal. |
 
