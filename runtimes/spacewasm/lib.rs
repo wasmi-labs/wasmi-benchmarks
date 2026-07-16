@@ -251,7 +251,7 @@ impl ModuleInstance for SpaceWasmModule {
         Ok(())
     }
 
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
         let bytes = self
             .memory(name)?
             .load(ptr as usize, buffer.len())

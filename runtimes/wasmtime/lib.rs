@@ -160,8 +160,8 @@ impl ModuleInstance for WasmtimeModule {
         Ok(())
     }
 
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
-        let Some(memory) = self.instance.get_memory(&self.store, name) else {
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let Some(memory) = self.instance.get_memory(&mut self.store, name) else {
             bail!("memory not found: {name}")
         };
         memory.read(&self.store, ptr as usize, buffer)?;
@@ -169,7 +169,7 @@ impl ModuleInstance for WasmtimeModule {
     }
 
     fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
-        let Some(memory) = self.instance.get_memory(&self.store, name) else {
+        let Some(memory) = self.instance.get_memory(&mut self.store, name) else {
             bail!("memory not found: {name}")
         };
         memory.write(&mut self.store, ptr as usize, buffer)?;

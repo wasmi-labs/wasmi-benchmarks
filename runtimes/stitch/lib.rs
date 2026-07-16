@@ -106,7 +106,7 @@ impl ModuleInstance for StitchModule {
         Ok(())
     }
 
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
         let Some(memory) = self.instance.exported_mem(name) else {
             bail!("memory not found: {name}")
         };

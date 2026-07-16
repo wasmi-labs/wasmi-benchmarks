@@ -157,7 +157,7 @@ impl ModuleInstance for WasmEdgeModule {
         Ok(())
     }
 
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
         let memory = self.instance.get_memory_ref(name)?;
         let Some(bytes) = memory.slice::<u8>(ptr as usize, buffer.len()) else {
             bail!(

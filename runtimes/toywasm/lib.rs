@@ -100,7 +100,7 @@ impl ModuleInstance for ToywasmModule {
         Ok(())
     }
 
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
         let memory = self.instance.get_memory(name)?;
         let data = memory.data();
         let ptr = ptr as usize;

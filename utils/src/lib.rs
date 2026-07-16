@@ -54,7 +54,7 @@ pub trait ModuleInstance {
     fn call(&mut self, name: &str, params: &[Val], results: &mut [Val]) -> anyhow::Result<()>;
 
     /// Reads from the memory exported from `self` by `name`: `buffer = memory[ptr..ptr+buffer.len()]`
-    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()>;
+    fn read_memory(&mut self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()>;
 
     /// Writes to the memory export from `self` by `name`: `memory[ptr..ptr+buffer.len()] = buffer`
     fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()>;
