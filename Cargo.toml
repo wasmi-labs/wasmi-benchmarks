@@ -33,6 +33,7 @@ rt-wasm3 = { path = "runtimes/wasm3", optional = true }
 rt-wamr = { path = "runtimes/wamr", optional = true }
 rt-toywasm = { path = "runtimes/toywasm", optional = true }
 rt-wasmedge = { path = "runtimes/wasmedge", optional = true }
+rt-v8 = { path = "runtimes/v8", optional = true }
 
 criterion = { workspace = true }
 wat = { workspace = true }
@@ -107,6 +108,7 @@ wasmi-v0-32 = ["dep:rt-wasmi-v0-32"]
 wasmi-v1 = ["dep:rt-wasmi-v1"]
 wasmi-v2 = ["dep:rt-wasmi-v2"]
 wasmedge = ["dep:rt-wasmedge"]
+v8 = ["dep:rt-v8"]
 
 # Enable all interpreter Wasm runtimes.
 interpreters = [
@@ -123,4 +125,5 @@ jits = [
     "wasmtime-winch",
     "wasmer-cranelift",
     "wasmer-singlepass",
+    "v8",
 ]

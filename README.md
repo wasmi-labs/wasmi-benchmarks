@@ -14,6 +14,7 @@ The following Wasm runtimes and configurations are included.
 | [`wasmtime`][Wasmtime] | JIT, Interpreter | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. |
 | [`wasmer`][Wasmer] | JIT | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
 | [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
+| [`v8`][V8] | Multi-Tier JIT | Google's high performance JS runtime. |
 | [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A fast and well-established Wasm interpreter. |
 | [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
 | [`tinywasm`][Tinywasm] | Interpreter | | Small Wasm interpreter written in pure stable Rust. |
@@ -21,7 +22,7 @@ The following Wasm runtimes and configurations are included.
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 | [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
 
-**Missing Wasm runtimes:** [Wain], [V8], [DLR-wasm-interpreter]
+**Missing Wasm runtimes:** [Wain], [DLR-wasm-interpreter]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9

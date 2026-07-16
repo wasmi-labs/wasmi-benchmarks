@@ -53,6 +53,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     });
     #[cfg(feature = "wasmedge")]
     rts.push(rt_wasmedge::WasmEdge);
+    #[cfg(feature = "v8")]
+    rts.push(rt_v8::V8);
     rts.into_vec()
 }
 
