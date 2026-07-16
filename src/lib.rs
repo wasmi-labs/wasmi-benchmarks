@@ -13,8 +13,6 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     push_wasmi_v1_rts(&mut rts);
     #[cfg(feature = "wasmi-v2")]
     push_wasmi_v2_rts(&mut rts);
-    #[cfg(feature = "tinywasm")]
-    rts.push(rt_tinywasm::Tinywasm);
     #[cfg(feature = "wasm3")]
     rts.push(rt_wasm3::Wasm3 {
         compilation_mode: rt_wasm3::CompilationMode::Eager,
@@ -25,10 +23,12 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     });
     #[cfg(feature = "stitch")]
     rts.push(rt_stitch::Stitch);
-    #[cfg(feature = "spacewasm")]
-    rts.push(rt_spacewasm::SpaceWasm);
     #[cfg(feature = "wamr")]
     rts.push(rt_wamr::Wamr);
+    #[cfg(feature = "tinywasm")]
+    rts.push(rt_tinywasm::Tinywasm);
+    #[cfg(feature = "spacewasm")]
+    rts.push(rt_spacewasm::SpaceWasm);
     #[cfg(feature = "toywasm")]
     rts.push(rt_toywasm::Toywasm);
     #[cfg(feature = "wasmtime-cranelift")]
