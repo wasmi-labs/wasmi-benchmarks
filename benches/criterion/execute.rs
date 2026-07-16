@@ -316,19 +316,17 @@ fn bench_execute_compression(c: &mut Criterion) {
         g.bench_function(&bench_id, |b| {
             let mut instance = rt.instantiate(&wasm[..]);
             let data = instance.call_typed::<i32, i32>("setup", len_input).unwrap();
-            // let input_ptr = instance.call_typed::<i32, i32>("input_ptr", data).unwrap();
-            // // Copy test data inside the wasm memory.
-            // let memory = instance.get_memory("memory").unwrap();
-            // memory
-            //     .write(input_ptr as usize, uncompressed_input.as_bytes())
-            //     .unwrap();
+            let input_ptr = instance.call_typed::<i32, i32>("input_ptr", data).unwrap();
+            instance
+                .write_memory("memory", input_ptr as u32, uncompressed_input.as_bytes())
+                .unwrap();
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
             let len_compressed = instance
                 .call_typed::<i32, i64>("len_compressed", data)
                 .unwrap();
-            assert_eq!(len_compressed, 151_925);
+            assert_eq!(len_compressed, 97_649);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }
