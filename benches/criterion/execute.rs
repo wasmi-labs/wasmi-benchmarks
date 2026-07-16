@@ -114,10 +114,6 @@ fn bench_primes(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::Primes, 1_000, InputEncoding::Wat)
 }
 
-fn bench_argon2(c: &mut Criterion) {
-    execute_benchmark::<i64>(c, ExecuteTestId::Argon2, 1, InputEncoding::Wasm)
-}
-
 fn bench_bulk_ops(c: &mut Criterion) {
     execute_benchmark::<i64>(c, ExecuteTestId::BulkOps, 5_000, InputEncoding::Wat)
 }
@@ -207,6 +203,29 @@ fn bench_nbody(c: &mut Criterion) {
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_argon2(c: &mut Criterion) {
+    let id = ExecuteTestId::Argon2;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len: i32 = 10_000;
+        let bench_id = format!("{}/{}", vm.id(), len);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", len).unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            let output = instance.call_typed::<i32, i64>("output", data).unwrap();
+            assert_eq!(output, 0x4CDBBC7DE0EAA94);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }

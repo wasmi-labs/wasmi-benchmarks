@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::ops::ControlFlow;
 use std::sync::{Mutex, OnceLock};
 
-use benchmark_utils as utils;
+use benchmark_utils::{self as utils, StartupTestId};
 use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 
 use std::alloc::Layout;
@@ -122,8 +122,9 @@ impl SpaceWasm {
                     | ExecuteTestId::PrimeSieve
                     | ExecuteTestId::MatrixMultiply
                     | ExecuteTestId::Nbody
+                    | ExecuteTestId::Argon2
             ),
-            _ => true,
+            TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
         }
     }
 }

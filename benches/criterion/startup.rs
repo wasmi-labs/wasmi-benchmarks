@@ -191,7 +191,7 @@ fn bench_coremark_minimal(c: &mut Criterion) {
 }
 
 fn bench_argon2(c: &mut Criterion) {
-    instantiate_benchmark(c, StartupTestId::Argon2, InputEncoding::Wasm)
+    instantiate_benchmark(c, StartupTestId::Argon2, InputEncoding::RustCompiledWasm)
 }
 
 fn bench_erc20(c: &mut Criterion) {
