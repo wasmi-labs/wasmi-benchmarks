@@ -3,9 +3,9 @@ use benchmark_utils::{InputEncoding, Val, read_benchmark_file, wat2wasm};
 use core::fmt;
 use core::slice;
 use criterion::{Criterion, criterion_group};
+use std::fs;
 use std::time::Duration;
 use wasmi_benchmarks::vms_under_test;
-use std::fs;
 
 criterion_group!(
     name = bench_execute;
@@ -325,7 +325,9 @@ fn bench_execute_compression(c: &mut Criterion) {
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            let len_compressed = instance.call_typed::<i32, i64>("len_compressed", data).unwrap();
+            let len_compressed = instance
+                .call_typed::<i32, i64>("len_compressed", data)
+                .unwrap();
             assert_eq!(len_compressed, 151_925);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
