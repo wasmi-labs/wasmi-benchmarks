@@ -104,6 +104,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `matrix_mul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | `tiny_keccak`| Tiny Rust implementation of Keccak crptography hashing. |
+| `mandelbrot` | Classic Rust mandelbrot implementation. |
 | `bulk-ops` | Show cases the Wasm [`bulk-memory-operations`] proposal. |
 
 ### Startup Benchmarks

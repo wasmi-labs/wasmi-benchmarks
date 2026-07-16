@@ -124,6 +124,7 @@ impl SpaceWasm {
                     | ExecuteTestId::Nbody
                     | ExecuteTestId::Argon2
                     | ExecuteTestId::TinyKeccak
+                    | ExecuteTestId::Mandelbrot
             ),
             TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
         }

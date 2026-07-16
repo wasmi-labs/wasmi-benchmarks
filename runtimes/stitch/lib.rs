@@ -47,6 +47,7 @@ impl Stitch {
                     | ExecuteTestId::MatrixMultiply
                     | ExecuteTestId::Nbody
                     | ExecuteTestId::TinyKeccak
+                    | ExecuteTestId::Mandelbrot
             ),
         }
     }
