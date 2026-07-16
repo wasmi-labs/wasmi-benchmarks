@@ -18,8 +18,8 @@ use std::alloc::Layout;
 
 use spacewasm::{
     AllocError, Allocator, CodeBuilder, CompilerOptions, ExportDesc, HostFunction, HostModule,
-    InnerVec, Interpreter, InterpreterResult, InterpreterRunner, MemoryStatistics, Module,
-    ModuleRef, Rc, Ref, Store, Value, WasmRef, WasmStream,
+    InnerVec, Interpreter, InterpreterResult, InterpreterRunner, Memory, MemoryKind,
+    MemoryStatistics, Module, ModuleRef, Rc, Ref, Store, Value, WasmRef, WasmStream,
 };
 use spacewasm_util::RustSystemAllocator;
 
@@ -254,12 +254,55 @@ impl ModuleInstance for SpaceWasmModule {
         Ok(())
     }
 
-    fn read_memory(&self, _name: &str, _ptr: u32, _buffer: &mut [u8]) -> anyhow::Result<()> {
-        todo!()
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let bytes = self
+            .memory(name)?
+            .load(ptr as usize, buffer.len())
+            .map_err(|e| anyhow::anyhow!("failed to read memory {name:?}: {e:?}"))?;
+        buffer.copy_from_slice(bytes);
+        Ok(())
     }
 
-    fn write_memory(&mut self, _name: &str, _ptr: u32, _buffer: &[u8]) -> anyhow::Result<()> {
-        todo!()
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        self.memory(name)?
+            .store(ptr as usize, buffer)
+            .map_err(|e| anyhow::anyhow!("failed to write memory {name:?}: {e:?}"))?;
+        Ok(())
+    }
+}
+
+impl SpaceWasmModule {
+    /// Resolves the memory exported by `name` to its backing [`Memory`].
+    ///
+    /// SpaceWasm has no memory-by-name accessor, so this mirrors how [`SpaceWasmModule::call`]
+    /// resolves an exported function: find the export, confirm it is a memory, then follow the
+    /// module's [`MemoryKind`] to the owning [`Memory`]. Both [`Memory::load`] and [`Memory::store`]
+    /// take `&self`, so this shared `&self` resolver serves reads and writes alike.
+    fn memory(&self, name: &str) -> anyhow::Result<&Rc<Memory>> {
+        let module = &self.store.modules()[self.module_index];
+        let Some(export) = module.exports.iter().find(|e| &*e.name == name) else {
+            anyhow::bail!("failed to find memory export {name:?}")
+        };
+        let ExportDesc::Mem(_) = export.desc else {
+            anyhow::bail!("export {name:?} is not a memory")
+        };
+        match &module.memory {
+            Some(MemoryKind::Owned(mem)) => Ok(mem),
+            Some(MemoryKind::Import(module_ref)) => {
+                match &self.store.modules()[module_ref.0 as usize].memory {
+                    Some(MemoryKind::Owned(mem)) => Ok(mem),
+                    _ => {
+                        anyhow::bail!(
+                            "imported memory {name:?} does not resolve to an owned memory"
+                        )
+                    }
+                }
+            }
+            Some(MemoryKind::ImportHost(_)) => {
+                anyhow::bail!("host-imported memory {name:?} is not supported")
+            }
+            None => anyhow::bail!("module has no memory for export {name:?}"),
+        }
     }
 }
 
