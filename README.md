@@ -101,6 +101,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `sort`   | Executes Rust's standard [`sort_unstable`] on integers. |
 | `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
 | `matrix_mul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
+| `nbody` | N-body physics simulation. |
 | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | `tiny_keccak`| Tiny Rust implementation of Keccak crptography hashing. |
 | `mandelbrot` | Classic Rust mandelbrot implementation. |
