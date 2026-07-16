@@ -120,6 +120,7 @@ impl SpaceWasm {
                     | ExecuteTestId::BulkOps
                     | ExecuteTestId::Sort
                     | ExecuteTestId::PrimeSieve
+                    | ExecuteTestId::MatrixMultiply
             ),
             _ => true,
         }

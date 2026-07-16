@@ -80,7 +80,7 @@ impl fmt::Display for ExecuteTestId {
             Self::FibonacciRec => "fibonacci-rec",
             Self::FibonacciTail => "fibonacci-tail",
             Self::Primes => "primes",
-            Self::MatrixMultiply => "matmul",
+            Self::MatrixMultiply => "matrix_mul",
             Self::Argon2 => "argon2",
             Self::BulkOps => "bulk-ops",
             Self::CoreMark => "coremark",
