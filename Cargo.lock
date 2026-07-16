@@ -3447,18 +3447,18 @@ dependencies = [
 
 [[package]]
 name = "wamrx"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63afc01044350cf5fdb1e8ec7cde80bceed6b07fc34bdad6a1142bcc0ccd82e9"
+checksum = "47f02d3cbcabfb3a115f9ececd1462aeb6026c1c2827ae3e12c4dafcd8c0b26f"
 dependencies = [
  "wamrx-sys",
 ]
 
 [[package]]
 name = "wamrx-sys"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a841b50d7402b92cbbc4da50a4eb513e265f0f66e186b26bbc3724b367b97a40"
+checksum = "ab9efc67ebd6c574684794e3a25933c58d2ad3f1b1078830f8c779974132e0d1"
 dependencies = [
  "bindgen 0.72.1",
  "cmake",

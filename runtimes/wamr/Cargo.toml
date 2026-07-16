@@ -9,4 +9,4 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-wamr = { package = "wamrx", version = "0.2", features = ["tail-call"] }
+wamr = { package = "wamrx", version = "0.3", features = ["tail-call"] }
