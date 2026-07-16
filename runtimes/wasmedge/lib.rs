@@ -1,5 +1,6 @@
 #![crate_type = "dylib"]
 
+use anyhow::bail;
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use std::collections::BTreeMap;
@@ -153,6 +154,30 @@ impl ModuleInstance for WasmEdgeModule {
         for (dst, src) in results.iter_mut().zip(call_results) {
             *dst = into_utils_val(src);
         }
+        Ok(())
+    }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let memory = self.instance.get_memory_ref(name)?;
+        let Some(bytes) = memory.slice::<u8>(ptr as usize, buffer.len()) else {
+            bail!(
+                "failed to slice memory at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        buffer.copy_from_slice(bytes);
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let memory = self.instance.get_memory_mut(name)?;
+        let Some(bytes) = memory.mut_slice::<u8>(ptr as usize, buffer.len()) else {
+            bail!(
+                "failed to slice memory at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        bytes.copy_from_slice(buffer);
         Ok(())
     }
 }

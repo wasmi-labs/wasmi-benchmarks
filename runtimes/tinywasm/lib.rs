@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, StartupTestId};
+use benchmark_utils::{self as utils, ExecuteTestId, StartupTestId};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
@@ -38,11 +38,12 @@ impl Runtime for Tinywasm {
 
 impl Tinywasm {
     fn can_run(&self, id: TestId) -> bool {
-        // Tinywasm traps ("trap: unreachable") while instantiating these clang-built WASI command
-        // modules, so they are excluded from the instantiation benchmarks.
         !matches!(
             id,
-            TestId::Startup(
+            | TestId::Execute(ExecuteTestId::Compression)
+            // Tinywasm traps ("trap: unreachable") while instantiating these clang-built WASI command
+            // modules, so they are excluded from the instantiation benchmarks.
+            | TestId::Startup(
                 StartupTestId::Bz2
                     | StartupTestId::Spidermonkey
                     | StartupTestId::PulldownCmark
@@ -109,6 +110,18 @@ impl ModuleInstance for TinywasmModule {
         self.prepare_params(params);
         let call_results = func.call(&mut self.store, &self.params[..])?;
         self.write_back_results(results, &call_results[..]);
+        Ok(())
+    }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let memory = self.instance.memory(name)?;
+        memory.read(&self.store, ptr as usize, buffer)?;
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let memory = self.instance.memory(name)?;
+        memory.write(&mut self.store, ptr as usize, buffer)?;
         Ok(())
     }
 }

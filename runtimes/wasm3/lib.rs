@@ -1,5 +1,6 @@
 #![crate_type = "dylib"]
 
+use anyhow::bail;
 use benchmark_utils::{self as utils, ExecuteTestId};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasm3::CompilationMode;
@@ -126,6 +127,40 @@ impl ModuleInstance for Wasm3Module {
         self.prepare_results(&func)?;
         func.call(&mut self.store, &self.params[..], &mut self.results[..])?;
         self.write_back_results(results);
+        Ok(())
+    }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let Some(memory) = self.instance.get_memory(&self.store) else {
+            bail!("memory not found: {name}")
+        };
+        let data = memory.data(&self.store);
+        let ptr = ptr as usize;
+        let len = buffer.len();
+        let Some(bytes) = data.get(ptr..ptr + len) else {
+            bail!(
+                "failed to slice bytes from {name} at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        buffer.copy_from_slice(bytes);
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let Some(memory) = self.instance.get_memory(&self.store) else {
+            bail!("memory not found: {name}")
+        };
+        let data = memory.data_mut(&mut self.store);
+        let ptr = ptr as usize;
+        let len = buffer.len();
+        let Some(bytes) = data.get_mut(ptr..ptr + len) else {
+            bail!(
+                "failed to slice bytes from {name} at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        bytes.copy_from_slice(buffer);
         Ok(())
     }
 }

@@ -1,5 +1,6 @@
 #![crate_type = "dylib"]
 
+use anyhow::bail;
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use wamr::{Engine, Func, FuncType, Instance, Linker, Module, Val, ValType};
@@ -82,6 +83,36 @@ impl ModuleInstance for WamrModule {
         Self::prepare_results(&mut self.results, &func);
         func.call(&self.params[..], &mut self.results[..])?;
         self.write_back_results(results);
+        Ok(())
+    }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let memory = self.instance.get_memory(name)?;
+        let data = memory.data();
+        let ptr = ptr as usize;
+        let len = buffer.len();
+        let Some(bytes) = data.get(ptr..ptr + len) else {
+            bail!(
+                "failed to slice bytes from {name} at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        buffer.copy_from_slice(bytes);
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let mut memory = self.instance.get_memory(name)?;
+        let data = memory.data_mut();
+        let ptr = ptr as usize;
+        let len = buffer.len();
+        let Some(bytes) = data.get_mut(ptr..ptr + len) else {
+            bail!(
+                "failed to slice bytes from {name} at {ptr} with length {}",
+                buffer.len()
+            )
+        };
+        bytes.copy_from_slice(buffer);
         Ok(())
     }
 }

@@ -1,0 +1,12 @@
+[package]
+name = "rt-v8"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+v8 = "150.1.0"

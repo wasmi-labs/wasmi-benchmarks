@@ -115,7 +115,10 @@ impl SpaceWasm {
         match id {
             TestId::Execute(id) => !matches!(
                 id,
-                ExecuteTestId::FibonacciTail | ExecuteTestId::CounterParam | ExecuteTestId::BulkOps
+                ExecuteTestId::FibonacciTail
+                    | ExecuteTestId::CounterParam
+                    | ExecuteTestId::BulkOps
+                    | ExecuteTestId::Compression
             ),
             TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
         }
@@ -249,6 +252,14 @@ impl ModuleInstance for SpaceWasmModule {
             *result = value_to_val(raw.to_value(sw_val_type(result.ty())));
         }
         Ok(())
+    }
+
+    fn read_memory(&self, _name: &str, _ptr: u32, _buffer: &mut [u8]) -> anyhow::Result<()> {
+        todo!()
+    }
+
+    fn write_memory(&mut self, _name: &str, _ptr: u32, _buffer: &[u8]) -> anyhow::Result<()> {
+        todo!()
     }
 }
 

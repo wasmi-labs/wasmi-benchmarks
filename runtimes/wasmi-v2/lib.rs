@@ -1,5 +1,6 @@
 #![crate_type = "dylib"]
 
+use anyhow::bail;
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasmi::CompilationMode;
@@ -156,6 +157,22 @@ impl ModuleInstance for WasmiModule {
         self.prepare_results(&func);
         func.call(&mut self.store, &self.params[..], &mut self.results[..])?;
         self.write_back_results(results);
+        Ok(())
+    }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let Some(memory) = self.instance.get_memory(&self.store, name) else {
+            bail!("memory not found: {name}")
+        };
+        memory.read(&self.store, ptr as usize, buffer)?;
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let Some(memory) = self.instance.get_memory(&self.store, name) else {
+            bail!("memory not found: {name}")
+        };
+        memory.write(&mut self.store, ptr as usize, buffer)?;
         Ok(())
     }
 }

@@ -137,6 +137,18 @@ impl ModuleInstance for WasmerModule {
         self.write_back_results(results, &call_results);
         Ok(())
     }
+
+    fn read_memory(&self, name: &str, ptr: u32, buffer: &mut [u8]) -> anyhow::Result<()> {
+        let memory = self.instance.exports.get_memory(name)?;
+        memory.view(&self.store).read(ptr as u64, buffer)?;
+        Ok(())
+    }
+
+    fn write_memory(&mut self, name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
+        let memory = self.instance.exports.get_memory(name)?;
+        memory.view(&self.store).write(ptr as u64, buffer)?;
+        Ok(())
+    }
 }
 
 impl WasmerModule {
