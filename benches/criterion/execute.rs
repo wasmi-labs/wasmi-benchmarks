@@ -21,8 +21,10 @@ criterion_group!(
         bench_fibonacci_tail,
         bench_sort,
         bench_execute_prime_sieve,
-        bench_primes,
         bench_matrix_multiply,
+        bench_nbody,
+
+        bench_primes,
         bench_argon2,
         bench_bulk_ops,
 );
@@ -170,6 +172,27 @@ fn bench_execute_prime_sieve(c: &mut Criterion) {
 
 fn bench_matrix_multiply(c: &mut Criterion) {
     let id = ExecuteTestId::MatrixMultiply;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let n: i32 = 400;
+        let bench_id = format!("{}/{}", vm.id(), n);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", n).unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_nbody(c: &mut Criterion) {
+    let id = ExecuteTestId::Nbody;
     let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
     let mut g = c.benchmark_group(format!("execute/{id}"));
     for vm in vms_under_test() {

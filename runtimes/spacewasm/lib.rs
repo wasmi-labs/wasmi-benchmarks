@@ -121,6 +121,7 @@ impl SpaceWasm {
                     | ExecuteTestId::Sort
                     | ExecuteTestId::PrimeSieve
                     | ExecuteTestId::MatrixMultiply
+                    | ExecuteTestId::Nbody
             ),
             _ => true,
         }
