@@ -40,7 +40,10 @@ impl Stitch {
             TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
             TestId::Execute(id) => !matches!(
                 id,
-                ExecuteTestId::FibonacciTail | ExecuteTestId::Argon2 | ExecuteTestId::Sort
+                ExecuteTestId::FibonacciTail
+                    | ExecuteTestId::Argon2
+                    | ExecuteTestId::Sort
+                    | ExecuteTestId::PrimeSieve
             ),
         }
     }

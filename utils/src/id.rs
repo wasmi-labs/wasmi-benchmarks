@@ -67,6 +67,7 @@ pub enum ExecuteTestId {
     BulkOps,
     CoreMark,
     Sort,
+    PrimeSieve,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -84,6 +85,7 @@ impl fmt::Display for ExecuteTestId {
             Self::BulkOps => "bulk-ops",
             Self::CoreMark => "coremark",
             Self::Sort => "sort",
+            Self::PrimeSieve => "prime_sieve",
         };
         f.write_str(s)
     }

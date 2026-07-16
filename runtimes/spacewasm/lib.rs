@@ -119,6 +119,7 @@ impl SpaceWasm {
                     | ExecuteTestId::CounterParam
                     | ExecuteTestId::BulkOps
                     | ExecuteTestId::Sort
+                    | ExecuteTestId::PrimeSieve
             ),
             _ => true,
         }

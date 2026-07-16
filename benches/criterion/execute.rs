@@ -20,6 +20,7 @@ criterion_group!(
         bench_fibonacci_iter,
         bench_fibonacci_tail,
         bench_sort,
+        bench_execute_prime_sieve,
         bench_primes,
         bench_matrix_multiply,
         bench_argon2,
@@ -144,6 +145,52 @@ fn bench_sort(c: &mut Criterion) {
                     .call("run", slice::from_ref(&data), &mut [])
                     .unwrap();
             });
+            instance
+                .call("teardown", slice::from_ref(&data), &mut [])
+                .unwrap();
+        });
+    }
+}
+
+fn bench_execute_prime_sieve(c: &mut Criterion) {
+    let id = ExecuteTestId::PrimeSieve;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len: i64 = 10_000_000;
+        let bench_id = format!("{}/{}", vm.id(), len);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let mut data = Val::I32(0);
+            instance
+                .call("setup", &[len.into()], slice::from_mut(&mut data))
+                .unwrap();
+            b.iter(|| {
+                instance
+                    .call("run", slice::from_ref(&data), &mut [])
+                    .unwrap();
+            });
+            let mut len_primes = Val::I64(0);
+            let mut largest_prime = Val::I64(0);
+            instance
+                .call(
+                    "len_primes",
+                    slice::from_ref(&data),
+                    slice::from_mut(&mut len_primes),
+                )
+                .unwrap();
+            instance
+                .call(
+                    "largest_prime",
+                    slice::from_ref(&data),
+                    slice::from_mut(&mut largest_prime),
+                )
+                .unwrap();
+            assert_eq!(len_primes.unwrap_i64(), 664579);
+            assert_eq!(largest_prime.unwrap_i64(), 9999991);
             instance
                 .call("teardown", slice::from_ref(&data), &mut [])
                 .unwrap();
