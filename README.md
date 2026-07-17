@@ -109,6 +109,8 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `mandelbrot` | Classic Rust mandelbrot implementation. |
 | `spectralnorm` | Compute intense benchmarks involving floats. |
 | `compression`| Compresses some input using the `miniz_oxide` crate. |
+| `word_count` | Count unqiue words in a string input via hash table inserts and look-ups. |
+| `json_parse` | Parses a JSON file using `serde_json`. |
 | `primes` | Calculates all primes until some number. |
 | `bulk-ops` | Tests performance of `memory.{copy,fill}` from the Wasm [`bulk-memory-operations`] proposal. |
 
