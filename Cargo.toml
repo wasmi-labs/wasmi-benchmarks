@@ -130,3 +130,23 @@ jits = [
     "wasmer-singlepass",
     "v8",
 ]
+# All Wasm runtimes available for Windows.
+windows = [
+    "wasmi-v2",
+    "wasm3",
+    "stitch",
+    "wamr",
+    "tinywasm",
+    "spacewasm",
+    "wasmi-v0-31",
+    "wasmi-v0-32",
+    "wasmi-v1",
+    "wasmtime-pulley",
+    "wasmedge",
+    "fizzy",
+    "wasmtime-cranelift",
+    "wasmtime-winch",
+    "wasmer-cranelift",
+    "wasmer-singlepass",
+    "v8",
+]
