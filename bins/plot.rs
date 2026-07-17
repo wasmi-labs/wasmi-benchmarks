@@ -17,8 +17,11 @@ pub enum VmAndConfig {
     Wasm3,
     Wasm3Lazy,
     Stitch,
+    Wamr,
+    Toywasm,
     Wasmtime(WasmtimeConfig),
     Wasmer(WasmerConfig),
+    SpaceWasm,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -68,6 +71,9 @@ impl VmAndConfig {
             Self::Wasmtime(WasmtimeConfig::Pulley) => "Wasmtime (Pulley)",
             Self::Wasmer(WasmerConfig::Cranelift) => "Wasmer (Cranelift)",
             Self::Wasmer(WasmerConfig::Singlepass) => "Wasmer (Singlepass)",
+            Self::Wamr => "WAMR fast-interpreter",
+            Self::Toywasm => "Toywasm",
+            Self::SpaceWasm => "SpaceWasm",
         }
     }
 
@@ -83,6 +89,9 @@ impl VmAndConfig {
             Self::Stitch => RGBColor(220, 175, 180),
             Self::Wasmtime(_) => RGBColor(140, 120, 160),
             Self::Wasmer(_) => RGBColor(95, 140, 175),
+            Self::Wamr => RGBColor(255, 165, 0),
+            Self::Toywasm => RGBColor(255, 192, 203),
+            Self::SpaceWasm => RGBColor(15, 20, 50),
         }
     }
 }
@@ -108,6 +117,9 @@ impl FromStr for VmAndConfig {
             "wasm3.eager" => Self::Wasm3,
             "wasm3.lazy" => Self::Wasm3Lazy,
             "stitch" => Self::Stitch,
+            "wamr" => Self::Wamr,
+            "toywasm" => Self::Toywasm,
+            "spacewasm" => Self::SpaceWasm,
             "wasmtime.cranelift" => Self::Wasmtime(WasmtimeConfig::Cranelift),
             "wasmtime.winch" => Self::Wasmtime(WasmtimeConfig::Winch),
             "wasmtime.pulley" => Self::Wasmtime(WasmtimeConfig::Pulley),
@@ -234,7 +246,7 @@ fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<()
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum BenchCategory {
     Execute,
-    Compile,
+    Startup,
 }
 
 #[derive(Debug)]
@@ -267,7 +279,7 @@ impl FromStr for BenchCategory {
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         match input {
             "execute" => Ok(Self::Execute),
-            "compile" => Ok(Self::Compile),
+            "startup" => Ok(Self::Startup),
             _ => Err(FromStrError::from(format!(
                 "invalid BenchCategory: {input}"
             ))),
@@ -279,7 +291,7 @@ impl fmt::Display for BenchCategory {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             BenchCategory::Execute => "execute".fmt(f),
-            BenchCategory::Compile => "compile".fmt(f),
+            BenchCategory::Startup => "startup".fmt(f),
         }
     }
 }
