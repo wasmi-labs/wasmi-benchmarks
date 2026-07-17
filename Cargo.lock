@@ -335,6 +335,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
+name = "checked"
+version = "0.2.0"
+source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+dependencies = [
+ "linker",
+ "wasm-interpreter",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1920,6 +1929,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c6639b70a7ce854b79c70d7e83f16b5dc0137cc914f3d7d03803b513ecc67ac"
 
 [[package]]
+name = "linker"
+version = "0.2.0"
+source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+dependencies = [
+ "wasm-interpreter",
+]
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1951,6 +1968,11 @@ name = "log"
 version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
+
+[[package]]
+name = "log_wrapper"
+version = "0.1.0"
+source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
 
 [[package]]
 name = "mach2"
@@ -2722,6 +2744,15 @@ dependencies = [
  "anyhow",
  "benchmark-utils",
  "fizzyx",
+]
+
+name = "rt-dlr-wasm-interpreter"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "checked",
+ "wasm-interpreter",
 ]
 
 [[package]]
@@ -3827,6 +3858,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasm-interpreter"
+version = "0.2.0"
+source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+dependencies = [
+ "libm",
+ "log_wrapper",
+]
+
+[[package]]
 name = "wasm3x"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4141,6 +4181,7 @@ dependencies = [
  "criterion",
  "plotters",
  "rt-fizzy",
+ "rt-dlr-wasm-interpreter",
  "rt-spacewasm",
  "rt-stitch",
  "rt-tinywasm",

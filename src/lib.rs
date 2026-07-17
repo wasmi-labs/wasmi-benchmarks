@@ -31,6 +31,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_spacewasm::SpaceWasm);
     #[cfg(feature = "toywasm")]
     rts.push(rt_toywasm::Toywasm);
+    #[cfg(feature = "dlr-wasm-interpreter")]
+    rts.push(rt_dlr_wasm_interpreter::DlrWasmInterpreter);
     #[cfg(feature = "wasmtime-cranelift")]
     rts.push(rt_wasmtime::Wasmtime {
         strategy: rt_wasmtime::Strategy::Cranelift,

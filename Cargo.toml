@@ -32,6 +32,7 @@ rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
 rt-wasm3 = { path = "runtimes/wasm3", optional = true }
 rt-wamr = { path = "runtimes/wamr", optional = true }
 rt-toywasm = { path = "runtimes/toywasm", optional = true }
+rt-dlr-wasm-interpreter = { path = "runtimes/dlr-wasm-interpreter", optional = true }
 rt-wasmedge = { path = "runtimes/wasmedge", optional = true }
 rt-v8 = { path = "runtimes/v8", optional = true }
 rt-fizzy = { path = "runtimes/fizzy", optional = true }
@@ -101,6 +102,7 @@ wasmtime-pulley = ["dep:rt-wasmtime", "rt-wasmtime/pulley"]
 wasm3 = ["dep:rt-wasm3"]
 wamr = ["dep:rt-wamr"]
 toywasm = ["dep:rt-toywasm"]
+dlr-wasm-interpreter = ["dep:rt-dlr-wasm-interpreter"]
 stitch = ["dep:rt-stitch"]
 spacewasm = ["dep:rt-spacewasm"]
 tinywasm = ["dep:rt-tinywasm"]
@@ -121,6 +123,7 @@ interpreters = [
     "wasmtime-pulley",
     "wasmedge",
     "fizzy",
+    "dlr-wasm-interpreter",
 ]
 # Enable all JIT Wasm runtimes.
 jits = [
