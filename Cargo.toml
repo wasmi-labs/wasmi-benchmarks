@@ -143,7 +143,6 @@ windows = [
     "wasmi-v1",
     "wasmtime-pulley",
     "wasmedge",
-    "fizzy",
     "wasmtime-cranelift",
     "wasmtime-winch",
     "wasmer-cranelift",
