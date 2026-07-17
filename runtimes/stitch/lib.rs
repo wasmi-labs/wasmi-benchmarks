@@ -52,7 +52,7 @@ impl Stitch {
                     | ExecuteTestId::WordCount
                     | ExecuteTestId::JsonParse
                     | ExecuteTestId::ReverseComplement
-                )
+                    | ExecuteTestId::RegexRedux)
             }
         }
     }
