@@ -337,7 +337,7 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 [[package]]
 name = "checked"
 version = "0.2.0"
-source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+source = "git+https://github.com/DLR-FT/wasm-interpreter?rev=a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2#a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2"
 dependencies = [
  "linker",
  "wasm-interpreter",
@@ -1931,7 +1931,7 @@ checksum = "0c6639b70a7ce854b79c70d7e83f16b5dc0137cc914f3d7d03803b513ecc67ac"
 [[package]]
 name = "linker"
 version = "0.2.0"
-source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+source = "git+https://github.com/DLR-FT/wasm-interpreter?rev=a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2#a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2"
 dependencies = [
  "wasm-interpreter",
 ]
@@ -1972,7 +1972,7 @@ checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 [[package]]
 name = "log_wrapper"
 version = "0.1.0"
-source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+source = "git+https://github.com/DLR-FT/wasm-interpreter?rev=a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2#a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2"
 
 [[package]]
 name = "mach2"
@@ -3860,7 +3860,7 @@ dependencies = [
 [[package]]
 name = "wasm-interpreter"
 version = "0.2.0"
-source = "git+https://github.com/Robbepop/wasm-interpreter.git?branch=relax-libm-pin#3cb18a881f37d3b9f07999770be8e297edae3956"
+source = "git+https://github.com/DLR-FT/wasm-interpreter?rev=a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2#a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2"
 dependencies = [
  "libm",
  "log_wrapper",

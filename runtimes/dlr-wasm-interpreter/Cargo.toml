@@ -18,5 +18,5 @@ anyhow = { workspace = true }
 #
 # `wasm` is the interpreter itself (package `wasm-interpreter`); `checked` is its safe, store-id
 # tagged wrapper API. The `linker` feature enables name-based import resolution.
-wasm = { package = "wasm-interpreter", git = "https://github.com/Robbepop/wasm-interpreter.git", branch = "relax-libm-pin" }
-checked = { git = "https://github.com/Robbepop/wasm-interpreter.git", branch = "relax-libm-pin", features = ["linker"] }
+wasm = { package = "wasm-interpreter", git = "https://github.com/DLR-FT/wasm-interpreter", rev = "a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2" }
+checked = { git = "https://github.com/DLR-FT/wasm-interpreter", rev = "a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2", features = ["linker"] }
