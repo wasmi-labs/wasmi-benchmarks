@@ -107,11 +107,12 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `argon2` | Password hashing library. Compute- and memory intense workload. |
 | `tiny_keccak`| Tiny Rust implementation of Keccak crptography hashing. |
 | `mandelbrot` | Classic Rust mandelbrot implementation. |
-| `spectralnorm` | Compute intense benchmarks involving floats. |
+| `spectralnorm` | Computes the eigenvalue using the power method. |
 | `compression`| Compresses some input using the `miniz_oxide` crate. |
 | `word_count` | Count unqiue words in a string input via hash table inserts and look-ups. |
 | `json_parse` | Parses a JSON file using `serde_json`. |
-| `primes` | Calculates all primes until some number. |
+| `reverse_complement` | Converts a DNA sequence into its reverse, complement. |
+| `regex_redux` | Match DNA 8-mers and substitute magic patterns. |
 | `bulk-ops` | Tests performance of `memory.{copy,fill}` from the Wasm [`bulk-memory-operations`] proposal. |
 
 ### Startup Benchmarks
