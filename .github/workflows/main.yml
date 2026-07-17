@@ -33,7 +33,7 @@ jobs:
           - name: Install Dependencies
             uses: ./.github/actions/install-dependencies
           - name: Check Build
-            run: cargo build --workspace ${{ matrix.features }}
+            run: cargo build --benches ${{ matrix.features }}
 
     bench-startup:
         name: Run Startup Benchmarks
