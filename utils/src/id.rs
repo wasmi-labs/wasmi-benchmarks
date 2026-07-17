@@ -75,6 +75,7 @@ pub enum ExecuteTestId {
     Compression,
     WordCount,
     JsonParse,
+    ReverseComplement,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -100,6 +101,7 @@ impl fmt::Display for ExecuteTestId {
             Self::Compression => "compression",
             Self::WordCount => "word_count",
             Self::JsonParse => "json_parse",
+            Self::ReverseComplement => "reverse_complement",
         };
         f.write_str(s)
     }

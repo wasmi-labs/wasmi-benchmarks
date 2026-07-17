@@ -51,6 +51,7 @@ impl Stitch {
                     | ExecuteTestId::Compression
                     | ExecuteTestId::WordCount
                     | ExecuteTestId::JsonParse
+                    | ExecuteTestId::ReverseComplement
                 )
             }
         }
