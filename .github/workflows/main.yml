@@ -32,9 +32,7 @@ jobs:
             uses: Swatinem/rust-cache@v2
           - name: Install Dependencies
             uses: ./.github/actions/install-dependencies
-          - name: Build (default features)
-            run: cargo build --workspace
-          - name: Build (all features)
+          - name: Check Build
             run: cargo build --workspace ${{ matrix.features }}
 
     bench-startup:
