@@ -6,26 +6,14 @@ use benchmark_utils::{ExecuteTestId, HostFunc, ModuleInstance, Runtime, RuntimeI
 use checked::{Linker, Store, Stored, StoredExternVal, StoredRunState, StoredValue};
 use wasm::{F32, F64, FuncType, ModuleAddr, NumType, ResultType, ValType, decode_and_validate};
 
-/// The DLR-FT [`wasm-interpreter`], an in-place Wasm interpreter aimed at spacecraft use — a peer to
-/// the [`Toywasm`](rt_toywasm) and [`SpaceWasm`](rt_spacewasm) adapters.
-///
-/// [`wasm-interpreter`]: https://github.com/DLR-FT/wasm-interpreter
 pub struct DlrWasmInterpreter;
 
-/// A concrete DLR runtime with its recorded host functions, produced by [`DlrWasmInterpreter::setup`].
-///
-/// The interpreter allocates host functions inside a [`Store`], so rather than holding a live store
-/// the recorded host functions are replayed into a fresh store on every instantiation.
 struct DlrInstance {
+    /// Note: the interpreter allocates host functions inside a [`Store`], so rather than holding a live store
+    ///       the recorded host functions are replayed into a fresh store on every instantiation.
     linker: utils::Linker,
 }
 
-/// An instantiated DLR module, produced by [`DlrInstance::instantiate`].
-///
-/// The DLR interpreter runs *in-place*: its [`Store`] keeps references into the module bytecode for
-/// the store's entire lifetime. Since [`RuntimeInstance::instantiate`] returns a `'static`
-/// [`ModuleInstance`], this wrapper owns the bytecode in `bytes` and hands the interpreter a
-/// `'static` view of it (see [`DlrInstance::instantiate`]).
 struct DlrModule {
     /// The interpreter store. Its `'static` lifetime is fabricated: it actually borrows into
     /// `bytes`. Declared **first** so it is dropped before `bytes` (fields drop in declaration
@@ -62,11 +50,6 @@ impl Runtime for DlrWasmInterpreter {
 }
 
 impl DlrWasmInterpreter {
-    /// Returns whether this runtime can run the test identified by `id`.
-    ///
-    /// The interpreter targets WebAssembly 2.0, which does not include the tail-call proposal, so
-    /// the `return_call`-based `fibonacci-tail` case is rejected at validation. Every other
-    /// benchmark (all execute cases and all WASI startup modules) runs.
     fn can_run(id: TestId) -> bool {
         !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
     }
@@ -78,14 +61,14 @@ impl RuntimeInstance for DlrInstance {
     }
 
     fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        // The DLR interpreter runs in-place, so its `Store` keeps references into the bytecode for
-        // its whole life. We own the bytecode in a `Box<[u8]>` and hand the interpreter a `'static`
-        // view of it; `DlrModule` keeps the box alive and drops the store before it (field order).
+        // Note: the DLR interpreter runs in-place, so its `Store` keeps references into the bytecode for
+        //       its whole life. We own the bytecode in a `Box<[u8]>` and hand the interpreter a `'static`
+        //       view of it; `DlrModule` keeps the box alive and drops the store before it (field order).
         let bytes: Box<[u8]> = Box::from(wasm);
         // SAFETY: `bytes` is moved into the returned `DlrModule` and is never mutated or moved out
-        // of while `store` (which borrows it) is alive. `store` is declared before `bytes` in
-        // `DlrModule`, so it is dropped first. Moving the box into the struct keeps the heap data at
-        // a stable address, so the references handed to the interpreter stay valid.
+        //         of while `store` (which borrows it) is alive. `store` is declared before `bytes` in
+        //         `DlrModule`, so it is dropped first. Moving the box into the struct keeps the heap data at
+        //         a stable address, so the references handed to the interpreter stay valid.
         let bytes_static: &'static [u8] =
             unsafe { core::slice::from_raw_parts(bytes.as_ptr(), bytes.len()) };
 
@@ -95,12 +78,12 @@ impl RuntimeInstance for DlrInstance {
         let mut store = Store::new(());
         let mut linker = Linker::new();
 
-        // Allocate one host function per recorded import, using its index as the `hostcode`, and
-        // bind it into the linker by name. The index lets us dispatch back to the right stub when
-        // the interpreter returns control on a host call (see `DlrModule::call`).
+        // Note: allocate one host function per recorded import, using its index as the `hostcode`, and
+        //       bind it into the linker by name. The index lets us dispatch back to the right stub when
+        //       the interpreter returns control on a host call.
         let mut stubs: Vec<(HostFunc, utils::FuncType)> = Vec::new();
         for (i, (module_name, name, ty, func)) in self.linker.funcs().enumerate() {
-            let func_addr = store.func_alloc(to_func_type(ty), i);
+            let func_addr = store.func_alloc(from_utils_func_type(ty), i);
             linker
                 .define(
                     module_name.to_string(),
@@ -196,10 +179,10 @@ impl ModuleInstance for DlrModule {
                     resumable,
                     required_fuel,
                 } => {
-                    // `Resumable` is overloaded: `finish_host_call` returns it (with
-                    // `required_fuel == None`) to hand control back so execution continues after a
-                    // serviced host call. A `Some` value means genuine fuel exhaustion, which cannot
-                    // happen here because we always invoke unfueled (`None`).
+                    // Note: `Resumable` is overloaded: `finish_host_call` returns it (with
+                    //       `required_fuel == None`) to hand control back so execution continues after a
+                    //       serviced host call. A `Some` value means genuine fuel exhaustion, which cannot
+                    //       happen here because we always invoke unfueled (`None`).
                     if required_fuel.is_some() {
                         bail!("dlr-wasm-interpreter: `{name}` ran out of fuel unexpectedly");
                     }
@@ -218,9 +201,9 @@ impl ModuleInstance for DlrModule {
             .map_err(|err| anyhow!("dlr-wasm-interpreter: no memory export `{name}`: {err:?}"))?
             .as_mem()
             .ok_or_else(|| anyhow!("dlr-wasm-interpreter: export `{name}` is not a memory"))?;
-        // `read_memory` is `&self`, and the DLR API exposes only a per-byte immutable read
-        // (`mem_read`) — there is no immutable bulk accessor. This path is only exercised by the
-        // `compression` execute test, outside the timed loop.
+        // Note: `read_memory` is `&self`, and the DLR API exposes only a per-byte immutable read
+        //       (`mem_read`) — there is no immutable bulk accessor. This path is only exercised by the
+        //       `compression` execute test, outside the timed loop.
         for (offset, dst) in buffer.iter_mut().enumerate() {
             let addr = ptr + offset as u32;
             *dst = self.store.mem_read(memory, addr).map_err(|err| {
@@ -248,20 +231,29 @@ impl ModuleInstance for DlrModule {
     }
 }
 
-/// Converts a runtime-neutral [`utils::FuncType`] into the interpreter's [`FuncType`].
-fn to_func_type(ty: &utils::FuncType) -> FuncType {
+fn from_utils_func_type(ty: &utils::FuncType) -> FuncType {
     FuncType {
         params: ResultType {
-            valtypes: ty.params().iter().copied().map(to_val_type).collect(),
+            valtypes: ty
+                .params()
+                .iter()
+                .copied()
+                .map(from_utils_val_type)
+                .collect(),
         },
         returns: ResultType {
-            valtypes: ty.results().iter().copied().map(to_val_type).collect(),
+            valtypes: ty
+                .results()
+                .iter()
+                .copied()
+                .map(from_utils_val_type)
+                .collect(),
         },
     }
 }
 
 /// Converts a runtime-neutral [`utils::ValType`] into the interpreter's [`ValType`].
-fn to_val_type(ty: utils::ValType) -> ValType {
+fn from_utils_val_type(ty: utils::ValType) -> ValType {
     ValType::NumType(match ty {
         utils::ValType::I32 => NumType::I32,
         utils::ValType::I64 => NumType::I64,
