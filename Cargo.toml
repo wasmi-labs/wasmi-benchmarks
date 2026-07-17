@@ -141,7 +141,6 @@ windows = [
     "wasmi-v0-32",
     "wasmi-v1",
     "wasmtime-pulley",
-    "wasmedge",
     "wasmtime-cranelift",
     "wasmtime-winch",
     "wasmer-cranelift",
