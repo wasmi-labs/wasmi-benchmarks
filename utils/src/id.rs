@@ -73,6 +73,7 @@ pub enum ExecuteTestId {
     Mandelbrot,
     Spectralnorm,
     Compression,
+    WordCount,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -96,6 +97,7 @@ impl fmt::Display for ExecuteTestId {
             Self::Mandelbrot => "mandelbrot",
             Self::Spectralnorm => "spectralnorm",
             Self::Compression => "compression",
+            Self::WordCount => "word_count",
         };
         f.write_str(s)
     }

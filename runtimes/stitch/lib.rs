@@ -48,7 +48,9 @@ impl Stitch {
                     | ExecuteTestId::TinyKeccak
                     | ExecuteTestId::Mandelbrot
                     | ExecuteTestId::Spectralnorm
-                    | ExecuteTestId::Compression)
+                    | ExecuteTestId::Compression
+                    | ExecuteTestId::WordCount
+                )
             }
         }
     }
