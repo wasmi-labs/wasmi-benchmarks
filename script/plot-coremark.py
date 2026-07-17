@@ -28,7 +28,7 @@ def plot_coremark(csv_path: str, out_path: str):
 
         for row in reader:
             runtimes.append(row["runtime"])
-            scores.append(float(row["score"]))
+            scores.append(int(row["score"]))
 
     plt.figure(figsize=(10, 5))
 
@@ -36,14 +36,16 @@ def plot_coremark(csv_path: str, out_path: str):
     # plt.bar(runtimes, scores, color=colors[:len(runtimes)])
     plt.bar(runtimes, scores)
 
-    plt.title("Coremark - Apple M2 Pro - rustc 1.91.1 (ed61e7d7e 2025-11-07)")
-    plt.xlabel("Wasmi Version")
+    plt.title("Coremark - Apple M2 Pro - rustc 1.97.0 (2d8144b78 2026-07-07)")
+    plt.xlabel("Wasm Runtimes")
     plt.ylabel("Score (higher is better)")
-    plt.ylim(bottom=0)
+    # plt.ylim(bottom=0)
+    plt.ylim(0, max(scores) * 1.1)
 
     for idx, val in enumerate(scores):
         plt.text(idx, val, str(val), ha="center", va="bottom")
 
+    plt.xticks(rotation=45, ha="right")
     plt.tight_layout()
     plt.savefig(out_path)
 
