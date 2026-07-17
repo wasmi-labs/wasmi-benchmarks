@@ -4,7 +4,7 @@ use anyhow::bail;
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasmi::CompilationMode;
-use wasmi::{Func, Val};
+use wasmi::{Func, Val, ValType};
 
 pub struct Wasmi {
     pub compilation_mode: CompilationMode,
@@ -81,8 +81,8 @@ impl RuntimeInstance for WasmiInstance {
     ) {
         let result_tys: Vec<utils::ValType> = ty.results().to_vec();
         let ty = wasmi::FuncType::new(
-            ty.params().iter().copied().map(to_wasmi_valtype),
-            ty.results().iter().copied().map(to_wasmi_valtype),
+            ty.params().iter().copied().map(from_utils_valtype),
+            ty.results().iter().copied().map(from_utils_valtype),
         );
         self.linker
             .func_new(
@@ -201,12 +201,12 @@ impl WasmiModule {
     }
 }
 
-fn to_wasmi_valtype(ty: utils::ValType) -> wasmi::ValType {
+fn from_utils_valtype(ty: utils::ValType) -> ValType {
     match ty {
-        utils::ValType::I32 => wasmi::ValType::I32,
-        utils::ValType::I64 => wasmi::ValType::I64,
-        utils::ValType::F32 => wasmi::ValType::F32,
-        utils::ValType::F64 => wasmi::ValType::F64,
+        utils::ValType::I32 => ValType::I32,
+        utils::ValType::I64 => ValType::I64,
+        utils::ValType::F32 => ValType::F32,
+        utils::ValType::F64 => ValType::F64,
     }
 }
 
