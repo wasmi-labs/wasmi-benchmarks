@@ -33,8 +33,6 @@ criterion_group!(
         bench_json_parse,
         bench_reverse_complement,
         bench_regex_redux,
-
-        bench_primes,
         bench_bulk_ops,
 );
 
@@ -117,10 +115,6 @@ fn bench_fibonacci_tail(c: &mut Criterion) {
         1_000_000,
         InputEncoding::Wat,
     )
-}
-
-fn bench_primes(c: &mut Criterion) {
-    execute_benchmark::<i64>(c, ExecuteTestId::Primes, 1_000, InputEncoding::Wat)
 }
 
 fn bench_bulk_ops(c: &mut Criterion) {
