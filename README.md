@@ -52,9 +52,6 @@ The following Wasm runtimes and configurations are included.
 - `lazy`: Function bodies are only compiled and validated upon first use.
 - `lazy.unchecked`: Function bodies are only compiled upon first use and Wasm validation is skipped.
 - `lazy-translation`: Function bodies are lazily compiled but eagerly validated.
-- `cranelift`: The runtime uses the Cranelift code generator.
-- `wasmtime.winch`: Wasmtime's JIT optimized for fast start-up times.
-- `wasmer.singlepass`: Wasmer's JIT optimized for fast start-up times.
 
 **Note:** by default runtimes compile and validate function bodies eagerly.
 
