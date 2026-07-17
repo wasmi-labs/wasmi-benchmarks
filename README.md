@@ -150,6 +150,11 @@ This will run Coremark using all available Wasm VMs and print their Coremark sco
   <a href="./data/amd-epyc-7763/coremark.csv">
     <img src="res/images/coremark-amd-epyc-7763.png" alt="CoreMark - AMD EPYC 7763" width="48%">
   </a>
+  <a href="./data/intel-xeon-platinum-8370C/coremark.csv">
+    <img src="res/images/coremark-intel-xeon-platinum-8370C.png"
+          alt="CoreMark - intel-xeon-platinum-8370C"
+          width="48%">
+  </a>
 </p>
 
 ## Plotting
