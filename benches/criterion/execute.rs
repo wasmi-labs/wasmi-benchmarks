@@ -30,6 +30,7 @@ criterion_group!(
         bench_spectralnorm,
         bench_compression,
         bench_word_count,
+        bench_json_parse,
 
         bench_primes,
         bench_bulk_ops,
@@ -358,6 +359,36 @@ fn bench_word_count(c: &mut Criterion) {
             let len_special_chars = instance.call_typed::<i32, i64>("len_special_chars", data).unwrap();
             assert_eq!(len_unique_words, 2213);
             assert_eq!(len_special_chars, 6314);
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_json_parse(c: &mut Criterion) {
+    let id = ExecuteTestId::JsonParse;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    let uncompressed_input = fs::read_to_string("res/rust/res/citm_catalog.json").unwrap();
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len_input = uncompressed_input.len() as i32;
+        let bench_id = format!("{}/{}", vm.id(), len_input);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", len_input).unwrap();
+            let input_ptr = instance.call_typed::<i32, i32>("input_ptr", data).unwrap();
+            instance
+                .write_memory("memory", input_ptr as u32, uncompressed_input.as_bytes())
+                .unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            let node_count = instance
+                .call_typed::<i32, i64>("node_count", data)
+                .unwrap();
+            assert_eq!(node_count, 37_778);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }

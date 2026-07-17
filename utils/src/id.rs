@@ -74,6 +74,7 @@ pub enum ExecuteTestId {
     Spectralnorm,
     Compression,
     WordCount,
+    JsonParse,
 }
 
 impl fmt::Display for ExecuteTestId {
@@ -98,6 +99,7 @@ impl fmt::Display for ExecuteTestId {
             Self::Spectralnorm => "spectralnorm",
             Self::Compression => "compression",
             Self::WordCount => "word_count",
+            Self::JsonParse => "json_parse",
         };
         f.write_str(s)
     }

@@ -50,6 +50,7 @@ impl Stitch {
                     | ExecuteTestId::Spectralnorm
                     | ExecuteTestId::Compression
                     | ExecuteTestId::WordCount
+                    | ExecuteTestId::JsonParse
                 )
             }
         }
