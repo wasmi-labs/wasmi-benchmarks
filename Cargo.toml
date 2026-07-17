@@ -135,7 +135,6 @@ windows = [
     "wasmi-v2",
     "wasm3",
     "stitch",
-    "wamr",
     "tinywasm",
     "spacewasm",
     "wasmi-v0-31",
