@@ -1149,6 +1149,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
 
 [[package]]
+name = "fizzyx"
+version = "0.1.0"
+source = "git+https://github.com/wasmi-labs/fizzyx?rev=1ecfc6fa279d4c373436ef6c4f15df3a61ea307f#1ecfc6fa279d4c373436ef6c4f15df3a61ea307f"
+dependencies = [
+ "fizzyx-sys",
+]
+
+[[package]]
+name = "fizzyx-sys"
+version = "0.1.0"
+source = "git+https://github.com/wasmi-labs/fizzyx?rev=1ecfc6fa279d4c373436ef6c4f15df3a61ea307f#1ecfc6fa279d4c373436ef6c4f15df3a61ea307f"
+dependencies = [
+ "bindgen 0.72.1",
+ "cmake",
+]
+
+[[package]]
 name = "flate2"
 version = "1.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2697,6 +2714,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-fizzy"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "fizzyx",
+]
+
+[[package]]
 name = "rt-spacewasm"
 version = "0.0.0"
 dependencies = [
@@ -4112,6 +4138,7 @@ dependencies = [
  "benchmark-utils",
  "criterion",
  "plotters",
+ "rt-fizzy",
  "rt-spacewasm",
  "rt-stitch",
  "rt-tinywasm",

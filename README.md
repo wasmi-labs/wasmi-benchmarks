@@ -21,8 +21,9 @@ The following Wasm runtimes and configurations are included.
 | [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter with low memory usage. |
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 | [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
+| [`fizzy`][Fizzy] | Interpreter | | A fast, deterministic, and pedantic WebAssembly interpreter. |
 
-**Missing Wasm runtimes:** [Fizzy], [Wain], [DLR-wasm-interpreter]
+**Missing Wasm runtimes:** [Wain], [DLR-wasm-interpreter]
 
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9

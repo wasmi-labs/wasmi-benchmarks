@@ -1,0 +1,12 @@
+[package]
+name = "rt-fizzy"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+fizzy = { package = "fizzyx", git = "https://github.com/wasmi-labs/fizzyx", rev = "1ecfc6fa279d4c373436ef6c4f15df3a61ea307f" }
