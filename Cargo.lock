@@ -1151,7 +1151,8 @@ checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
 [[package]]
 name = "fizzyx"
 version = "0.1.0"
-source = "git+https://github.com/wasmi-labs/fizzyx?rev=1ecfc6fa279d4c373436ef6c4f15df3a61ea307f#1ecfc6fa279d4c373436ef6c4f15df3a61ea307f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aed4ace76d9bec7bbcce7f38e5f38c30e385453db9fdd4a8ac0d2321deba7e1e"
 dependencies = [
  "fizzyx-sys",
 ]
@@ -1159,7 +1160,8 @@ dependencies = [
 [[package]]
 name = "fizzyx-sys"
 version = "0.1.0"
-source = "git+https://github.com/wasmi-labs/fizzyx?rev=1ecfc6fa279d4c373436ef6c4f15df3a61ea307f#1ecfc6fa279d4c373436ef6c4f15df3a61ea307f"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b765c5977ba34e1617c3f2ceade9b2975ea59ffe15479b9dce694c05188a69db"
 dependencies = [
  "bindgen 0.72.1",
  "cmake",
