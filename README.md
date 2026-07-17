@@ -11,12 +11,15 @@ The following Wasm runtimes and configurations are included.
 | [`wasmi-v0.31`][Wasmi v0.31] | Interpreter | | The old version of the Wasmi Wasm stack-machine interpreter. |
 | [`wasmi-v1`][Wasmi v1] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The Wasmi v1 interpreter.  |
 | [`wasmi-v2`][Wasmi v2] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
-| [`wasmtime`][Wasmtime] | JIT, Interpreter | `cranelift`, `winch`, `pulley` | Well established Wasm JIT runtime with cutting edge Wasm features. |
-| [`wasmer`][Wasmer] | JIT | `cranelift`, `singlepass` | Universal Wasm JIT runtime with many bindings to other language ecosystems. |
-| [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
+| [`wasmtime.cranelift`][Wasmtime] | Optimizing JIT | | Wasmtime's optimizing JIT backend for the fastest performance. |
+| [`wasmtime.winch`][Wasmtime] | Baseline JIT | | Wasmtime's baseline JIT for faster startup performance. |
+| [`wasmtime.pulley`][Wasmtime] | Interpreter | | Wasmtime's portable interpreter backend. |
+| [`wasmer.cranelift`][Wasmer] | Optimizing JIT | | Wasmer's optimizing JIT backend based on Cranelift. |
+| [`wasmer.singlepass`][Wasmer] | Baseline JIT | | Wasmer's baseline JIT for faster startup performance. |
 | [`v8`][V8] | Multi-Tier JIT | | Google's high performance JS runtime. |
 | [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A fast and well-established Wasm interpreter. |
 | [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
+| [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
 | [`tinywasm`][Tinywasm] | Interpreter | | Small Wasm interpreter written in pure stable Rust. |
 | [`toywasm`][Toywasm] | Interpreter | | Feature-rich in-place WebAssembly interpreter with low memory usage. |
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
