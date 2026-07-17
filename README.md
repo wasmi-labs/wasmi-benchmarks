@@ -144,6 +144,8 @@ cargo run --profile bench
 This will run Coremark using all available Wasm VMs and print their 
 Coremark scores to the console. Higher scores are better.
 
+[![CoreMark](res/images/coremark-interpreters.png)](./data/coremark.csv)
+
 ## Plotting
 
 In order to run the benchmarks and simultaneously plot diagrams of their results use the following command:
