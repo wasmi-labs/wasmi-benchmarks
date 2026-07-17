@@ -3,7 +3,8 @@ description: 'Installs necessary dependencies like fontconfig and ninja.'
 runs:
   using: 'composite' # Allows for multiple `steps`
   steps:
-    - name: Install Dependencies
+    - name: Install Dependencies (Linux)
+      if: runner.os == 'Linux'
       # - libfontconfig1-dev: required for plotters
       # - ninja-build: required for Wasmer's WAMR backend
       # - cmake: required to build the WAMR runtime (rt-wamr) from source
@@ -12,3 +13,15 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libfontconfig1-dev ninja-build cmake clang libclang-dev
+    - name: Install Dependencies (macOS)
+      if: runner.os == 'macOS'
+      # ninja: required for Wasmer's WAMR backend; cmake: required to build rt-wamr.
+      # clang/libclang ship with the Xcode command-line tools.
+      shell: bash
+      run: brew install ninja cmake
+    - name: Install Dependencies (Windows)
+      if: runner.os == 'Windows'
+      # ninja: required for Wasmer's WAMR backend.
+      # cmake and LLVM (libclang for bindgen) are preinstalled on the runner.
+      shell: bash
+      run: choco install ninja

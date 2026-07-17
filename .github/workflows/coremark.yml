@@ -1,0 +1,45 @@
+name: CoreMark on CI
+
+on:
+  workflow_dispatch:
+
+# Disable running jobs on earlier commits.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coremark:
+    name: Run CoreMark (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            features: "--all-features"
+          - os: macos-latest
+            features: "--all-features"
+          - os: windows-latest
+            features: "--all-features"
+    steps:
+      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Set up Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: System Information (Linux)
+        if: runner.os == 'Linux'
+        run: lscpu
+      - name: System Information (macOS)
+        if: runner.os == 'macOS'
+        run: sysctl -a machdep.cpu
+      - name: System Information (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors
+      - name: Build CoreMark Benchmark
+        run: cargo build --bin coremark --profile bench ${{ matrix.features }}
+      - name: Run CoreMark Benchmark
+        run: cargo run --bin coremark --profile bench ${{ matrix.features }}
