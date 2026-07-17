@@ -356,8 +356,12 @@ fn bench_word_count(c: &mut Criterion) {
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            let len_unique_words = instance.call_typed::<i32, i64>("len_unique_words", data).unwrap();
-            let len_special_chars = instance.call_typed::<i32, i64>("len_special_chars", data).unwrap();
+            let len_unique_words = instance
+                .call_typed::<i32, i64>("len_unique_words", data)
+                .unwrap();
+            let len_special_chars = instance
+                .call_typed::<i32, i64>("len_special_chars", data)
+                .unwrap();
             assert_eq!(len_unique_words, 2213);
             assert_eq!(len_special_chars, 6314);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
@@ -386,9 +390,7 @@ fn bench_json_parse(c: &mut Criterion) {
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            let node_count = instance
-                .call_typed::<i32, i64>("node_count", data)
-                .unwrap();
+            let node_count = instance.call_typed::<i32, i64>("node_count", data).unwrap();
             assert_eq!(node_count, 37_778);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
@@ -418,10 +420,10 @@ fn bench_reverse_complement(c: &mut Criterion) {
             b.iter(|| {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
-            let output_ptr = instance
-                .call_typed::<i32, i32>("output_ptr", data)
+            let output_ptr = instance.call_typed::<i32, i32>("output_ptr", data).unwrap();
+            instance
+                .read_memory("memory", output_ptr as u32, &mut output_buffer[..])
                 .unwrap();
-            instance.read_memory("memory", output_ptr as u32, &mut output_buffer[..]).unwrap();
             assert_eq!(&output_buffer[..], output_text.as_bytes());
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
