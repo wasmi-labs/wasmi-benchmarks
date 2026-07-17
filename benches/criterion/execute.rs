@@ -28,7 +28,7 @@ criterion_group!(
         bench_tiny_keccak,
         bench_mandelbrot,
         bench_spectralnorm,
-        bench_execute_compression,
+        bench_compression,
 
         bench_primes,
         bench_bulk_ops,
@@ -302,7 +302,7 @@ fn bench_spectralnorm(c: &mut Criterion) {
     }
 }
 
-fn bench_execute_compression(c: &mut Criterion) {
+fn bench_compression(c: &mut Criterion) {
     let id = ExecuteTestId::Compression;
     let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
     let mut g = c.benchmark_group(format!("execute/{id}"));
