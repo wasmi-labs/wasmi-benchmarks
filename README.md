@@ -7,17 +7,17 @@ This includes execution and compilation benchmarks for the Wasmi interpreter and
 The following Wasm runtimes and configurations are included.
 
 | Runtime | Kind | Configurations | Description |
-|:-------:|:---------------|:-----|:---|
+|:-------:|:--------------:|:-----|:---|
 | [`wasmi-v0.31`][Wasmi v0.31] | Interpreter | | The old version of the Wasmi Wasm stack-machine interpreter. |
-| [`wasmi-v1`][Wasmi v1] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The Wasmi v1 interpreter.  |
-| [`wasmi-v2`][Wasmi v2] | Interpreter | `eager`, `eager.unchecked`, `lazy`, `lazy.unchecked`, `lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
+| [`wasmi-v1`][Wasmi v1] | Interpreter | `eager`<br>`eager.unchecked`<br>`lazy`<br>`lazy.unchecked`<br>`lazy-translation` | The Wasmi v1 interpreter.  |
+| [`wasmi-v2`][Wasmi v2] | Interpreter | `eager`<br>`eager.unchecked`<br>`lazy`<br>`lazy.unchecked`<br>`lazy-translation` | The new and experimental Wasmi v2 interpreter with its various optimizations. |
 | [`wasmtime.cranelift`][Wasmtime] | Optimizing JIT | | Wasmtime's optimizing JIT backend for the fastest performance. |
 | [`wasmtime.winch`][Wasmtime] | Baseline JIT | | Wasmtime's baseline JIT for faster startup performance. |
 | [`wasmtime.pulley`][Wasmtime] | Interpreter | | Wasmtime's portable interpreter backend. |
 | [`wasmer.cranelift`][Wasmer] | Optimizing JIT | | Wasmer's optimizing JIT backend based on Cranelift. |
 | [`wasmer.singlepass`][Wasmer] | Baseline JIT | | Wasmer's baseline JIT for faster startup performance. |
 | [`v8`][V8] | Multi-Tier JIT | | Google's high performance JS runtime. |
-| [`wasm3`][Wasm3] | Interpreter | `eager`, `lazy` | A fast and well-established Wasm interpreter. |
+| [`wasm3`][Wasm3] | Interpreter | `eager`<br>`lazy` | A fast and well-established Wasm interpreter. |
 | [`stitch`][Stitch] | Interpreter | | Experimental and very fast zero-dependencies Wasm interpreter. |
 | [`wamr`][WAMR] | Interpreter | | The WebAssembly Micro Runtime (WAMR) fast interpreter. |
 | [`tinywasm`][Tinywasm] | Interpreter | | Small Wasm interpreter written in pure stable Rust. |
