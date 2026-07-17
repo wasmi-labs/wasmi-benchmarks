@@ -11,7 +11,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::ops::ControlFlow;
 use std::sync::{Mutex, OnceLock};
 
-use benchmark_utils::{self as utils, StartupTestId};
+use benchmark_utils::{self as utils};
 use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 
 use std::alloc::Layout;
@@ -109,16 +109,12 @@ impl SpaceWasm {
         //   - `fibonacci-tail` uses the tail-call proposal (`return_call`).
         //   - `counter-param` uses multi-value block signatures (`loop (param i32) (result i32)`).
         //   - `bulk-ops` uses the bulk-memory opcodes (`0xFC` prefix).
-        //   - `argon2` and the WASI-heavy modules (bz2/pulldown-cmark/spidermonkey/ffmpeg) are
-        //     produced by modern toolchains and use post-MVP features (sign-extension, bulk memory,
-        //     non-trapping conversions, ...).
-        match id {
-            TestId::Execute(id) => !matches!(
-                id,
+        !matches!(
+            id,
+            TestId::Execute(
                 ExecuteTestId::FibonacciTail | ExecuteTestId::CounterParam | ExecuteTestId::BulkOps
-            ),
-            TestId::Startup(id) => !matches!(id, StartupTestId::Argon2,),
-        }
+            )
+        )
     }
 }
 
