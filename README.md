@@ -144,8 +144,14 @@ cargo run --profile bench
 This will run Coremark using all available Wasm VMs and print their 
 Coremark scores to the console. Higher scores are better.
 
-[![CoreMark - Apple M2 Pro](res/images/coremark-apple-m2-pro.png)](./data/apple-m2-pro/coremark.csv)
-[![CoreMark - AMD EPYC 7763](res/images/coremark-amd-epyc-7763.png)](./data/amd-epyc-7763coremark.csv)
+<p align="center">
+  <a href="./data/apple-m2-pro/coremark.csv">
+    <img src="res/images/coremark-apple-m2-pro.png" alt="CoreMark - Apple M2 Pro" width="48%">
+  </a>
+  <a href="./data/amd-epyc-7763/coremark.csv">
+    <img src="res/images/coremark-amd-epyc-7763.png" alt="CoreMark - AMD EPYC 7763" width="48%">
+  </a>
+</p>
 
 ## Plotting
 
