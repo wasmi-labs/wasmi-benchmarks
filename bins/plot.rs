@@ -109,7 +109,7 @@ impl FromStr for VmAndConfig {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let vm_and_config = match input {
-            "dlr-wasm-interpreter" => Self::DlrWasmInterpreter, 
+            "dlr-wasm-interpreter" => Self::DlrWasmInterpreter,
             "fizzy" => Self::Fizzy,
             "spacewasm" => Self::SpaceWasm,
             "stitch" => Self::Stitch,
