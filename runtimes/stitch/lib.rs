@@ -40,19 +40,21 @@ impl Stitch {
         match id {
             TestId::Startup(id) => !matches!(id, StartupTestId::Ffmpeg),
             TestId::Execute(id) => {
-                !matches!(id, |ExecuteTestId::FibonacciTail| ExecuteTestId::Argon2
-                    | ExecuteTestId::Sort
-                    | ExecuteTestId::PrimeSieve
-                    | ExecuteTestId::MatrixMultiply
-                    | ExecuteTestId::Nbody
-                    | ExecuteTestId::TinyKeccak
-                    | ExecuteTestId::Mandelbrot
-                    | ExecuteTestId::Spectralnorm
-                    | ExecuteTestId::Compression
-                    | ExecuteTestId::WordCount
-                    | ExecuteTestId::JsonParse
-                    | ExecuteTestId::ReverseComplement
-                    | ExecuteTestId::RegexRedux)
+                !matches!(id,
+                    | ExecuteTestId::FibonacciTail
+                    // | ExecuteTestId::Argon2
+                    // | ExecuteTestId::Sort
+                    // | ExecuteTestId::PrimeSieve
+                    // | ExecuteTestId::MatrixMultiply
+                    // | ExecuteTestId::Nbody
+                    // | ExecuteTestId::Mandelbrot
+                    // | ExecuteTestId::Spectralnorm
+                    // | ExecuteTestId::Compression
+                    // | ExecuteTestId::WordCount
+                    // | ExecuteTestId::JsonParse
+                    // | ExecuteTestId::ReverseComplement
+                    // | ExecuteTestId::RegexRedux
+                )
             }
         }
     }
@@ -71,7 +73,7 @@ impl RuntimeInstance for StitchInstance {
 
     fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
         let mut store = Store::new(Engine::new());
-        let mut linker = Linker::new();
+        let mut linker = Linker::default();
         for (module, name, ty, func) in self.linker.funcs() {
             // Stitch only exposes the typed `Func::wrap` constructor (no untyped/dynamic host
             // function API), so `wrap_host_func` matches the runtime-neutral signature against the
