@@ -470,11 +470,20 @@ where
         // Anchor the label at the bar's end and offset it by a fixed pixel
         // amount so the gap between bar and label is identical for every bar,
         // regardless of the runtime's value, the axis range or the scaling.
+        //
+        // The font size is kept below the bar thickness (bars render ~20px tall:
+        // a 50px row minus the histogram's 15px margin on each side) so the label
+        // sits within the bar instead of overhanging it.
+        //
+        // `VPos::Center` centers on the font's x-height, but the labels are
+        // digits (cap-height, no descenders) whose optical center is a couple of
+        // pixels higher, so nudge the label down slightly to sit on the bar's
+        // vertical center.
         EmptyElement::at((value, SegmentValue::CenterOf(index)))
             + Text::new(
                 entry.label(min, time),
-                (10, 0),
-                TextStyle::from(("monospace", 30)).pos(Pos::new(HPos::Left, VPos::Center)),
+                (10, 2),
+                TextStyle::from(("monospace", 22)).pos(Pos::new(HPos::Left, VPos::Center)),
             )
     }))?;
 
