@@ -1,3 +1,7 @@
+use clap::Parser;
+use plotters::coord::Shift;
+use plotters::coord::ranged1d::{Ranged, SegmentedCoord, ValueFormatter};
+use plotters::coord::types::RangedCoordusize;
 use plotters::prelude::*;
 use plotters::style::colors::full_palette as color;
 use plotters::style::text_anchor::{HPos, Pos, VPos};
@@ -5,6 +9,25 @@ use std::collections::BTreeMap;
 use std::error::Error;
 use std::fmt::{self, Display};
 use std::str::FromStr;
+
+/// Scaling of the relative-time axis in the rendered plots.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, clap::ValueEnum)]
+enum Scale {
+    /// Logarithmic scaling.
+    Log,
+    /// Linear scaling.
+    Linear,
+}
+
+/// Renders Criterion benchmark results (read as JSON from stdin) into SVG plots.
+#[derive(Debug, Parser)]
+struct Args {
+    /// Optional external title appended to each plot's title.
+    title: Option<String>,
+    /// Scaling of the relative-time axis.
+    #[arg(long, value_enum, default_value_t = Scale::Log)]
+    scale: Scale,
+}
 
 /// VM under test and its configuration.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -152,7 +175,11 @@ impl BenchEntry {
     }
 }
 
-fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<(), Box<dyn Error>> {
+fn plot_for_data(
+    ext_title: Option<&str>,
+    scale: Scale,
+    bench_group: &BenchGroup,
+) -> Result<(), Box<dyn Error>> {
     let min = bench_group
         .results
         .iter()
@@ -191,22 +218,70 @@ fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<()
         &test_title,
         TextStyle::from(("monospace", 45)).pos(Pos::new(HPos::Center, VPos::Center)),
     )?;
-    let mut chart = ChartBuilder::on(&root)
+    let mut builder = ChartBuilder::on(&root);
+    builder
         .x_label_area_size(75)
         .y_label_area_size(400)
         .margin_right(200)
-        .margin_top(25)
-        .build_cartesian_2d(
-            (0.5_f64..max_diff * 1.05).log_scale(),
-            (0usize..data.len() - 1).into_segmented(),
-        )?;
+        .margin_top(25);
+    let y_axis = (0usize..data.len() - 1).into_segmented();
+
+    // Log and linear scaling produce different chart coordinate types, so the
+    // shared drawing logic lives in the generic `draw_chart` helper. Linear
+    // scaling also starts the axis (and the bar baseline) at `0.0` instead of
+    // `0.5`.
+    match scale {
+        Scale::Log => {
+            let mut chart =
+                builder.build_cartesian_2d((0.5_f64..max_diff * 1.05).log_scale(), y_axis)?;
+            draw_chart(
+                &root,
+                &mut chart,
+                &data,
+                min,
+                0.5,
+                "Relative Time (lower is better, logarithmic scale)",
+            )?;
+        }
+        Scale::Linear => {
+            let mut chart = builder.build_cartesian_2d(0.0_f64..max_diff * 1.05, y_axis)?;
+            draw_chart(
+                &root,
+                &mut chart,
+                &data,
+                min,
+                0.0,
+                "Relative Time (lower is better, linear scale)",
+            )?;
+        }
+    }
+    Ok(())
+}
+
+/// Draws the mesh, the bars and their value labels onto `chart`, then presents `root`.
+///
+/// This is generic over the X coordinate type so it can render both the
+/// logarithmic and the linear chart produced in [`plot_for_data`].
+fn draw_chart<DB, X>(
+    root: &DrawingArea<DB, Shift>,
+    chart: &mut ChartContext<'_, DB, Cartesian2d<X, SegmentedCoord<RangedCoordusize>>>,
+    data: &[BenchEntry],
+    min: f64,
+    baseline: f64,
+    x_desc: &str,
+) -> Result<(), Box<dyn Error>>
+where
+    DB: DrawingBackend,
+    DB::ErrorType: 'static,
+    X: Ranged<ValueType = f64> + ValueFormatter<f64>,
+{
     chart
         .configure_mesh()
         .disable_y_mesh()
         .x_max_light_lines(1)
         .bold_line_style(BLACK.mix(0.15))
         .y_desc("") // WebAssembly Runtime
-        .x_desc("Relative Time (lower is better, logarithmic scale)")
+        .x_desc(x_desc)
         .y_label_formatter(&|coord| {
             // We want to draw the Wasm runtime names instead of the numbers.
             match coord {
@@ -223,14 +298,14 @@ fn plot_for_data(ext_title: Option<&str>, bench_group: &BenchGroup) -> Result<()
         .draw()?;
 
     chart.draw_series(
-        Histogram::horizontal(&chart)
+        Histogram::horizontal(chart)
             .style_func(|x, _bar_height| match x {
                 SegmentValue::Exact(n) => data[*n].vm.color().filled(),
                 SegmentValue::CenterOf(_n) => unreachable!(),
                 SegmentValue::Last => unreachable!(),
             })
             .margin(15)
-            .baseline(0.5)
+            .baseline(baseline)
             .data(
                 data.iter()
                     .enumerate()
@@ -319,12 +394,9 @@ pub struct BenchResult {
     pub unit: String,
 }
 
-fn decode_stdin() -> Result<(), Box<dyn Error>> {
+fn decode_stdin(ext_title: Option<&str>, scale: Scale) -> Result<(), Box<dyn Error>> {
     use serde_json as json;
     use std::io::{self, BufRead};
-
-    let args: Vec<String> = std::env::args().collect();
-    let ext_title = args.get(1).cloned();
 
     // Create a buffer to read input
     let stdin = io::stdin();
@@ -397,7 +469,7 @@ fn decode_stdin() -> Result<(), Box<dyn Error>> {
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(ext_title.as_deref(), &bench_group)?;
+                    plot_for_data(ext_title, scale, &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
@@ -407,5 +479,6 @@ fn decode_stdin() -> Result<(), Box<dyn Error>> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    decode_stdin()
+    let args = Args::parse();
+    decode_stdin(args.title.as_deref(), args.scale)
 }
