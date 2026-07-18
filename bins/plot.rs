@@ -94,10 +94,8 @@ impl VmAndConfig {
         const TEAL: RGBColor = RGBColor(76, 161, 143);
         const ORANGE: RGBColor = RGBColor(227, 146, 63);
         match self {
-            | VmAndConfig::WasmiV2(_) => ORANGE,
-            | VmAndConfig::V8
-            | VmAndConfig::Wasmer(_)
-            | VmAndConfig::Wasmtime(_) => BLUE,
+            VmAndConfig::WasmiV2(_) => ORANGE,
+            VmAndConfig::V8 | VmAndConfig::Wasmer(_) | VmAndConfig::Wasmtime(_) => BLUE,
             _ => TEAL,
         }
     }
