@@ -19,6 +19,38 @@ enum Scale {
     Linear,
 }
 
+/// Excludes a kind of Wasm runtime from the rendered plots.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default, clap::ValueEnum)]
+enum Filter {
+    /// Include all Wasm runtimes.
+    #[default]
+    None,
+    /// Exclude all JIT-compiling Wasm runtimes.
+    Jit,
+    /// Exclude all interpreter-based Wasm runtimes.
+    Interpreter,
+}
+
+impl Filter {
+    /// Returns `true` if the given `vm` passes this filter.
+    fn keeps(self, vm: VmAndConfig) -> bool {
+        match self {
+            Filter::None => true,
+            Filter::Jit => vm.kind() != RuntimeKind::Jit,
+            Filter::Interpreter => vm.kind() != RuntimeKind::Interpreter,
+        }
+    }
+}
+
+/// The execution kind of a Wasm runtime.
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+enum RuntimeKind {
+    /// A JIT-compiling Wasm runtime.
+    Jit,
+    /// An interpreter-based Wasm runtime.
+    Interpreter,
+}
+
 /// Renders Criterion benchmark results (read as JSON from stdin) into SVG plots.
 #[derive(Debug, Parser)]
 struct Args {
@@ -27,6 +59,9 @@ struct Args {
     /// Scaling of the relative-time axis.
     #[arg(long, value_enum, default_value_t = Scale::Log)]
     scale: Scale,
+    /// Excludes a kind of Wasm runtime from the plots.
+    #[arg(long, value_enum, default_value_t = Filter::None)]
+    filter: Filter,
 }
 
 /// VM under test and its configuration.
@@ -111,16 +146,32 @@ impl VmAndConfig {
         }
     }
 
+    /// The color of JIT-compiling Wasm runtimes.
+    const BLUE: RGBColor = RGBColor(52, 119, 186);
+    /// The color of most interpreter-based Wasm runtimes.
+    const TEAL: RGBColor = RGBColor(76, 161, 143);
+    /// The color of the Wasmi v2 interpreter.
+    const ORANGE: RGBColor = RGBColor(227, 146, 63);
+
     /// Returns the color associated to the Wasm runtime kind.
     fn color(&self) -> RGBColor {
-        const BLUE: RGBColor = RGBColor(52, 119, 186);
-        const TEAL: RGBColor = RGBColor(76, 161, 143);
-        const ORANGE: RGBColor = RGBColor(227, 146, 63);
         match self {
-            VmAndConfig::WasmiV2(_) => ORANGE,
-            VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => TEAL,
-            VmAndConfig::V8 | VmAndConfig::Wasmer(_) | VmAndConfig::Wasmtime(_) => BLUE,
-            _ => TEAL,
+            VmAndConfig::WasmiV2(_) => Self::ORANGE,
+            VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => Self::TEAL,
+            VmAndConfig::V8 | VmAndConfig::Wasmer(_) | VmAndConfig::Wasmtime(_) => Self::BLUE,
+            _ => Self::TEAL,
+        }
+    }
+
+    /// Returns the execution kind of the Wasm runtime.
+    ///
+    /// Derived from [`Self::color`] so it stays consistent with the plotted
+    /// colors: JITs are blue, interpreters are teal or orange.
+    fn kind(&self) -> RuntimeKind {
+        if self.color() == Self::BLUE {
+            RuntimeKind::Jit
+        } else {
+            RuntimeKind::Interpreter
         }
     }
 }
@@ -178,26 +229,30 @@ impl BenchEntry {
 fn plot_for_data(
     ext_title: Option<&str>,
     scale: Scale,
+    filter: Filter,
     bench_group: &BenchGroup,
 ) -> Result<(), Box<dyn Error>> {
-    let min = bench_group
-        .results
-        .iter()
-        .map(|(_id, &BenchResult { estimate, unit: _ })| estimate)
-        .min_by(|a, b| a.total_cmp(b))
-        .unwrap_or(1.0);
-    let max = bench_group
-        .results
-        .iter()
-        .map(|(_id, &BenchResult { estimate, unit: _ })| estimate)
-        .max_by(|a, b| a.total_cmp(b))
-        .unwrap_or(1.0);
-    let max_diff = core::cmp::max_by(10.0, max / min, f64::total_cmp);
     let mut data: Vec<_> = bench_group
         .results
         .iter()
+        .filter(|&(&vm, _)| filter.keeps(vm))
         .map(|(&vm, &BenchResult { estimate, unit: _ })| BenchEntry { vm, time: estimate })
         .collect();
+    if data.is_empty() {
+        // No runtime of the selected kind ran in this group: nothing to plot.
+        return Ok(());
+    }
+    let min = data
+        .iter()
+        .map(|entry| entry.time)
+        .min_by(f64::total_cmp)
+        .unwrap_or(1.0);
+    let max = data
+        .iter()
+        .map(|entry| entry.time)
+        .max_by(f64::total_cmp)
+        .unwrap_or(1.0);
+    let max_diff = core::cmp::max_by(10.0, max / min, f64::total_cmp);
     data.sort_by_key(|lhs| lhs.time as u64);
     data.reverse();
 
@@ -211,7 +266,7 @@ fn plot_for_data(
     let path = format!("target/wasmi-benchmarks/{category}/{name}.svg");
     let _ = std::fs::create_dir_all(&path);
     let _ = std::fs::remove_dir(&path);
-    let height = 50 + 75 + 25 + 5 + bench_group.results.len() as u32 * 50;
+    let height = 50 + 75 + 25 + 5 + data.len() as u32 * 50;
     let root = SVGBackend::new(&path, (1280, height)).into_drawing_area();
     root.fill(&color::WHITE)?;
     let root = root.margin(5, 5, 5, 5).titled(
@@ -315,11 +370,15 @@ where
 
     chart.draw_series(data.iter().enumerate().map(|(index, &entry)| {
         let result = entry.result(min);
-        Text::new(
-            format!("x{result:.02}"),
-            (result * 1.05, SegmentValue::CenterOf(index)),
-            TextStyle::from(("monospace", 30)).pos(Pos::new(HPos::Left, VPos::Center)),
-        )
+        // Anchor the label at the bar's end and offset it by a fixed pixel
+        // amount so the gap between bar and label is identical for every bar,
+        // regardless of the runtime's value, the axis range or the scaling.
+        EmptyElement::at((result, SegmentValue::CenterOf(index)))
+            + Text::new(
+                format!("x{result:.02}"),
+                (10, 0),
+                TextStyle::from(("monospace", 30)).pos(Pos::new(HPos::Left, VPos::Center)),
+            )
     }))?;
 
     // To avoid the IO failure being ignored silently, we manually call the present function
@@ -394,7 +453,11 @@ pub struct BenchResult {
     pub unit: String,
 }
 
-fn decode_stdin(ext_title: Option<&str>, scale: Scale) -> Result<(), Box<dyn Error>> {
+fn decode_stdin(
+    ext_title: Option<&str>,
+    scale: Scale,
+    filter: Filter,
+) -> Result<(), Box<dyn Error>> {
     use serde_json as json;
     use std::io::{self, BufRead};
 
@@ -469,7 +532,7 @@ fn decode_stdin(ext_title: Option<&str>, scale: Scale) -> Result<(), Box<dyn Err
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(ext_title, scale, &bench_group)?;
+                    plot_for_data(ext_title, scale, filter, &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
@@ -480,5 +543,5 @@ fn decode_stdin(ext_title: Option<&str>, scale: Scale) -> Result<(), Box<dyn Err
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    decode_stdin(args.title.as_deref(), args.scale)
+    decode_stdin(args.title.as_deref(), args.scale, args.filter)
 }
