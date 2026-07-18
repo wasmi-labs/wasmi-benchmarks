@@ -252,7 +252,8 @@ fn plot_for_data(
         .map(|entry| entry.time)
         .max_by(f64::total_cmp)
         .unwrap_or(1.0);
-    let max_diff = core::cmp::max_by(10.0, max / min, f64::total_cmp);
+    // The longest bar reaches `max / min` (the slowest runtime's relative time).
+    let max_result = max / min;
     data.sort_by_key(|lhs| lhs.time as u64);
     data.reverse();
 
@@ -282,13 +283,18 @@ fn plot_for_data(
     let y_axis = (0usize..data.len() - 1).into_segmented();
 
     // Log and linear scaling produce different chart coordinate types, so the
-    // shared drawing logic lives in the generic `draw_chart` helper. Linear
-    // scaling also starts the axis (and the bar baseline) at `0.0` instead of
-    // `0.5`.
+    // shared drawing logic lives in the generic `draw_chart` helper. The two
+    // scales also differ in how the axis maximum is derived: the log scale is
+    // floored to a full decade (`10.0`) so it always shows a complete range of
+    // gridlines, whereas the linear scale is fit tightly to the data (plus a
+    // small headroom) so the bars are not squeezed into a fraction of the plot.
+    // Linear scaling also starts the axis (and the bar baseline) at `0.0`
+    // instead of `0.5`.
     match scale {
         Scale::Log => {
+            let axis_max = core::cmp::max_by(10.0, max_result, f64::total_cmp);
             let mut chart =
-                builder.build_cartesian_2d((0.5_f64..max_diff * 1.05).log_scale(), y_axis)?;
+                builder.build_cartesian_2d((0.5_f64..axis_max * 1.05).log_scale(), y_axis)?;
             draw_chart(
                 &root,
                 &mut chart,
@@ -299,7 +305,7 @@ fn plot_for_data(
             )?;
         }
         Scale::Linear => {
-            let mut chart = builder.build_cartesian_2d(0.0_f64..max_diff * 1.05, y_axis)?;
+            let mut chart = builder.build_cartesian_2d(0.0_f64..max_result * 1.05, y_axis)?;
             draw_chart(
                 &root,
                 &mut chart,
