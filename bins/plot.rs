@@ -19,6 +19,16 @@ enum Scale {
     Linear,
 }
 
+/// How measured times are expressed in the rendered plots.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default, clap::ValueEnum)]
+enum Time {
+    /// Values relative to the fastest runtime in the group (e.g. `x2.35`).
+    #[default]
+    Relative,
+    /// Absolute measured durations (e.g. `5.23 ms`).
+    Absolute,
+}
+
 /// Excludes a kind of Wasm runtime from the rendered plots.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Default, clap::ValueEnum)]
 enum Filter {
@@ -59,6 +69,9 @@ struct Args {
     /// Scaling of the relative-time axis.
     #[arg(long, value_enum, default_value_t = Scale::Log)]
     scale: Scale,
+    /// Whether to plot relative or absolute times.
+    #[arg(long, value_enum, default_value_t = Time::Relative)]
+    time: Time,
     /// Excludes a kind of Wasm runtime from the plots.
     #[arg(long, value_enum, default_value_t = Filter::None)]
     filter: Filter,
@@ -217,18 +230,64 @@ impl FromStr for VmAndConfig {
 #[derive(Debug, Copy, Clone)]
 pub struct BenchEntry {
     pub vm: VmAndConfig,
+    /// The measured time, normalized to nanoseconds.
     pub time: f64,
 }
 
 impl BenchEntry {
-    pub fn result(&self, min: f64) -> f64 {
-        self.time / min
+    /// Returns the value plotted for this entry given the fastest time `min` (nanoseconds).
+    ///
+    /// In [`Time::Relative`] mode this is the ratio to the fastest runtime, in
+    /// [`Time::Absolute`] mode it is the raw time in nanoseconds.
+    fn value(&self, min: f64, time: Time) -> f64 {
+        match time {
+            Time::Relative => self.time / min,
+            Time::Absolute => self.time,
+        }
     }
+
+    /// Returns the label drawn at the end of this entry's bar.
+    fn label(&self, min: f64, time: Time) -> String {
+        match time {
+            Time::Relative => format!("x{:.02}", self.value(min, time)),
+            Time::Absolute => format_duration_ns(self.time),
+        }
+    }
+}
+
+/// Converts a `estimate` given in `unit` to nanoseconds.
+///
+/// Criterion reports times in one of `ns`, `us`/`µs`, `ms` or `s`; anything
+/// else is unexpected and treated as an error.
+fn estimate_to_ns(estimate: f64, unit: &str) -> Result<f64, Box<dyn Error>> {
+    let factor = match unit {
+        "ns" => 1.0,
+        "us" | "µs" => 1_000.0,
+        "ms" => 1_000_000.0,
+        "s" => 1_000_000_000.0,
+        _ => return Err(FromStrError::from(format!("unexpected time unit: {unit}")).into()),
+    };
+    Ok(estimate * factor)
+}
+
+/// Formats a nanosecond duration adaptively as `ns`, `µs`, `ms` or `s`.
+fn format_duration_ns(ns: f64) -> String {
+    let (value, unit) = if ns < 1_000.0 {
+        (ns, "ns")
+    } else if ns < 1_000_000.0 {
+        (ns / 1_000.0, "µs")
+    } else if ns < 1_000_000_000.0 {
+        (ns / 1_000_000.0, "ms")
+    } else {
+        (ns / 1_000_000_000.0, "s")
+    };
+    format!("{value:.02} {unit}")
 }
 
 fn plot_for_data(
     ext_title: Option<&str>,
     scale: Scale,
+    time: Time,
     filter: Filter,
     bench_group: &BenchGroup,
 ) -> Result<(), Box<dyn Error>> {
@@ -236,8 +295,13 @@ fn plot_for_data(
         .results
         .iter()
         .filter(|&(&vm, _)| filter.keeps(vm))
-        .map(|(&vm, &BenchResult { estimate, unit: _ })| BenchEntry { vm, time: estimate })
-        .collect();
+        .map(|(&vm, BenchResult { estimate, unit })| {
+            Ok(BenchEntry {
+                vm,
+                time: estimate_to_ns(*estimate, unit)?,
+            })
+        })
+        .collect::<Result<_, Box<dyn Error>>>()?;
     if data.is_empty() {
         // No runtime of the selected kind ran in this group: nothing to plot.
         return Ok(());
@@ -252,8 +316,12 @@ fn plot_for_data(
         .map(|entry| entry.time)
         .max_by(f64::total_cmp)
         .unwrap_or(1.0);
-    // The longest bar reaches `max / min` (the slowest runtime's relative time).
-    let max_result = max / min;
+    // The longest bar reaches the slowest runtime's plotted value: its relative
+    // time (`max / min`) in relative mode or its absolute time in absolute mode.
+    let max_value = match time {
+        Time::Relative => max / min,
+        Time::Absolute => max,
+    };
     data.sort_by_key(|lhs| lhs.time as u64);
     data.reverse();
 
@@ -282,37 +350,54 @@ fn plot_for_data(
         .margin_top(25);
     let y_axis = (0usize..data.len() - 1).into_segmented();
 
+    // In log scaling the bars start at a lower bound below the fastest value so
+    // the fastest bar stays visible: `0.5` (below a relative min of `1.0`) in
+    // relative mode, or `min * 0.5` (below the absolute min) in absolute mode.
+    let kind = match time {
+        Time::Relative => "Relative Time",
+        Time::Absolute => "Time",
+    };
+    let log_baseline = match time {
+        Time::Relative => 0.5,
+        Time::Absolute => min * 0.5,
+    };
+
     // Log and linear scaling produce different chart coordinate types, so the
     // shared drawing logic lives in the generic `draw_chart` helper. The two
     // scales also differ in how the axis maximum is derived: the log scale is
-    // floored to a full decade (`10.0`) so it always shows a complete range of
-    // gridlines, whereas the linear scale is fit tightly to the data (plus a
-    // small headroom) so the bars are not squeezed into a fraction of the plot.
-    // Linear scaling also starts the axis (and the bar baseline) at `0.0`
-    // instead of `0.5`.
+    // floored to a full decade (`10.0`) in relative mode so it always shows a
+    // complete range of gridlines, whereas the linear scale is fit tightly to
+    // the data (plus a small headroom) so the bars are not squeezed into a
+    // fraction of the plot. Linear scaling also starts the axis (and the bar
+    // baseline) at `0.0` instead of the log baseline.
     match scale {
         Scale::Log => {
-            let axis_max = core::cmp::max_by(10.0, max_result, f64::total_cmp);
+            let axis_max = match time {
+                Time::Relative => core::cmp::max_by(10.0, max_value, f64::total_cmp),
+                Time::Absolute => max_value,
+            };
             let mut chart =
-                builder.build_cartesian_2d((0.5_f64..axis_max * 1.05).log_scale(), y_axis)?;
+                builder.build_cartesian_2d((log_baseline..axis_max * 1.05).log_scale(), y_axis)?;
             draw_chart(
                 &root,
                 &mut chart,
                 &data,
                 min,
-                0.5,
-                "Relative Time (lower is better, logarithmic scale)",
+                time,
+                log_baseline,
+                &format!("{kind} (lower is better, logarithmic scale)"),
             )?;
         }
         Scale::Linear => {
-            let mut chart = builder.build_cartesian_2d(0.0_f64..max_result * 1.05, y_axis)?;
+            let mut chart = builder.build_cartesian_2d(0.0_f64..max_value * 1.05, y_axis)?;
             draw_chart(
                 &root,
                 &mut chart,
                 &data,
                 min,
+                time,
                 0.0,
-                "Relative Time (lower is better, linear scale)",
+                &format!("{kind} (lower is better, linear scale)"),
             )?;
         }
     }
@@ -328,6 +413,7 @@ fn draw_chart<DB, X>(
     chart: &mut ChartContext<'_, DB, Cartesian2d<X, SegmentedCoord<RangedCoordusize>>>,
     data: &[BenchEntry],
     min: f64,
+    time: Time,
     baseline: f64,
     x_desc: &str,
 ) -> Result<(), Box<dyn Error>>
@@ -336,27 +422,32 @@ where
     DB::ErrorType: 'static,
     X: Ranged<ValueType = f64> + ValueFormatter<f64>,
 {
-    chart
-        .configure_mesh()
-        .disable_y_mesh()
+    // We want to draw the Wasm runtime names instead of the numbers.
+    let y_label_formatter = |coord: &SegmentValue<usize>| match coord {
+        SegmentValue::CenterOf(n) => data[*n].vm.label().to_string(),
+        SegmentValue::Exact(_n) => unreachable!(),
+        SegmentValue::Last => unreachable!(),
+    };
+    // In absolute mode the axis values are nanoseconds, so format the ticks
+    // adaptively as ns/µs/ms/s; relative mode keeps plotters' default numbers.
+    let x_label_formatter = |value: &f64| format_duration_ns(*value);
+
+    let mut mesh = chart.configure_mesh();
+    mesh.disable_y_mesh()
         .x_max_light_lines(1)
         .bold_line_style(BLACK.mix(0.15))
         .y_desc("") // WebAssembly Runtime
         .x_desc(x_desc)
-        .y_label_formatter(&|coord| {
-            // We want to draw the Wasm runtime names instead of the numbers.
-            match coord {
-                SegmentValue::CenterOf(n) => data[*n].vm.label().to_string(),
-                SegmentValue::Exact(_n) => unreachable!(),
-                SegmentValue::Last => unreachable!(),
-            }
-        })
+        .y_label_formatter(&y_label_formatter)
         .x_label_style(("sans-serif", 20))
         .y_label_style(("sans-serif", 30))
         .axis_desc_style(("sans-serif", 35))
         .x_labels(3)
-        .y_labels(data.len())
-        .draw()?;
+        .y_labels(data.len());
+    if let Time::Absolute = time {
+        mesh.x_label_formatter(&x_label_formatter);
+    }
+    mesh.draw()?;
 
     chart.draw_series(
         Histogram::horizontal(chart)
@@ -370,18 +461,18 @@ where
             .data(
                 data.iter()
                     .enumerate()
-                    .map(|(index, entry)| (index, entry.result(min))),
+                    .map(|(index, entry)| (index, entry.value(min, time))),
             ),
     )?;
 
     chart.draw_series(data.iter().enumerate().map(|(index, &entry)| {
-        let result = entry.result(min);
+        let value = entry.value(min, time);
         // Anchor the label at the bar's end and offset it by a fixed pixel
         // amount so the gap between bar and label is identical for every bar,
         // regardless of the runtime's value, the axis range or the scaling.
-        EmptyElement::at((result, SegmentValue::CenterOf(index)))
+        EmptyElement::at((value, SegmentValue::CenterOf(index)))
             + Text::new(
-                format!("x{result:.02}"),
+                entry.label(min, time),
                 (10, 0),
                 TextStyle::from(("monospace", 30)).pos(Pos::new(HPos::Left, VPos::Center)),
             )
@@ -462,6 +553,7 @@ pub struct BenchResult {
 fn decode_stdin(
     ext_title: Option<&str>,
     scale: Scale,
+    time: Time,
     filter: Filter,
 ) -> Result<(), Box<dyn Error>> {
     use serde_json as json;
@@ -538,7 +630,7 @@ fn decode_stdin(
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(ext_title, scale, filter, &bench_group)?;
+                    plot_for_data(ext_title, scale, time, filter, &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
@@ -549,5 +641,5 @@ fn decode_stdin(
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    decode_stdin(args.title.as_deref(), args.scale, args.filter)
+    decode_stdin(args.title.as_deref(), args.scale, args.time, args.filter)
 }
