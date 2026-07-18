@@ -95,6 +95,7 @@ impl VmAndConfig {
         const ORANGE: RGBColor = RGBColor(227, 146, 63);
         match self {
             VmAndConfig::WasmiV2(_) => ORANGE,
+            VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => TEAL,
             VmAndConfig::V8 | VmAndConfig::Wasmer(_) | VmAndConfig::Wasmtime(_) => BLUE,
             _ => TEAL,
         }
