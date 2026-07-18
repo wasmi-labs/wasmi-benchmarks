@@ -9,4 +9,4 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-makepad-stitch = "0.1.0"
+makepad-stitch = { git = "https://github.com/Robbepop/stitch", branch = "v0.1-dev" }
