@@ -14,6 +14,7 @@ pub enum VmAndConfig {
     WasmiV1(WasmiConfig),
     WasmiV2(WasmiConfig),
     Wasmtime(WasmtimeConfig),
+    DlrWasmInterpreter,
     Fizzy,
     SpaceWasm,
     Stitch,
@@ -58,6 +59,7 @@ impl VmAndConfig {
     /// Returns the label of the Wasm runtime kind.
     fn label(&self) -> &str {
         match self {
+            Self::DlrWasmInterpreter => "DLR-wasm-interpreter",
             Self::Fizzy => "Fizzy",
             Self::SpaceWasm => "SpaceWasm",
             Self::Stitch => "Stitch (lazy)",
@@ -107,6 +109,7 @@ impl FromStr for VmAndConfig {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let vm_and_config = match input {
+            "dlr-wasm-interpreter" => Self::DlrWasmInterpreter, 
             "fizzy" => Self::Fizzy,
             "spacewasm" => Self::SpaceWasm,
             "stitch" => Self::Stitch,
