@@ -2,9 +2,7 @@
 
 use anyhow::bail;
 use benchmark_utils as utils;
-use benchmark_utils::{
-    ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId,
-};
+use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 use makepad_stitch::{Engine, ExternVal, Func, Instance, Linker, Module, Store, Val, ValType};
 
 pub struct Stitch;
