@@ -1,0 +1,13 @@
+[package]
+name = "rt-dlr-wasm-interpreter"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+dlr-wasm-interpreter = { version = "0.2.0" }
+dlr-wasm-interpreter-checked = { version = "0.2.0", features = ["linker"] }
