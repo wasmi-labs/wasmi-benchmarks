@@ -1,7 +1,9 @@
 #![crate_type = "dylib"]
 
 use anyhow::{anyhow, bail};
-use benchmark_utils::{self as utils, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId};
+use benchmark_utils::{
+    self as utils, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId,
+};
 use sf_nano_core::{BackendMode, Caller, Import, Instance, Value, WasmError, set_backend_mode};
 
 /// The Silverfir-nano Wasm runtime.
@@ -47,7 +49,10 @@ impl SilverfirNano {
     fn can_run(&self, id: TestId) -> bool {
         // Silverfir-nano is a Wasm 3.0 runtime (tail calls included) and the benchmarks it can't
         // handle are pruned here as they surface. Nothing is excluded yet.
-        !matches!(id, TestId::Execute(ExecuteTestId::CoreMark) | TestId::Startup(StartupTestId::Ffmpeg))
+        !matches!(
+            id,
+            TestId::Execute(ExecuteTestId::CoreMark) | TestId::Startup(StartupTestId::Ffmpeg)
+        )
     }
 }
 
