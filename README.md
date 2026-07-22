@@ -46,6 +46,7 @@ The following Wasm runtimes and configurations are included.
 [V8]: https://github.com/v8/v8
 [DLR-wasm-interpreter]: https://github.com/DLR-FT/wasm-interpreter
 [Fizzy]: https://github.com/wasmx/fizzy
+[Silverfir-nano]: https://github.com/mbbill/Silverfir-nano
 
 ### Configuration Explanation
 
