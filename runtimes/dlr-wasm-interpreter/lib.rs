@@ -3,8 +3,12 @@
 use anyhow::{anyhow, bail};
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ExecuteTestId, HostFunc, ModuleInstance, Runtime, RuntimeInstance, TestId};
-use checked::{Linker, Store, Stored, StoredExternVal, StoredRunState, StoredValue};
-use wasm::{F32, F64, FuncType, ModuleAddr, NumType, ResultType, ValType, decode_and_validate};
+use dlr_wasm_interpreter::{
+    F32, F64, FuncType, ModuleAddr, NumType, ResultType, ValType, decode_and_validate,
+};
+use dlr_wasm_interpreter_checked::{
+    Linker, Store, Stored, StoredExternVal, StoredRunState, StoredValue,
+};
 
 pub struct DlrWasmInterpreter;
 

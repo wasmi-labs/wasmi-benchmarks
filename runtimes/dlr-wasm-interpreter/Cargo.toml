@@ -9,14 +9,5 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-# The DLR-FT `wasm-interpreter` is not published on crates.io yet. Its `main` branch pins
-# `libm = "=0.2.8"` (exact), which cannot coexist with the rest of this workspace (spacewasm,
-# tinywasm, ... require a newer `0.2.x`). We therefore depend on the `relax-libm-pin` branch of a
-# fork, which relaxes that pin to a caret requirement; it is otherwise identical to upstream `main`
-# (currently `0.2.0`), newer than the only release tag (`v0.1.0`). Once upstream relaxes the pin
-# (see the filed issue) and/or publishes to crates.io, switch back to DLR-FT / a versioned dep.
-#
-# `wasm` is the interpreter itself (package `wasm-interpreter`); `checked` is its safe, store-id
-# tagged wrapper API. The `linker` feature enables name-based import resolution.
-wasm = { package = "wasm-interpreter", git = "https://github.com/DLR-FT/wasm-interpreter", rev = "a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2" }
-checked = { git = "https://github.com/DLR-FT/wasm-interpreter", rev = "a2d3b4e3dfeb7c5c49f43fc9158b17f0b716f9d2", features = ["linker"] }
+dlr-wasm-interpreter = { version = "0.2.0" }
+dlr-wasm-interpreter-checked = { version = "0.2.0", features = ["linker"] }
