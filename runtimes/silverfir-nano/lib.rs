@@ -2,7 +2,7 @@
 
 use anyhow::{anyhow, bail};
 use benchmark_utils::{
-    self as utils, ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, StartupTestId, TestId,
+    self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId,
 };
 use sf_nano_core::{BackendMode, Caller, Import, Instance, Value, WasmError, set_backend_mode};
 
@@ -46,13 +46,8 @@ impl Runtime for SilverfirNano {
 }
 
 impl SilverfirNano {
-    fn can_run(&self, id: TestId) -> bool {
-        // Silverfir-nano is a Wasm 3.0 runtime (tail calls included) and the benchmarks it can't
-        // handle are pruned here as they surface. Nothing is excluded yet.
-        !matches!(
-            id,
-            TestId::Execute(ExecuteTestId::CoreMark) | TestId::Startup(StartupTestId::Ffmpeg)
-        )
+    fn can_run(&self, _id: TestId) -> bool {
+        true
     }
 }
 
@@ -64,18 +59,31 @@ impl RuntimeInstance for SilverfirNanoInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        // The recorded `func` is never invoked: execute benchmarks import nothing, and startup
-        // benchmarks link imports purely to satisfy instantiation (which is all that is timed).
+        // Recorded here and replayed as a real Silverfir-nano import in `instantiate`, where each
+        // call is dispatched to `func`. In practice the benchmarks never call these (execute cases
+        // import nothing; startup cases only link imports to satisfy instantiation, which is all
+        // that is timed), but the wiring is faithful rather than an inert stub.
         self.linker.define(module, name, ty, func);
     }
 
     fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        // Replay every recorded import as an inert host stub. The import's type is taken from the
-        // module's own import declaration, so an untyped `Import::func` is sufficient.
+        // Replay every recorded host function as a real import. Silverfir-nano now accepts `Fn`
+        // closures for host functions, so each import captures the recorded `func` and dispatches
+        // to it across the runtime-neutral value boundary instead of being a no-op stub.
         let imports: Vec<Import> = self
             .linker
             .funcs()
-            .map(|(module, name, _ty, _func)| Import::func(module, name, inert_stub))
+            .map(|(module, name, ty, func)| {
+                // Owned so the `'static` host closure can seed its result slots on every call.
+                let result_types = ty.results().to_vec();
+                Import::func(
+                    module,
+                    name,
+                    move |_caller: &mut Caller, params: &[Value], results: &mut [Value]| {
+                        dispatch_host_func(func, &result_types, params, results)
+                    },
+                )
+            })
             .collect();
         let instance = Instance::new(wasm, &imports).expect("failed to instantiate Wasm module");
         Box::new(SilverfirNanoModule {
@@ -138,14 +146,49 @@ impl ModuleInstance for SilverfirNanoModule {
     }
 }
 
-/// Inert host import stub. Never actually invoked by the benchmarks (see [`link_func`]); it exists
-/// only so modules with imports can be instantiated.
-fn inert_stub(
-    _caller: &mut Caller,
-    _params: &[Value],
-    _results: &mut [Value],
+/// Dispatches a call to a recorded host `func` across the runtime-neutral value boundary.
+///
+/// Silverfir-nano hands the host closure a `results` slice pre-sized to the callee's result arity
+/// (each slot defaulted). The recorded `func` writes into a matching runtime-neutral buffer, seeded
+/// from `result_types`, which is then converted back into `results`.
+fn dispatch_host_func(
+    func: utils::HostFunc,
+    result_types: &[utils::ValType],
+    params: &[Value],
+    results: &mut [Value],
 ) -> Result<(), WasmError> {
+    let params = params
+        .iter()
+        .copied()
+        .map(host_value_to_utils)
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut out: Vec<utils::Val> = result_types
+        .iter()
+        .copied()
+        .map(utils::Val::default_for_ty)
+        .collect();
+    func(&params, &mut out);
+    for (dst, src) in results.iter_mut().zip(out) {
+        *dst = from_utils_val(src);
+    }
     Ok(())
+}
+
+/// Converts a Silverfir-nano [`Value`] host-function argument into the runtime-neutral
+/// [`Val`](utils::Val). Traps on `V128`/reference arguments, which the numeric benchmark imports
+/// never use.
+fn host_value_to_utils(val: Value) -> Result<utils::Val, WasmError> {
+    Ok(match val {
+        Value::I32(val) => utils::Val::I32(val),
+        Value::I64(val) => utils::Val::I64(val),
+        Value::F32(val) => utils::Val::F32(val),
+        Value::F64(val) => utils::Val::F64(val),
+        _ => {
+            return Err(WasmError::Trap(
+                "silverfir-nano: unsupported host function argument type",
+            ));
+        }
+    })
 }
 
 /// Returns `memory[ptr..ptr + len]`, erroring if the range is out of bounds.
