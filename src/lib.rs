@@ -21,6 +21,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_wasm3::Wasm3 {
         compilation_mode: rt_wasm3::CompilationMode::Lazy,
     });
+    #[cfg(feature = "silverfir-nano")]
+    rts.push(rt_silverfir_nano::SilverfirNano);
     #[cfg(feature = "stitch")]
     rts.push(rt_stitch::Stitch);
     #[cfg(feature = "wamr")]

@@ -30,6 +30,7 @@ rt-tinywasm = { path = "runtimes/tinywasm", optional = true }
 rt-wasmer = { path = "runtimes/wasmer", optional = true, default-features = false }
 rt-wasmtime = { path = "runtimes/wasmtime", optional = true }
 rt-wasm3 = { path = "runtimes/wasm3", optional = true }
+rt-silverfir-nano = { path = "runtimes/silverfir-nano", optional = true }
 rt-wamr = { path = "runtimes/wamr", optional = true }
 rt-toywasm = { path = "runtimes/toywasm", optional = true }
 rt-dlr-wasm-interpreter = { path = "runtimes/dlr-wasm-interpreter", optional = true }
@@ -102,6 +103,7 @@ wasmtime-cranelift = ["dep:rt-wasmtime", "rt-wasmtime/cranelift"]
 wasmtime-winch = ["dep:rt-wasmtime", "rt-wasmtime/winch"]
 wasmtime-pulley = ["dep:rt-wasmtime", "rt-wasmtime/pulley"]
 wasm3 = ["dep:rt-wasm3"]
+silverfir-nano = ["dep:rt-silverfir-nano"]
 wamr = ["dep:rt-wamr"]
 toywasm = ["dep:rt-toywasm"]
 dlr-wasm-interpreter = ["dep:rt-dlr-wasm-interpreter"]
@@ -134,6 +136,7 @@ jits = [
     "wasmer-cranelift",
     "wasmer-singlepass",
     "v8",
+    "silverfir-nano",
 ]
 # All Wasm runtimes available for Windows.
 windows = [

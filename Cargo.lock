@@ -2839,6 +2839,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-silverfir-nano"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "sf-nano-core",
+]
+
+[[package]]
 name = "rt-spacewasm"
 version = "0.0.0"
 dependencies = [
@@ -3194,6 +3203,20 @@ checksum = "57a4a1d465f5de0833aed8a7c76b1c01606bc8160c5a7d2c0108867dfffdfef3"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "sf-nano-core"
+version = "0.1.0"
+source = "git+https://github.com/mbbill/Silverfir-nano?rev=33f4fb3e4ff9#33f4fb3e4ff9834b9042eff3f68b25a378cceeb8"
+dependencies = [
+ "paste",
+ "sf-nano-tracked-alloc",
+]
+
+[[package]]
+name = "sf-nano-tracked-alloc"
+version = "0.1.0"
+source = "git+https://github.com/mbbill/Silverfir-nano?rev=33f4fb3e4ff9#33f4fb3e4ff9834b9042eff3f68b25a378cceeb8"
 
 [[package]]
 name = "sha2"
@@ -4269,6 +4292,7 @@ dependencies = [
  "plotters",
  "rt-dlr-wasm-interpreter",
  "rt-fizzy",
+ "rt-silverfir-nano",
  "rt-spacewasm",
  "rt-stitch",
  "rt-tinywasm",
