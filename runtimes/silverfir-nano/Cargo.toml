@@ -14,4 +14,4 @@ anyhow = { workspace = true }
 # step. Default features (`jit` + `guard-pages`) select its native JIT backend — the
 # only execution backend it has — with guard-page memory, matching how the other JITs
 # in this suite are benchmarked.
-sf-nano-core = { git = "https://github.com/mbbill/Silverfir-nano", rev = "33f4fb3e4ff9" }
+sf-nano-core = { git = "https://github.com/mbbill/Silverfir-nano", tag = "0.1" }
