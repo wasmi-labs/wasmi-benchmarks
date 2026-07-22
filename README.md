@@ -25,7 +25,7 @@ The following Wasm runtimes and configurations are included.
 | [`spacewasm`][SpaceWasm] | Interpreter | | NASA JPL's `no_std` Wasm 1.0 (MVP) interpreter for on-board spacecraft use. |
 | [`wasmedge`][WasmEdge] | Interpreter | | The interpreter of the WasmEdge Wasm runtime. |
 | [`fizzy`][Fizzy] | Interpreter | | A fast, deterministic, and pedantic WebAssembly interpreter. |
-| [`dlr-wasm-interpreter`][DLR-wasm-interpreter] | Interpreter | An in-place Wasm interpreter by the DLR-FT for use in aviation. |
+| [`dlr-wasm-interpreter`][DLR-wasm-interpreter] | Interpreter | | An in-place Wasm interpreter by the DLR-FT for use in aviation. |
 
 **Missing Wasm runtimes:** [Wain]
 
