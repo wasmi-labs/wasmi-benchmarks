@@ -1,9 +1,7 @@
 #![crate_type = "dylib"]
 
 use anyhow::{anyhow, bail};
-use benchmark_utils::{
-    self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId,
-};
+use benchmark_utils::{self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId};
 use sf_nano_core::{BackendMode, Caller, Import, Instance, Value, WasmError, set_backend_mode};
 
 /// The Silverfir-nano Wasm runtime.
