@@ -24,6 +24,7 @@ rt-wasmi-v0-31 = { path = "runtimes/wasmi-v0-31", optional = true }
 rt-wasmi-v0-32 = { path = "runtimes/wasmi-v0-32", optional = true }
 rt-wasmi-v1 = { path = "runtimes/wasmi-v1", optional = true }
 rt-wasmi-v2 = { path = "runtimes/wasmi-v2", optional = true }
+rt-wasmi-v2-beta-8 = { path = "runtimes/wasmi-v2-beta-8", optional = true }
 rt-stitch = { path = "runtimes/stitch", optional = true }
 rt-spacewasm = { path = "runtimes/spacewasm", optional = true }
 rt-tinywasm = { path = "runtimes/tinywasm", optional = true }
@@ -87,6 +88,7 @@ codegen-units = 4
 [features]
 default = [
     "wasmi-v2",
+    "wasmi-v2-beta-8",
     "wasm3",
     "stitch",
     "wamr",
@@ -112,6 +114,7 @@ wasmi-v0-31 = ["dep:rt-wasmi-v0-31"]
 wasmi-v0-32 = ["dep:rt-wasmi-v0-32"]
 wasmi-v1 = ["dep:rt-wasmi-v1"]
 wasmi-v2 = ["dep:rt-wasmi-v2"]
+wasmi-v2-beta-8 = ["dep:rt-wasmi-v2-beta-8"]
 wasmedge = ["dep:rt-wasmedge"]
 v8 = ["dep:rt-v8"]
 fizzy = ["dep:rt-fizzy"]

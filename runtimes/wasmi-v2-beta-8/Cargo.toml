@@ -1,0 +1,18 @@
+[package]
+name = "rt-wasmi-v2-beta-8"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+
+[dependencies.wasmi]
+git = "https://github.com/wasmi-labs/wasmi"
+branch = "rf-add-instance-entity-handle-cache-eager"
+package = "wasmi"
+default-features = false
+features = ["auto-dispatch", "validate"]

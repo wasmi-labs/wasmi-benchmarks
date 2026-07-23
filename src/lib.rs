@@ -13,6 +13,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     push_wasmi_v1_rts(&mut rts);
     #[cfg(feature = "wasmi-v2")]
     push_wasmi_v2_rts(&mut rts);
+    #[cfg(feature = "wasmi-v2-beta-8")]
+    push_wasmi_v2_beta_8_rts(&mut rts);
     #[cfg(feature = "wasm3")]
     rts.push(rt_wasm3::Wasm3 {
         compilation_mode: rt_wasm3::CompilationMode::Eager,
@@ -101,6 +103,22 @@ fn push_wasmi_v2_rts(rts: &mut Rts) {
         (CompilationMode::Lazy, Validation::Unchecked),
     ] {
         rts.push(rt_wasmi_v2::Wasmi {
+            compilation_mode,
+            validation,
+        });
+    }
+}
+
+#[cfg(feature = "wasmi-v2-beta-8")]
+fn push_wasmi_v2_beta_8_rts(rts: &mut Rts) {
+    use rt_wasmi_v2_beta_8::{CompilationMode, Validation};
+    for (compilation_mode, validation) in [
+        (CompilationMode::Eager, Validation::Checked),
+        (CompilationMode::LazyTranslation, Validation::Checked),
+        (CompilationMode::Lazy, Validation::Checked),
+        (CompilationMode::Lazy, Validation::Unchecked),
+    ] {
+        rts.push(rt_wasmi_v2_beta_8::Wasmi {
             compilation_mode,
             validation,
         });

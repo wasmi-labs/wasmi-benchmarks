@@ -2956,7 +2956,16 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "benchmark-utils",
- "wasmi 2.0.0-beta.7",
+ "wasmi 2.0.0-beta.7 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "rt-wasmi-v2-beta-8"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "wasmi 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
 ]
 
 [[package]]
@@ -4252,9 +4261,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2ccaa112ecda892f20071b6af052f60af3ff03f8d3de2bb20007415fb116dbc"
 dependencies = [
  "spin",
- "wasmi_collections 2.0.0-beta.7",
- "wasmi_core 2.0.0-beta.7",
- "wasmi_ir 2.0.0-beta.7",
+ "wasmi_collections 2.0.0-beta.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasmi_core 2.0.0-beta.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasmi_ir 2.0.0-beta.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "wasmparser 0.228.0",
+]
+
+[[package]]
+name = "wasmi"
+version = "2.0.0-beta.7"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+dependencies = [
+ "spin",
+ "wasmi_collections 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
+ "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
+ "wasmi_ir 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
  "wasmparser 0.228.0",
 ]
 
@@ -4282,6 +4303,7 @@ dependencies = [
  "rt-wasmi-v0-32",
  "rt-wasmi-v1",
  "rt-wasmi-v2",
+ "rt-wasmi-v2-beta-8",
  "rt-wasmtime",
  "serde_json",
  "wat",
@@ -4315,6 +4337,11 @@ name = "wasmi_collections"
 version = "2.0.0-beta.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "308acd69ff7c49bd127c5e63f48c17b830f2c06eff27c7dc45490da13c769735"
+
+[[package]]
+name = "wasmi_collections"
+version = "2.0.0-beta.7"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
 
 [[package]]
 name = "wasmi_core"
@@ -4359,6 +4386,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasmi_core"
+version = "2.0.0-beta.7"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+dependencies = [
+ "libm",
+]
+
+[[package]]
 name = "wasmi_ir"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4373,7 +4408,15 @@ version = "2.0.0-beta.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9de7004daf22eed130a448a25ad779509722d750273ae46b3fcdf72a8febc1b"
 dependencies = [
- "wasmi_core 2.0.0-beta.7",
+ "wasmi_core 2.0.0-beta.7 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "wasmi_ir"
+version = "2.0.0-beta.7"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+dependencies = [
+ "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
 ]
 
 [[package]]
