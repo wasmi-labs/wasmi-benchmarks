@@ -85,7 +85,6 @@ pub enum VmAndConfig {
     WasmiV1(WasmiConfig),
     WasmiV2(WasmiConfig),
     Wasmtime(WasmtimeConfig),
-    DlrWasmInterpreter,
     Fizzy,
     SpaceWasm,
     Stitch,
@@ -96,6 +95,8 @@ pub enum VmAndConfig {
     Wasm3(Wasm3Config),
     WasmEdge,
     Wasmer(WasmerConfig),
+    DlrWasmInterpreter,
+    SilverfirNano,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -130,7 +131,6 @@ impl VmAndConfig {
     /// Returns the label of the Wasm runtime kind.
     fn label(&self) -> &str {
         match self {
-            Self::DlrWasmInterpreter => "DLR-wasm-interpreter",
             Self::Fizzy => "Fizzy",
             Self::SpaceWasm => "SpaceWasm",
             Self::Stitch => "Stitch (lazy)",
@@ -158,6 +158,8 @@ impl VmAndConfig {
             Self::Wasmtime(WasmtimeConfig::Cranelift) => "Wasmtime (Cranelift)",
             Self::Wasmtime(WasmtimeConfig::Winch) => "Wasmtime (Winch)",
             Self::Wasmtime(WasmtimeConfig::Pulley) => "Wasmtime (Pulley)",
+            Self::DlrWasmInterpreter => "DLR-wasm-interpreter",
+            Self::SilverfirNano => "Silverfir-nano",
         }
     }
 
@@ -173,7 +175,10 @@ impl VmAndConfig {
         match self {
             VmAndConfig::WasmiV2(_) => Self::ORANGE,
             VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => Self::TEAL,
-            VmAndConfig::V8 | VmAndConfig::Wasmer(_) | VmAndConfig::Wasmtime(_) => Self::BLUE,
+            VmAndConfig::V8
+            | VmAndConfig::Wasmer(_)
+            | VmAndConfig::Wasmtime(_)
+            | VmAndConfig::SilverfirNano => Self::BLUE,
             _ => Self::TEAL,
         }
     }
@@ -196,7 +201,6 @@ impl FromStr for VmAndConfig {
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         let vm_and_config = match input {
-            "dlr-wasm-interpreter" => Self::DlrWasmInterpreter,
             "fizzy" => Self::Fizzy,
             "spacewasm" => Self::SpaceWasm,
             "stitch" => Self::Stitch,
@@ -224,6 +228,8 @@ impl FromStr for VmAndConfig {
             "wasmtime.cranelift" => Self::Wasmtime(WasmtimeConfig::Cranelift),
             "wasmtime.winch" => Self::Wasmtime(WasmtimeConfig::Winch),
             "wasmtime.pulley" => Self::Wasmtime(WasmtimeConfig::Pulley),
+            "dlr-wasm-interpreter" => Self::DlrWasmInterpreter,
+            "silverfir-nano" => Self::SilverfirNano,
             _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         };
         Ok(vm_and_config)

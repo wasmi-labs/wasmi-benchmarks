@@ -1,0 +1,7 @@
+# silverfir-nano's x64 JIT emits SSSE3/SSE4.1 instructions, which Rust's default x86_64
+# baseline does not enable. Scoped per host arch so it never reaches the wasm32 test-case
+# builds. aarch64 needs nothing extra here: its JIT only requires NEON, which is ARMv8
+# baseline.
+
+[target.'cfg(target_arch = "x86_64")']
+rustflags = ["-C", "target-feature=+ssse3,+sse4.1"]

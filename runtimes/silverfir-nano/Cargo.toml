@@ -1,0 +1,17 @@
+[package]
+name = "rt-silverfir-nano"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+# Silverfir-nano is not published to crates.io, so it is pulled in as a pinned git
+# dependency (like `stitch`/`spacewasm`). `sf-nano-core` is pure Rust with no C build
+# step. Default features (`jit` + `guard-pages`) select its native JIT backend — the
+# only execution backend it has — with guard-page memory, matching how the other JITs
+# in this suite are benchmarked.
+sf-nano-core = { git = "https://github.com/mbbill/Silverfir-nano", tag = "0.1" }
