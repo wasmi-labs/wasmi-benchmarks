@@ -105,16 +105,20 @@ fn make_engine(compiler: WasmerCompiler) -> wasmer::Engine {
     match compiler {
         #[cfg(feature = "cranelift")]
         WasmerCompiler::Cranelift => {
-            let builder =
-                wasmer::sys::EngineBuilder::new(wasmer_compiler_cranelift::Cranelift::new());
+            let mut compiler = wasmer_compiler_cranelift::Cranelift::new();
+            // Compile on a single thread so compile timings don't depend on the host's core count.
+            compiler.num_threads(core::num::NonZero::new(1).unwrap());
+            let builder = wasmer::sys::EngineBuilder::new(compiler);
             let mut features = wasmer::sys::Features::new();
             features.tail_call(true);
             builder.set_features(Some(features)).engine().into()
         }
         #[cfg(feature = "singlepass")]
         WasmerCompiler::Singlepass => {
-            let builder =
-                wasmer::sys::EngineBuilder::new(wasmer_compiler_singlepass::Singlepass::new());
+            let mut compiler = wasmer_compiler_singlepass::Singlepass::new();
+            // Compile on a single thread so compile timings don't depend on the host's core count.
+            compiler.num_threads(core::num::NonZero::new(1).unwrap());
+            let builder = wasmer::sys::EngineBuilder::new(compiler);
             builder.engine().into()
         }
         #[allow(unreachable_patterns)]
