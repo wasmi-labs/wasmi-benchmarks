@@ -1,9 +1,7 @@
-# Build host code for the benchmark machine's CPU. Also satisfies silverfir-nano's
-# x64 JIT, which requires SSSE3+SSE4.1 (not in the default x86_64 target). Scoped per
-# host arch so it never reaches the wasm32 test-case builds.
+# silverfir-nano's x64 JIT emits SSSE3/SSE4.1 instructions, which Rust's default x86_64
+# baseline does not enable. Scoped per host arch so it never reaches the wasm32 test-case
+# builds. aarch64 needs nothing extra here: its JIT only requires NEON, which is ARMv8
+# baseline.
 
 [target.'cfg(target_arch = "x86_64")']
-rustflags = ["-C", "target-cpu=native"]
-
-[target.'cfg(target_arch = "aarch64")']
-rustflags = ["-C", "target-cpu=native"]
+rustflags = ["-C", "target-feature=+ssse3,+sse4.1"]
