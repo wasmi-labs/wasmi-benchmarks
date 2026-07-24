@@ -2965,7 +2965,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "benchmark-utils",
- "wasmi 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
+ "wasmi 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls)",
 ]
 
 [[package]]
@@ -4270,12 +4270,12 @@ dependencies = [
 [[package]]
 name = "wasmi"
 version = "2.0.0-beta.7"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls#556d9cd876e54e2f0932cf544c6c7e29a39953f9"
 dependencies = [
  "spin",
- "wasmi_collections 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
- "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
- "wasmi_ir 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
+ "wasmi_collections 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls)",
+ "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls)",
+ "wasmi_ir 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls)",
  "wasmparser 0.228.0",
 ]
 
@@ -4341,7 +4341,7 @@ checksum = "308acd69ff7c49bd127c5e63f48c17b830f2c06eff27c7dc45490da13c769735"
 [[package]]
 name = "wasmi_collections"
 version = "2.0.0-beta.7"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls#556d9cd876e54e2f0932cf544c6c7e29a39953f9"
 
 [[package]]
 name = "wasmi_core"
@@ -4388,7 +4388,7 @@ dependencies = [
 [[package]]
 name = "wasmi_core"
 version = "2.0.0-beta.7"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls#556d9cd876e54e2f0932cf544c6c7e29a39953f9"
 dependencies = [
  "libm",
 ]
@@ -4414,9 +4414,9 @@ dependencies = [
 [[package]]
 name = "wasmi_ir"
 version = "2.0.0-beta.7"
-source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager#9fbb8fa5fd484df4e059efc2750ddf81ccaf1965"
+source = "git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls#556d9cd876e54e2f0932cf544c6c7e29a39953f9"
 dependencies = [
- "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-add-instance-entity-handle-cache-eager)",
+ "wasmi_core 2.0.0-beta.7 (git+https://github.com/wasmi-labs/wasmi?branch=rf-cache-func-entry-inline-calls)",
 ]
 
 [[package]]
