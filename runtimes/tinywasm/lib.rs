@@ -1,6 +1,6 @@
 #![crate_type = "dylib"]
 
-use benchmark_utils::{self as utils, ExecuteTestId, StartupTestId};
+use benchmark_utils as utils;
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 use tinywasm::types::{FuncType as TinyFuncType, WasmType, WasmValue as Val};
 
@@ -37,19 +37,8 @@ impl Runtime for Tinywasm {
 }
 
 impl Tinywasm {
-    fn can_run(&self, id: TestId) -> bool {
-        !matches!(
-            id,
-            | TestId::Execute(ExecuteTestId::Compression | ExecuteTestId::RegexRedux)
-            // Tinywasm traps ("trap: unreachable") while instantiating these clang-built WASI command
-            // modules, so they are excluded from the instantiation benchmarks.
-            | TestId::Startup(
-                StartupTestId::Bz2
-                    | StartupTestId::Spidermonkey
-                    | StartupTestId::PulldownCmark
-                    | StartupTestId::Ffmpeg
-            )
-        )
+    fn can_run(&self, _id: TestId) -> bool {
+        true
     }
 }
 
