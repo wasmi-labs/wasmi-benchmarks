@@ -12,7 +12,7 @@ anyhow = { workspace = true }
 
 [dependencies.wasmi]
 git = "https://github.com/wasmi-labs/wasmi"
-branch = "rf-add-instance-entity-handle-cache-eager"
+branch = "rf-cache-func-entry-inline-calls"
 package = "wasmi"
 default-features = false
 features = ["auto-dispatch", "validate"]
