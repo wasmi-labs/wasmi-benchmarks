@@ -2,12 +2,16 @@
 
 use anyhow::{anyhow, bail};
 use benchmark_utils::{self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId};
-use sf_nano_core::{BackendMode, Caller, Import, Instance, Value, WasmError, set_backend_mode};
+use sf_nano_core::{
+    BackendMode, Caller, Import, Instance, RuntimeConfig, Value, WasmError, runtime_config,
+    set_backend_mode, set_runtime_config,
+};
 
 /// The Silverfir-nano Wasm runtime.
 ///
 /// Silverfir-nano is JIT-only: its single execution backend is native code generation
-/// ([`BackendMode::Native`]), so there is just one configuration to benchmark.
+/// ([`BackendMode::Native`]), so there is just one configuration to benchmark, with compilation
+/// pinned to a single thread.
 pub struct SilverfirNano;
 
 /// A Silverfir-nano runtime with its recorded host functions, produced by [`SilverfirNano::setup`].
@@ -34,6 +38,16 @@ impl Runtime for SilverfirNano {
         if !self.can_run(id) {
             return None;
         }
+        // Compile single-threaded: by default Silverfir-nano spreads eager compilation of large
+        // modules over up to 8 threads, unlike every other runtime here. Write-once global, so the
+        // call fails on every `setup` after the first; assert the outcome instead.
+        let mut config: RuntimeConfig = *runtime_config();
+        config.parallel_compilation = false;
+        let _ = set_runtime_config(config);
+        assert!(
+            !runtime_config().parallel_compilation,
+            "failed to constrain Silverfir-nano to single-threaded compilation",
+        );
         // Idempotent global; `Native` is already the default. Set it explicitly so the choice of
         // backend is visible at the adapter boundary.
         set_backend_mode(BackendMode::Native);
