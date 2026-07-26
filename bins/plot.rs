@@ -96,7 +96,7 @@ pub enum VmAndConfig {
     WasmEdge,
     Wasmer(WasmerConfig),
     DlrWasmInterpreter,
-    SilverfirNano,
+    SilverfirNano(SilverfirNanoConfig),
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -125,6 +125,12 @@ pub enum WasmtimeConfig {
 pub enum WasmerConfig {
     Cranelift,
     Singlepass,
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SilverfirNanoConfig {
+    Jit,
+    Interpreter,
 }
 
 impl VmAndConfig {
@@ -159,7 +165,8 @@ impl VmAndConfig {
             Self::Wasmtime(WasmtimeConfig::Winch) => "Wasmtime (Winch)",
             Self::Wasmtime(WasmtimeConfig::Pulley) => "Wasmtime (Pulley)",
             Self::DlrWasmInterpreter => "DLR-wasm-interpreter",
-            Self::SilverfirNano => "Silverfir-nano",
+            Self::SilverfirNano(SilverfirNanoConfig::Jit) => "Silverfir-nano (JIT)",
+            Self::SilverfirNano(SilverfirNanoConfig::Interpreter) => "Silverfir-nano (interpreter)",
         }
     }
 
@@ -178,7 +185,7 @@ impl VmAndConfig {
             VmAndConfig::V8
             | VmAndConfig::Wasmer(_)
             | VmAndConfig::Wasmtime(_)
-            | VmAndConfig::SilverfirNano => Self::BLUE,
+            | VmAndConfig::SilverfirNano(SilverfirNanoConfig::Jit) => Self::BLUE,
             _ => Self::TEAL,
         }
     }
@@ -229,7 +236,8 @@ impl FromStr for VmAndConfig {
             "wasmtime.winch" => Self::Wasmtime(WasmtimeConfig::Winch),
             "wasmtime.pulley" => Self::Wasmtime(WasmtimeConfig::Pulley),
             "dlr-wasm-interpreter" => Self::DlrWasmInterpreter,
-            "silverfir-nano" => Self::SilverfirNano,
+            "silverfir-nano.jit" => Self::SilverfirNano(SilverfirNanoConfig::Jit),
+            "silverfir-nano.interpreter" => Self::SilverfirNano(SilverfirNanoConfig::Interpreter),
             _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         };
         Ok(vm_and_config)

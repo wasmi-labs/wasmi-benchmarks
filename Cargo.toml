@@ -103,7 +103,9 @@ wasmtime-cranelift = ["dep:rt-wasmtime", "rt-wasmtime/cranelift"]
 wasmtime-winch = ["dep:rt-wasmtime", "rt-wasmtime/winch"]
 wasmtime-pulley = ["dep:rt-wasmtime", "rt-wasmtime/pulley"]
 wasm3 = ["dep:rt-wasm3"]
-silverfir-nano = ["dep:rt-silverfir-nano"]
+silverfir-nano = ["silverfir-nano-jit", "silverfir-nano-interp"]
+silverfir-nano-jit = ["dep:rt-silverfir-nano", "rt-silverfir-nano/jit"]
+silverfir-nano-interp = ["dep:rt-silverfir-nano", "rt-silverfir-nano/interp"]
 wamr = ["dep:rt-wamr"]
 toywasm = ["dep:rt-toywasm"]
 dlr-wasm-interpreter = ["dep:rt-dlr-wasm-interpreter"]
@@ -128,6 +130,7 @@ interpreters = [
     "wasmedge",
     "fizzy",
     "dlr-wasm-interpreter",
+    "silverfir-nano-interp",
 ]
 # Enable all JIT Wasm runtimes.
 jits = [
@@ -136,7 +139,7 @@ jits = [
     "wasmer-cranelift",
     "wasmer-singlepass",
     "v8",
-    "silverfir-nano",
+    "silverfir-nano-jit",
 ]
 # All Wasm runtimes available for Windows.
 windows = [

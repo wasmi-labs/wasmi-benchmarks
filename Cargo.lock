@@ -3207,7 +3207,7 @@ dependencies = [
 [[package]]
 name = "sf-nano-core"
 version = "0.1.0"
-source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.2#78f255e741928de1054829a5b895899813436262"
+source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.3#c062ff313f781ab6f76762a555c0c5eec829fae0"
 dependencies = [
  "paste",
  "sf-nano-tracked-alloc",
@@ -3216,7 +3216,7 @@ dependencies = [
 [[package]]
 name = "sf-nano-tracked-alloc"
 version = "0.1.0"
-source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.2#78f255e741928de1054829a5b895899813436262"
+source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.3#c062ff313f781ab6f76762a555c0c5eec829fae0"
 
 [[package]]
 name = "sha2"

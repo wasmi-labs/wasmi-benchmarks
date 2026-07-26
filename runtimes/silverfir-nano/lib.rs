@@ -1,25 +1,27 @@
 #![crate_type = "dylib"]
+#![cfg(any(feature = "jit", feature = "interp"))]
 
 use anyhow::{anyhow, bail};
 use benchmark_utils::{self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId};
-use sf_nano_core::{
-    BackendMode, Caller, Import, Instance, RuntimeConfig, Value, WasmError, runtime_config,
-    set_backend_mode, set_runtime_config,
-};
+pub use sf_nano_core::Tier;
+use sf_nano_core::{Caller, Config, Engine, Import, Instance, Value, WasmError};
 
 /// The Silverfir-nano Wasm runtime.
 ///
-/// Silverfir-nano is JIT-only: its single execution backend is native code generation
-/// ([`BackendMode::Native`]), so there is just one configuration to benchmark, with compilation
-/// pinned to a single thread.
-pub struct SilverfirNano;
+/// Silverfir-nano ships two execution engines — an optimizing JIT and an interpreter — selected
+/// per [`Engine`] via its [`Tier`], so both are benchmarked as separate configurations.
+pub struct SilverfirNano {
+    pub tier: Tier,
+}
 
-/// A Silverfir-nano runtime with its recorded host functions, produced by [`SilverfirNano::setup`].
+/// A Silverfir-nano runtime with its engine and recorded host functions, produced by
+/// [`SilverfirNano::setup`].
 ///
 /// Silverfir-nano's [`Instance::new`] takes all imports up front, so — like the `tinywasm` and
 /// `stitch` adapters — host functions are recorded into a runtime-neutral [`Linker`](utils::Linker)
 /// and replayed as [`Import`]s on every instantiation.
 struct SilverfirNanoInstance {
+    engine: Engine,
     linker: utils::Linker,
 }
 
@@ -31,27 +33,25 @@ struct SilverfirNanoModule {
 
 impl Runtime for SilverfirNano {
     fn id(&self) -> &'static str {
-        "silverfir-nano"
+        match self.tier {
+            #[cfg(feature = "jit")]
+            Tier::Jit => "silverfir-nano.jit",
+            #[cfg(feature = "interp")]
+            Tier::Interp => "silverfir-nano.interpreter",
+        }
     }
 
     fn setup(&self, id: TestId) -> Option<Box<dyn RuntimeInstance>> {
         if !self.can_run(id) {
             return None;
         }
-        // Compile single-threaded: by default Silverfir-nano spreads eager compilation of large
-        // modules over up to 8 threads, unlike every other runtime here. Write-once global, so the
-        // call fails on every `setup` after the first; assert the outcome instead.
-        let mut config: RuntimeConfig = *runtime_config();
-        config.parallel_compilation = false;
-        let _ = set_runtime_config(config);
-        assert!(
-            !runtime_config().parallel_compilation,
-            "failed to constrain Silverfir-nano to single-threaded compilation",
-        );
-        // Idempotent global; `Native` is already the default. Set it explicitly so the choice of
-        // backend is visible at the adapter boundary.
-        set_backend_mode(BackendMode::Native);
+        // Compile single-threaded: by default Silverfir-nano spreads eager JIT compilation of
+        // large modules over multiple threads, unlike every other runtime here. A no-op for the
+        // interpreter, which has nothing to parallelize.
+        let config = Config::new().tier(self.tier).parallel_compilation(false);
+        let engine = Engine::new(config).expect("failed to configure Silverfir-nano engine");
         Some(Box::new(SilverfirNanoInstance {
+            engine,
             linker: utils::Linker::new(),
         }))
     }
@@ -97,7 +97,8 @@ impl RuntimeInstance for SilverfirNanoInstance {
                 )
             })
             .collect();
-        let instance = Instance::new(wasm, &imports).expect("failed to instantiate Wasm module");
+        let instance =
+            Instance::new(&self.engine, wasm, &imports).expect("failed to instantiate Wasm module");
         Box::new(SilverfirNanoModule {
             instance,
             params: Vec::new(),
