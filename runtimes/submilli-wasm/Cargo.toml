@@ -1,0 +1,12 @@
+[package]
+name = "rt-submilli-wasm"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+submilli-wasm = "0.1.2"
