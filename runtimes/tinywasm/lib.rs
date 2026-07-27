@@ -77,7 +77,12 @@ impl RuntimeInstance for TinywasmInstance {
                 });
             imports.define(module, name, host);
         }
-        let module = tinywasm::parse_bytes(wasm).unwrap();
+
+        // Compile on a single thread so compile timings don't depend on the host's core count.
+        let parser_options = tinywasm::parser::ParserOptions::default().with_parser_threads(1);
+        let module = tinywasm::parser::Parser::with_options(parser_options)
+            .parse_module_bytes(wasm)
+            .unwrap();
         let instance =
             tinywasm::ModuleInstance::instantiate(&mut store, &module, Some(imports)).unwrap();
         Box::new(TinywasmModule {
