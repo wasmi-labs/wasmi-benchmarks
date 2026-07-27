@@ -11,7 +11,7 @@ benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
 
 [dependencies.wasmtime]
-version = "46.0.0"
+version = "47.0.0"
 default-features = false
 features = ["runtime", "anyhow"]
 
