@@ -7,21 +7,19 @@
 //!
 //! [SpaceWasm]: https://github.com/nasa/spacewasm
 
-use std::collections::{BTreeMap, HashSet};
-use std::ops::ControlFlow;
-use std::sync::{Mutex, OnceLock};
-
 use benchmark_utils::{self as utils};
 use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
-
-use std::alloc::Layout;
-
 use spacewasm::{
-    AllocError, Allocator, CodeBuilder, CompilerOptions, ExportDesc, HostFunction, HostModule,
+    AllocError, Allocator, CodeBuilder, CompilerOptions, Engine, ExportDesc,
+    HOST_FUNCTION_NAME_CAP, HOST_MODULE_NAME_CAP, HostFunction, HostModule, HostName, HostValList,
     InnerVec, Interpreter, InterpreterResult, InterpreterRunner, Memory, MemoryKind,
-    MemoryStatistics, Module, ModuleRef, Rc, Ref, Store, Value, WasmRef, WasmStream,
+    MemoryStatistics, Module, ModuleRef, Rc, Ref, StartInvocation, Value, WasmMemoryAllocator,
+    WasmRef, WasmStream,
 };
-use spacewasm_util::RustSystemAllocator;
+use std::alloc::Layout;
+use std::collections::BTreeMap;
+use std::ops::ControlFlow;
+use std::ptr::NonNull;
 
 /// Backs SpaceWasm's internal collections with the process heap.
 ///
@@ -31,6 +29,10 @@ use spacewasm_util::RustSystemAllocator;
 /// measurements untouched. We deliberately avoid SpaceWasm's bundled `PageAllocator` (a per-page
 /// bump allocator that requires LIFO release) because the benchmark harness repeatedly instantiates
 /// and drops modules; a plain `malloc`/`free` handles that churn without constraints.
+///
+/// The same type also serves as the [`WasmMemoryAllocator`] backing Wasm linear memories. SpaceWasm
+/// ships such an implementation only behind `#[cfg(test)]` (`spacewasm::test_support`), so
+/// embedders supply their own — upstream's spec-test harness does exactly this.
 struct SystemAllocator;
 
 unsafe impl Allocator for SystemAllocator {
@@ -52,10 +54,32 @@ unsafe impl Allocator for SystemAllocator {
     }
 }
 
+impl WasmMemoryAllocator for SystemAllocator {
+    fn allocate(&self, layout: Layout) -> Result<NonNull<u8>, AllocError> {
+        unsafe { NonNull::new(std::alloc::alloc(layout)).ok_or(AllocError::AllocationFailed) }
+    }
+
+    fn reallocate(
+        &self,
+        ptr: NonNull<u8>,
+        old_layout: Layout,
+        layout: Layout,
+    ) -> Result<NonNull<u8>, AllocError> {
+        unsafe {
+            NonNull::new(std::alloc::realloc(ptr.as_ptr(), old_layout, layout.size()))
+                .ok_or(AllocError::AllocationFailed)
+        }
+    }
+
+    fn deallocate(&self, ptr: NonNull<u8>, layout: Layout) {
+        unsafe { std::alloc::dealloc(ptr.as_ptr(), layout) }
+    }
+}
+
 spacewasm::global_allocator!(SystemAllocator, SystemAllocator);
 
 /// Number of 256-word IR pages the compiler may emit for a single module.
-const MAX_CODE_PAGES: usize = 65_536;
+const MAX_CODE_PAGES: u32 = 65_536;
 /// Compile-time bound on control-flow nesting depth accepted by the validator.
 const MAX_CONTROL_FRAMES: usize = 1024;
 /// Compile-time bound on operand-stack depth accepted by the validator.
@@ -64,12 +88,6 @@ const MAX_STACK_DEPTH: usize = 4_096;
 const STACK_SIZE: usize = 1 << 16;
 /// Capacity of the store's Wasm module table. We only ever load a single benchmark module.
 const MAX_MODULES: usize = 1;
-/// Upper bound on distinct import module namespaces (`env`, `wasi_snapshot_preview1`, ...).
-///
-/// SpaceWasm's [`Store::new`] takes a const-generic `[HostModule; N]`, so the namespace count must
-/// be resolved at compile time; [`build_store`] dispatches the runtime count onto a fixed set of
-/// arms. The number of *functions* per namespace is unbounded — only the namespace count is capped.
-const MAX_NAMESPACES: usize = 8;
 
 pub struct SpaceWasm;
 
@@ -78,10 +96,12 @@ struct SpaceWasmInstance {
 }
 
 struct SpaceWasmModule {
-    store: Store,
-    /// Compiled IR text pages kept alive for the lifetime of the instance.
-    text: spacewasm::Vec<spacewasm::Box<spacewasm::TextPage>>,
-    /// Index of the loaded module within `store`.
+    /// Owns the store (modules, host modules) and the interpreter stack.
+    engine: Engine,
+    /// Owns the compiled IR text pages; kept alive for the lifetime of the instance because the
+    /// interpreter is handed them on every run.
+    code_builder: CodeBuilder,
+    /// Index of the loaded module within the engine's store.
     module_index: usize,
     /// Reusable parameter buffer to avoid per-call allocation.
     params: Vec<Value>,
@@ -139,51 +159,54 @@ impl RuntimeInstance for SpaceWasmInstance {
         let host_modules: Vec<HostModule> = groups
             .into_iter()
             .map(|(name, functions)| HostModule {
-                name: intern(name),
+                name: host_name(name, "import module namespace", HOST_MODULE_NAME_CAP),
                 globals: spacewasm::Vec::zero(),
                 functions: sw_vec(functions),
                 memory: spacewasm::Vec::zero(),
                 table: spacewasm::Vec::zero(),
             })
             .collect();
-        let mut store = build_store(host_modules);
+        // The engine owns the store and a single interpreter stack shared by all calls.
+        let mut engine = Engine::new(STACK_SIZE, MAX_MODULES, sw_vec(host_modules))
+            .expect("rt-spacewasm: failed to create SpaceWasm engine");
 
         // Compile and validate the module.
-        let mut code_builder = CodeBuilder::<MAX_CODE_PAGES>::default();
-        let allocator = Rc::new(RustSystemAllocator)
+        let mut code_builder = CodeBuilder::new(CompilerOptions {
+            allow_memory_grow: true,
+            // `0` disables the control-flow backpatch iteration limit, which would otherwise reject
+            // valid programs with deeply nested control flow.
+            max_backpatch_iterations: 0,
+            max_code_pages: MAX_CODE_PAGES,
+        })
+        .expect("rt-spacewasm: failed to allocate the IR code builder");
+        let allocator = Rc::new(SystemAllocator)
             .expect("rt-spacewasm: failed to allocate Wasm memory allocator")
             .into_wasm_memory_allocator();
-        let module = Module::new::<MAX_CODE_PAGES, MAX_CONTROL_FRAMES, MAX_STACK_DEPTH>(
+        let module = Module::new::<MAX_CONTROL_FRAMES, MAX_STACK_DEPTH>(
             "benchmark-input-wasm-module",
             &mut SliceStream::new(wasm),
-            &mut store,
+            &mut engine.store,
             &mut code_builder,
             allocator,
-            CompilerOptions {
-                allow_memory_grow: true,
-            },
         )
         .expect("rt-spacewasm: failed to compile and validate the Wasm module");
-        let (text, _) = code_builder
-            .finish()
-            .expect("rt-spacewasm: failed to finalize compiled code");
 
         // Instantiate: push the module into the store and run its start section (if any).
-        let module_index = {
-            let mut state = store
-                .allocate(STACK_SIZE)
-                .expect("rt-spacewasm: failed to allocate interpreter state");
-            match state.initialize_module(module, &text, usize::MAX) {
+        let module_ref = engine.push_module(module);
+        match engine.invoke_start(module_ref) {
+            StartInvocation::Finished => {}
+            // A Wasm start function is only seeded by `invoke_start`; the interpreter drives it.
+            StartInvocation::Running => match run_to_completion(&code_builder, &mut engine) {
                 InterpreterResult::Finished => {}
                 other => panic!("rt-spacewasm: module initialization failed: {other:?}"),
-            }
-            state.store.modules().len() - 1
-        };
+            },
+            other => panic!("rt-spacewasm: module initialization failed: {other:?}"),
+        }
 
         Box::new(SpaceWasmModule {
-            store,
-            text,
-            module_index,
+            engine,
+            code_builder,
+            module_index: module_ref.0 as usize,
             params: Vec::new(),
         })
     }
@@ -197,7 +220,7 @@ impl ModuleInstance for SpaceWasmModule {
         results: &mut [utils::Val],
     ) -> anyhow::Result<()> {
         // Resolve the exported function to a callable reference.
-        let module = &self.store.modules()[self.module_index];
+        let module = &self.engine.store.modules()[self.module_index];
         let Some(export) = module.exports.iter().find(|e| &*e.name == name) else {
             anyhow::bail!("failed to find function export {name:?}")
         };
@@ -216,30 +239,23 @@ impl ModuleInstance for SpaceWasmModule {
         self.params.clear();
         self.params.extend(params.iter().copied().map(val_to_value));
 
-        // A fresh interpreter state per call; the module's memory/globals live in the store and
-        // persist across calls, matching how the other runtime adapters reuse one instance.
-        let mut state = self
-            .store
-            .allocate(STACK_SIZE)
-            .map_err(|e| anyhow::anyhow!("failed to allocate interpreter state: {e:?}"))?;
-        state
+        // The engine — and with it the interpreter stack — is reused across calls, so the run state
+        // is rewound before each invocation; `Engine::invoke` requires an idle engine and a
+        // previously trapped call would leave the stack/program counter dirty. The module's memory
+        // and globals live in the store and persist, matching the other runtime adapters.
+        self.engine.reset();
+        self.engine
             .invoke(func_ref, &self.params)
             .map_err(|e| anyhow::anyhow!("failed to invoke {name:?}: {e:?}"))?;
-        let interpreter = Interpreter::default();
-        let outcome = loop {
-            match interpreter.run(&self.text, &mut state, usize::MAX) {
-                InterpreterResult::OutOfFuel => continue,
-                other => break other,
-            }
-        };
-        match outcome {
+        match run_to_completion(&self.code_builder, &mut self.engine) {
             InterpreterResult::Finished => {}
             other => anyhow::bail!("execution of {name:?} failed: {other:?}"),
         }
 
         // MVP functions return at most one result.
         if let Some(result) = results.first_mut() {
-            let raw = state
+            let raw = self
+                .engine
                 .result
                 .ok_or_else(|| anyhow::anyhow!("function {name:?} returned no result"))?;
             *result = value_to_val(raw.to_value(sw_val_type(result.ty())));
@@ -272,7 +288,7 @@ impl SpaceWasmModule {
     /// module's [`MemoryKind`] to the owning [`Memory`]. Both [`Memory::load`] and [`Memory::store`]
     /// take `&self`, so this shared `&self` resolver serves reads and writes alike.
     fn memory(&self, name: &str) -> anyhow::Result<&Rc<Memory>> {
-        let module = &self.store.modules()[self.module_index];
+        let module = &self.engine.store.modules()[self.module_index];
         let Some(export) = module.exports.iter().find(|e| &*e.name == name) else {
             anyhow::bail!("failed to find memory export {name:?}")
         };
@@ -282,7 +298,7 @@ impl SpaceWasmModule {
         match &module.memory {
             Some(MemoryKind::Owned(mem)) => Ok(mem),
             Some(MemoryKind::Import(module_ref)) => {
-                match &self.store.modules()[module_ref.0 as usize].memory {
+                match &self.engine.store.modules()[module_ref.0 as usize].memory {
                     Some(MemoryKind::Owned(mem)) => Ok(mem),
                     _ => {
                         anyhow::bail!(
@@ -304,15 +320,15 @@ impl SpaceWasmModule {
 /// SpaceWasm accepts a capturing `impl Fn + 'static` closure and describes signatures dynamically,
 /// so this works for any signature without per-arity enumeration.
 fn build_host_function(name: &str, ty: &utils::FuncType, func: utils::HostFunc) -> HostFunction {
-    let name = intern(name);
-    let params_sig = intern(&signature(ty.params()));
-    let results_sig = intern(&signature(ty.results()));
+    let host_name = host_name(name, "import function name", HOST_FUNCTION_NAME_CAP);
+    let params = host_val_list(name, ty.params());
+    let results = host_val_list(name, ty.results());
     let result_types: Box<[utils::ValType]> = ty.results().into();
-    HostFunction::new(
-        name,
-        params_sig.into(),
-        results_sig.into(),
-        move |_state, args: &[Value]| {
+    HostFunction::try_new(
+        host_name,
+        params,
+        results,
+        move |_engine: &mut Engine, args: &[Value]| {
             let params: Vec<utils::Val> = args.iter().copied().map(value_to_val).collect();
             let mut results: Vec<utils::Val> = result_types
                 .iter()
@@ -322,36 +338,37 @@ fn build_host_function(name: &str, ty: &utils::FuncType, func: utils::HostFunc) 
             ControlFlow::Continue(results.first().copied().map(val_to_value))
         },
     )
+    .unwrap_or_else(|e| panic!("rt-spacewasm: unsupported signature for import {name:?}: {e:?}"))
 }
 
-/// Constructs a [`Store`] from a runtime-determined number of host modules.
+/// Runs the interpreter until it stops for a reason other than exhausting its instruction budget.
 ///
-/// [`Store::new`] is const-generic over the module count, so the runtime count is dispatched onto a
-/// fixed set of array sizes (`0..=MAX_NAMESPACES`).
-fn build_store(modules: Vec<HostModule>) -> Store {
-    let count = modules.len();
-    let mut iter = modules.into_iter();
-    macro_rules! take {
-        ($n:literal) => {
-            std::array::from_fn::<_, $n, _>(|_| iter.next().unwrap())
-        };
+/// The budget is already `usize::MAX`, so the retry only guards against a bounded run slipping
+/// through; every other outcome (finished, trap, pause) is returned to the caller.
+fn run_to_completion(code_builder: &CodeBuilder, engine: &mut Engine) -> InterpreterResult {
+    loop {
+        match Interpreter.run(code_builder.pages(), engine, usize::MAX) {
+            InterpreterResult::OutOfFuel => continue,
+            other => break other,
+        }
     }
-    let store = match count {
-        0 => Store::new(MAX_MODULES, []),
-        1 => Store::new(MAX_MODULES, take!(1)),
-        2 => Store::new(MAX_MODULES, take!(2)),
-        3 => Store::new(MAX_MODULES, take!(3)),
-        4 => Store::new(MAX_MODULES, take!(4)),
-        5 => Store::new(MAX_MODULES, take!(5)),
-        6 => Store::new(MAX_MODULES, take!(6)),
-        7 => Store::new(MAX_MODULES, take!(7)),
-        8 => Store::new(MAX_MODULES, take!(8)),
-        _ => panic!(
-            "rt-spacewasm: more than {MAX_NAMESPACES} distinct import module namespaces are not \
-             supported"
-        ),
-    };
-    store.expect("rt-spacewasm: failed to create SpaceWasm store")
+}
+
+/// Converts `name` into SpaceWasm's inline, fixed-capacity host name representation.
+///
+/// `what` and `cap` only shape the panic message; SpaceWasm caps module and function names at
+/// [`HOST_MODULE_NAME_CAP`] / [`HOST_FUNCTION_NAME_CAP`] bytes respectively.
+fn host_name<const CAPACITY: usize>(name: &str, what: &str, cap: usize) -> HostName<CAPACITY> {
+    HostName::try_from_str(name).unwrap_or_else(|_| {
+        panic!("rt-spacewasm: {what} {name:?} exceeds SpaceWasm's {cap}-byte limit")
+    })
+}
+
+/// Converts a value-type sequence into SpaceWasm's inline host signature representation.
+fn host_val_list(name: &str, types: &[utils::ValType]) -> HostValList {
+    HostValList::try_new(&signature(types)).unwrap_or_else(|e| {
+        panic!("rt-spacewasm: unsupported signature for import {name:?}: {e:?}")
+    })
 }
 
 /// Moves items into a freshly-sized SpaceWasm [`spacewasm::Vec`].
@@ -378,25 +395,6 @@ fn signature(types: &[utils::ValType]) -> String {
             utils::ValType::F64 => 'd',
         })
         .collect()
-}
-
-/// Interns a string, leaking each unique value once so it can be used where `&'static str` is
-/// required (SpaceWasm's [`HostModule`]/[`HostFunction`] names and signature strings).
-///
-/// The set of import names and signatures is finite and fixed across the whole process, so this
-/// leaks a bounded amount regardless of how many times a module is instantiated.
-fn intern(s: &str) -> &'static str {
-    static INTERNER: OnceLock<Mutex<HashSet<&'static str>>> = OnceLock::new();
-    let mut set = INTERNER
-        .get_or_init(|| Mutex::new(HashSet::new()))
-        .lock()
-        .unwrap();
-    if let Some(existing) = set.get(s) {
-        return existing;
-    }
-    let leaked: &'static str = Box::leak(s.to_owned().into_boxed_str());
-    set.insert(leaked);
-    leaked
 }
 
 fn sw_val_type(ty: utils::ValType) -> spacewasm::ValType {
