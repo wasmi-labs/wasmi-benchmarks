@@ -1,0 +1,24 @@
+[package]
+name = "rt-silverfir-nano"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+# Silverfir-nano is not published to crates.io, so it is pulled in as a pinned git
+# dependency (like `stitch`/`spacewasm`). `sf-nano-core` is pure Rust with no C build
+# step. Its two execution engines are independent Cargo features, selected below, so
+# neither configuration pays for the other's code.
+sf-nano-core = { git = "https://github.com/mbbill/Silverfir-nano", tag = "0.3", default-features = false }
+
+[features]
+# The optimizing JIT, with guard-page memory (which implies `jit` upstream), matching
+# how the other JITs in this suite are benchmarked.
+jit = ["sf-nano-core/jit", "sf-nano-core/guard-pages"]
+# The folded stack machine interpreter, whose dispatch handlers are generated for the
+# host at build time.
+interp = ["sf-nano-core/interp"]
