@@ -23,8 +23,6 @@ jobs:
           - os: windows-latest
             features: "--no-default-features --features windows"
     steps:
-      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
-      - uses: dtolnay/rust-toolchain@stable
       - name: System Information (Linux)
         if: runner.os == 'Linux'
         run: lscpu
@@ -35,6 +33,8 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors
+      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
+      - uses: dtolnay/rust-toolchain@stable
       - name: Set up Rust cache
         uses: Swatinem/rust-cache@v2
       - name: Install Dependencies
