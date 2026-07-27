@@ -1,0 +1,63 @@
+name: Startup Benchmarks on CI
+
+on:
+  workflow_dispatch:
+
+# Disable running jobs on earlier commits.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  startup:
+    name: Run Startup Benchmarks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        # Keeps the `> out.json` redirect and `cat` identical on all runners.
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            features: "--all-features"
+          - os: macos-latest
+            features: "--all-features"
+          - os: windows-latest
+            features: "--no-default-features --features windows"
+    steps:
+      - name: System Information (Linux)
+        if: runner.os == 'Linux'
+        run: lscpu
+      - name: System Information (macOS)
+        if: runner.os == 'macOS'
+        run: sysctl -a machdep.cpu
+      - name: System Information (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors
+      - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b
+        with:
+          submodules: recursive
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Set up Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: Install Dependencies
+        uses: ./.github/actions/install-dependencies
+      - name: Install Cargo Criterion (tool)
+        run: cargo install cargo-criterion || true
+      - name: Compile Benchmarks
+        run: cargo criterion --bench criterion ${{ matrix.features }} --no-run
+      - name: Clear Stale Criterion Data
+        # Criterion reports results for benchmarks it finds in `target/criterion`, even ones the
+        # current run did not execute. Should the Rust cache ever restore that directory, results
+        # from an earlier run (on different hardware, with a different feature set) would leak into
+        # the JSON below. On a fresh runner this is a no-op.
+        run: rm -rf target/criterion
+      - name: Run Benchmarks
+        # Keep `--message-format` between the features and the `startup/` filter: `--features`
+        # takes multiple values and would otherwise swallow the filter as a feature name.
+        run: cargo criterion --bench criterion ${{ matrix.features }} --message-format=json startup/ > out.json
+      - name: Print JSON Output
+        run: cat out.json
