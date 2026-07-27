@@ -156,4 +156,6 @@ windows = [
     "wasmer-cranelift",
     "wasmer-singlepass",
     "v8",
+    "silverfir-nano-jit",
+    "silverfir-nano-interp",
 ]
