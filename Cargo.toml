@@ -91,9 +91,7 @@ default = [
     "wasm3",
     "stitch",
     "wamr",
-    "tinywasm",
-    "spacewasm",
-    "toywasm",
+    "silverfir-nano-interp",
 ]
 wasmer = ["wasmer-singlepass", "wasmer-cranelift"]
 wasmer-singlepass = ["dep:rt-wasmer", "rt-wasmer/singlepass"]
@@ -130,7 +128,9 @@ interpreters = [
     "wasmedge",
     "fizzy",
     "dlr-wasm-interpreter",
-    "silverfir-nano-interp",
+    "tinywasm",
+    "spacewasm",
+    "toywasm",
 ]
 # Enable all JIT Wasm runtimes.
 jits = [
