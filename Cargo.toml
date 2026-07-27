@@ -147,7 +147,6 @@ windows = [
     "wasm3",
     "stitch",
     "tinywasm",
-    "spacewasm",
     "wasmi-v0-31",
     "wasmi-v0-32",
     "wasmi-v1",
