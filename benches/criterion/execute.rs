@@ -396,8 +396,8 @@ fn bench_reverse_complement(c: &mut Criterion) {
     let id = ExecuteTestId::ReverseComplement;
     let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
     let mut g = c.benchmark_group(format!("execute/{id}"));
-    let input_text = fs::read_to_string("res/rust/cases/reverse_complement/input.txt").unwrap();
-    let output_text = fs::read_to_string("res/rust/cases/reverse_complement/output.txt").unwrap();
+    let input_text = fs::read_to_string("res/rust/cases/reverse-complement/input.txt").unwrap();
+    let output_text = fs::read_to_string("res/rust/cases/reverse-complement/output.txt").unwrap();
     let mut output_buffer = vec![0x0_u8; output_text.as_bytes().len()];
     for vm in vms_under_test() {
         let Some(rt) = vm.setup(id.into()) else {
@@ -429,7 +429,7 @@ fn bench_regex_redux(c: &mut Criterion) {
     let id = ExecuteTestId::RegexRedux;
     let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
     let mut g = c.benchmark_group(format!("execute/{id}"));
-    let input_text = fs::read_to_string("res/rust/cases/reverse_complement/input.txt").unwrap();
+    let input_text = fs::read_to_string("res/rust/cases/reverse-complement/input.txt").unwrap();
     for vm in vms_under_test() {
         let Some(rt) = vm.setup(id.into()) else {
             continue;
