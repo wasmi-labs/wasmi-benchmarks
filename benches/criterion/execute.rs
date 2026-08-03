@@ -219,7 +219,7 @@ fn bench_argon2(c: &mut Criterion) {
         let Some(rt) = vm.setup(id.into()) else {
             continue;
         };
-        let len: i32 = 10_000;
+        let len: i32 = 3_000;
         let bench_id = format!("{}/{}", vm.id(), len);
         g.bench_function(&bench_id, |b| {
             let mut instance = rt.instantiate(&wasm[..]);
@@ -228,7 +228,7 @@ fn bench_argon2(c: &mut Criterion) {
                 instance.call_typed::<i32, ()>("run", data).unwrap();
             });
             let output = instance.call_typed::<i32, i64>("output", data).unwrap();
-            assert_eq!(output, 0x4CDBBC7DE0EAA94);
+            assert_eq!(output, 0x76318FB48BBA1258);
             instance.call_typed::<i32, ()>("teardown", data).unwrap();
         });
     }
