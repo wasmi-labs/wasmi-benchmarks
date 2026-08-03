@@ -108,6 +108,7 @@ Tests the execution performance of the Wasm runtime, prefixed by `execute/`.
 | `fibonacci-iter` | Iterative fibonacci calculation. Compute intense workload. |
 | `fibonacci-tail` | Tail-call based fibonacci calculation. |
 | `sort`   | Executes Rust's standard [`sort_unstable`] on integers. |
+| `sort-dyn` | Executes Rust's standard [`sort_unstable`] on integers with dynamically called comparators. |
 | `prime_sieve` | Executes a Rust sieve of eratosthenes implementation. |
 | `matrix-mul` | Naive matrix multiplication implementation. Makes heavy use of linear memory and floats. |
 | `nbody` | N-body physics simulation. |
@@ -202,6 +203,7 @@ These are derived directly from each runtime's `can_run` implementation (under
 | `fibonacci-iter`     | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `fibonacci-tail`     | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |
 | `sort`               | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `sort-dyn`           | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `prime_sieve`        | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `matrix-mul`         | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `nbody`              | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |

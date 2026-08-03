@@ -21,6 +21,7 @@ criterion_group!(
         bench_fibonacci_iter,
         bench_fibonacci_tail,
         bench_sort,
+        bench_sort_dyn,
         bench_execute_prime_sieve,
         bench_matrix_multiply,
         bench_nbody,
@@ -130,6 +131,27 @@ fn bench_sort(c: &mut Criterion) {
             continue;
         };
         let len: i32 = 1_000_000;
+        let bench_id = format!("{}/{}", vm.id(), len);
+        g.bench_function(&bench_id, |b| {
+            let mut instance = rt.instantiate(&wasm[..]);
+            let data = instance.call_typed::<i32, i32>("setup", len).unwrap();
+            b.iter(|| {
+                instance.call_typed::<i32, ()>("run", data).unwrap();
+            });
+            instance.call_typed::<i32, ()>("teardown", data).unwrap();
+        });
+    }
+}
+
+fn bench_sort_dyn(c: &mut Criterion) {
+    let id = ExecuteTestId::SortDyn;
+    let wasm = read_benchmark_file(InputEncoding::RustCompiledWasm, id.into());
+    let mut g = c.benchmark_group(format!("execute/{id}"));
+    for vm in vms_under_test() {
+        let Some(rt) = vm.setup(id.into()) else {
+            continue;
+        };
+        let len: i32 = 400_000;
         let bench_id = format!("{}/{}", vm.id(), len);
         g.bench_function(&bench_id, |b| {
             let mut instance = rt.instantiate(&wasm[..]);
