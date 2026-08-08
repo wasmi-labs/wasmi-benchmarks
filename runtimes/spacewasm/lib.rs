@@ -192,7 +192,9 @@ impl RuntimeInstance for SpaceWasmInstance {
         .expect("rt-spacewasm: failed to compile and validate the Wasm module");
 
         // Instantiate: push the module into the store and run its start section (if any).
-        let module_ref = engine.push_module(module);
+        let module_ref = engine
+            .push_module(module)
+            .expect("rt-spacewasm: failed to push the module into the engine store");
         match engine.invoke_start(module_ref) {
             StartInvocation::Finished => {}
             // A Wasm start function is only seeded by `invoke_start`; the interpreter drives it.

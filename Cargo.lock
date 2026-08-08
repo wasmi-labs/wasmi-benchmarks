@@ -3534,9 +3534,9 @@ dependencies = [
 
 [[package]]
 name = "spacewasm"
-version = "0.4.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54af5ecb5a2bb1da47ec791fe2d13de2d0244110d990465b373bd1e6de232970"
+checksum = "8cee439e904cf5af6e5c9af19e5c7597054266ec3def403f8778915b9bd32d59"
 dependencies = [
  "libm",
 ]
