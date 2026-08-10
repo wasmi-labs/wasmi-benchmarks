@@ -1,20 +1,17 @@
 runtime,score
-wasmtime.cranelift,31348
-wasmer.cranelift,30499
-v8,26907
-wasmtime.winch,12930
-wasmer.singlepass,12244
-wasmi-v2.eager.checked,2822
-wasm3.eager,2805
-stitch,2193
-wasmi-v1.eager.checked,1920
-wasmtime.pulley,1701
-wasmi-v0.32,1661
-wamr,1428
-tinywasm,924
-wasmi-v0.31,878
-fizzy,857
-spacewasm,432
-wasmedge,311
-dlr-wasm-interpreter,282
+silverfir-nano,5521
+wasmi v2,4171
+stitch,3014
+wasm3,2759
+wamr,2389
+wasmi v1,1733
+wasmtime.pulley,1596
+wasmi v0.32,1431
+tinywasm,946
+fizzy,858
+wasmi v0.31,775
+submilli-wasm,475
+wasmedge,313
+spacewasm,293
+dlr-wasm-interpreter,273
 toywasm,253
