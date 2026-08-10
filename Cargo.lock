@@ -3169,7 +3169,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "benchmark-utils",
- "wasmi 2.0.0-beta.9",
+ "wasmi 2.0.0-beta.10",
 ]
 
 [[package]]
@@ -4495,14 +4495,14 @@ dependencies = [
 
 [[package]]
 name = "wasmi"
-version = "2.0.0-beta.9"
+version = "2.0.0-beta.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b1a7422428b80c240a6c226b76b2b9896a929e668c58cf6acb14d77c1d6c174"
+checksum = "ab57cbb8db5ee46c6667b642544d7664adfbc0ea6a1ab219c92d734b795f36b1"
 dependencies = [
  "spin",
- "wasmi_collections 2.0.0-beta.9",
- "wasmi_core 2.0.0-beta.9",
- "wasmi_ir 2.0.0-beta.9",
+ "wasmi_collections 2.0.0-beta.10",
+ "wasmi_core 2.0.0-beta.10",
+ "wasmi_ir 2.0.0-beta.10",
  "wasmparser 0.228.0",
 ]
 
@@ -4562,9 +4562,9 @@ checksum = "f8a8c42a2a76148d43097b1d7cc2a5bf33d5c23bd4dd69015fc887e311767884"
 
 [[package]]
 name = "wasmi_collections"
-version = "2.0.0-beta.9"
+version = "2.0.0-beta.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0da869b384421f4a3f063f8bf9190f0913e73c5e9570274340fa00417cdabd8"
+checksum = "55ea3ee266456966465c55a1f440e33116caf2b05a4fc30da36cb0c9813059d5"
 
 [[package]]
 name = "wasmi_core"
@@ -4601,9 +4601,9 @@ dependencies = [
 
 [[package]]
 name = "wasmi_core"
-version = "2.0.0-beta.9"
+version = "2.0.0-beta.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b482261c22b8e95cff23ecac2d726244fba206f38457f4357f26dd6b4d2c3795"
+checksum = "1f8285efe48a9e1afbcdfcc19cd807b3eb20129b7e199c7a99efd30ba192926b"
 dependencies = [
  "libm",
 ]
@@ -4619,11 +4619,11 @@ dependencies = [
 
 [[package]]
 name = "wasmi_ir"
-version = "2.0.0-beta.9"
+version = "2.0.0-beta.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e45e3896b5e59e399608d08c529690fa24e85a2dad403e4df91e218a6b0bf74b"
+checksum = "6227be1aebba39b4815ab6a312d0528590f0db2473621ec9285606410889b0a6"
 dependencies = [
- "wasmi_core 2.0.0-beta.9",
+ "wasmi_core 2.0.0-beta.10",
 ]
 
 [[package]]
