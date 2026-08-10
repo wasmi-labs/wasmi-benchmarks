@@ -1,19 +1,22 @@
 runtime,score
-wasmtime cranelift,23572
-wasmer cranelift,23065
-v8,21675
-wasmer singlepass,9039
-wasmtime winch,8588
-stitch,2721
-wasm3,2300
-wasmi v2,2118
-wamr,1988
-wasmi v1,1246
-wasmi v0.32,1186
-wasmtime pulley,1148
-wasmi v0.31,860
+wasmer.cranelift,21203
+v8,20841
+wasmtime.cranelift,19366
+silverfir-nano.jit,17850
+wasmtime.winch,9112
+wasmer.singlepass,8919
+silverfir-nano.interpreter,3437
+wasmi-v2,3103
+stitch,2221
+wasm3,2051
+wamr,1987
+wasmi-v1,1292
+wasmtime.pulley,1337
+wasmi-v0.32,1213
 fizzy,695
-tinywasm,662
+tinywasm,689
+wasmi-v0.31,639
+submilli-wasm,402
 spacewasm,332
 wasmedge,195
 toywasm,99
