@@ -6,12 +6,12 @@ silverfir-nano.jit,19360
 wasmtime.winch,11806
 wasmer.singlepass,9243
 silverfir-nano.interpreter,2226
-wasmi-v2.eager.checked,1839
+wasmi-v2,1839
 stitch,1362
 wamr,1286
 wasmtime.pulley,1140
-wasm3.eager,1121
-wasmi-v1.eager.checked,1054
+wasm3,1121
+wasmi-v1,1054
 wasmi-v0.32,936
 tinywasm,595
 wasmi-v0.31,460
