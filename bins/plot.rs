@@ -5,7 +5,7 @@ use plotters::coord::types::RangedCoordusize;
 use plotters::prelude::*;
 use plotters::style::colors::full_palette as color;
 use plotters::style::text_anchor::{HPos, Pos, VPos};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt::{self, Display};
 use std::str::FromStr;
@@ -311,26 +311,57 @@ fn plot_for_data(
     filter: Filter,
     bench_group: &BenchGroup,
 ) -> Result<(), Box<dyn Error>> {
-    let mut data: Vec<_> = bench_group
-        .results
-        .iter()
-        .filter(|&(&vm, _)| filter.keeps(vm))
-        .map(|(&vm, BenchResult { estimate, unit })| {
-            Ok(BenchEntry {
-                vm,
-                time: estimate_to_ns(*estimate, unit)?,
-            })
-        })
-        .collect::<Result<_, Box<dyn Error>>>()?;
+    let data = bench_group.entries(filter)?;
     if data.is_empty() {
         // No runtime of the selected kind ran in this group: nothing to plot.
         return Ok(());
     }
+    // Bars are plotted relative to the fastest runtime of this group.
     let min = data
         .iter()
         .map(|entry| entry.time)
         .min_by(f64::total_cmp)
         .unwrap_or(1.0);
+    let kind = match time {
+        Time::Relative => "Relative Time",
+        Time::Absolute => "Time",
+    };
+    let category = bench_group.category;
+    let name = &bench_group.name;
+    render_plot(
+        &plot_title(ext_title, &format!("{category}/{name}")),
+        &format!("target/wasmi-benchmarks/{category}/{name}.svg"),
+        scale,
+        time,
+        kind,
+        min,
+        data,
+    )
+}
+
+/// Appends the optional external title to the plot's `test_id`.
+fn plot_title(ext_title: Option<&str>, test_id: &str) -> String {
+    match ext_title {
+        Some(ext_title) => format!("{test_id} - {ext_title}"),
+        None => test_id.to_string(),
+    }
+}
+
+/// Renders `data` as a horizontal bar chart into the SVG file at `path`.
+///
+/// In [`Time::Relative`] mode every bar is plotted as `entry.time / min`, so
+/// `min` is the baseline the plot is relative to: the fastest runtime of a
+/// benchmark group for the per-test-case plots, or `1.0` for the geomean plots
+/// whose entries already are relative values.
+fn render_plot(
+    title: &str,
+    path: &str,
+    scale: Scale,
+    time: Time,
+    kind: &str,
+    min: f64,
+    mut data: Vec<BenchEntry>,
+) -> Result<(), Box<dyn Error>> {
     let max = data
         .iter()
         .map(|entry| entry.time)
@@ -342,24 +373,17 @@ fn plot_for_data(
         Time::Relative => max / min,
         Time::Absolute => max,
     };
-    data.sort_by_key(|lhs| lhs.time as u64);
-    data.reverse();
+    // Slowest runtime first so the bars form a descending staircase.
+    data.sort_by(|lhs, rhs| rhs.time.total_cmp(&lhs.time));
+    let data = &data[..];
 
-    let category = bench_group.category;
-    let name = &bench_group.name;
-    let test_id = format!("{category}/{name}");
-    let test_title = match ext_title {
-        Some(ext_title) => format!("{test_id} - {ext_title}"),
-        None => test_id,
-    };
-    let path = format!("target/wasmi-benchmarks/{category}/{name}.svg");
-    let _ = std::fs::create_dir_all(&path);
-    let _ = std::fs::remove_dir(&path);
+    let _ = std::fs::create_dir_all(path);
+    let _ = std::fs::remove_dir(path);
     let height = 50 + 75 + 25 + 5 + data.len() as u32 * 50;
-    let root = SVGBackend::new(&path, (1280, height)).into_drawing_area();
+    let root = SVGBackend::new(path, (1280, height)).into_drawing_area();
     root.fill(&color::WHITE)?;
     let root = root.margin(5, 5, 5, 5).titled(
-        &test_title,
+        title,
         TextStyle::from(("monospace", 45)).pos(Pos::new(HPos::Center, VPos::Center)),
     )?;
     let mut builder = ChartBuilder::on(&root);
@@ -373,10 +397,6 @@ fn plot_for_data(
     // In log scaling the bars start at a lower bound below the fastest value so
     // the fastest bar stays visible: `0.5` (below a relative min of `1.0`) in
     // relative mode, or `min * 0.5` (below the absolute min) in absolute mode.
-    let kind = match time {
-        Time::Relative => "Relative Time",
-        Time::Absolute => "Time",
-    };
     let log_baseline = match time {
         Time::Relative => 0.5,
         Time::Absolute => min * 0.5,
@@ -401,7 +421,7 @@ fn plot_for_data(
             draw_chart(
                 &root,
                 &mut chart,
-                &data,
+                data,
                 min,
                 time,
                 log_baseline,
@@ -413,7 +433,7 @@ fn plot_for_data(
             draw_chart(
                 &root,
                 &mut chart,
-                &data,
+                data,
                 min,
                 time,
                 0.0,
@@ -512,7 +532,7 @@ where
     Ok(())
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum BenchCategory {
     Execute,
     Startup,
@@ -573,10 +593,153 @@ pub struct BenchGroup {
     pub input: Option<i64>,
 }
 
+impl BenchGroup {
+    /// Returns the measured times of all runtimes of this group that pass `filter`.
+    fn entries(&self, filter: Filter) -> Result<Vec<BenchEntry>, Box<dyn Error>> {
+        self.results
+            .iter()
+            .filter(|&(&vm, _)| filter.keeps(vm))
+            .map(|(&vm, BenchResult { estimate, unit })| {
+                Ok(BenchEntry {
+                    vm,
+                    time: estimate_to_ns(*estimate, unit)?,
+                })
+            })
+            .collect()
+    }
+}
+
 #[derive(Debug)]
 pub struct BenchResult {
     pub estimate: f64,
     pub unit: String,
+}
+
+/// The measured times of all benchmark groups of a single [`BenchCategory`].
+///
+/// Collected while decoding so the geomean plot of the category can be rendered
+/// once all its groups have been seen.
+#[derive(Debug, Default)]
+struct GeomeanData {
+    /// One entry per test case: its name and the times of the runtimes that
+    /// passed the [`Filter`], in nanoseconds.
+    cases: Vec<(String, BTreeMap<VmAndConfig, f64>)>,
+}
+
+impl GeomeanData {
+    /// Records the filtered results of `bench_group` as another test case.
+    fn push_group(
+        &mut self,
+        filter: Filter,
+        bench_group: &BenchGroup,
+    ) -> Result<(), Box<dyn Error>> {
+        let times = bench_group
+            .entries(filter)?
+            .into_iter()
+            .map(|entry| (entry.vm, entry.time))
+            .collect();
+        self.cases.push((bench_group.name.clone(), times));
+        Ok(())
+    }
+
+    /// Returns the runtimes that appear in at least one test case.
+    fn runtimes(&self) -> BTreeSet<VmAndConfig> {
+        self.cases
+            .iter()
+            .flat_map(|(_name, times)| times.keys().copied())
+            .collect()
+    }
+}
+
+/// Renders the geomean plot of `category` into
+/// `target/wasmi-benchmarks/geomean-{category}.svg`.
+///
+/// The geomean summarizes an entire category instead of being one of its test
+/// cases, so it is put next to the `{category}` folders instead of into them.
+///
+/// Every runtime is plotted relative to a theoretical optimal runtime that
+/// picks the fastest measured runtime for each test case individually, as the
+/// geometric mean of its per-test-case ratios `time / optimal`. The geometric
+/// mean is the correct average for such normalized ratios: it is symmetric
+/// under being twice as fast or twice as slow and independent of the runtime
+/// the ratios are normalized to.
+///
+/// Only the test cases that _every_ plotted runtime ran are averaged, so all
+/// bars cover the same set of test cases and stay comparable. Note that this is
+/// evaluated after `filter` has been applied: a test case that is missing only
+/// runtimes that `filter` excludes anyway still contributes to the geomean.
+///
+/// The geomean is always plotted as a relative time, since averaging absolute
+/// times across differently sized test cases is meaningless.
+fn plot_geomean(
+    ext_title: Option<&str>,
+    scale: Scale,
+    category: BenchCategory,
+    geomean_data: &GeomeanData,
+) -> Result<(), Box<dyn Error>> {
+    let runtimes = geomean_data.runtimes();
+    if runtimes.is_empty() {
+        // No runtime of the selected kind ran at all: nothing to plot.
+        return Ok(());
+    }
+    let mut common = Vec::new();
+    for (name, times) in &geomean_data.cases {
+        let missing: Vec<_> = runtimes
+            .iter()
+            .filter(|vm| !times.contains_key(vm))
+            .map(|vm| vm.label())
+            .collect();
+        match missing.is_empty() {
+            true => common.push(times),
+            false => eprintln!(
+                "{category}/geomean: excluding test case {name:?}: not run by {}",
+                missing.join(", ")
+            ),
+        }
+    }
+    if common.is_empty() {
+        eprintln!(
+            "{category}/geomean: no test case was run by all runtimes: skipping geomean plot"
+        );
+        return Ok(());
+    }
+    eprintln!(
+        "{category}/geomean: averaging {} runtimes over {} of {} test cases",
+        runtimes.len(),
+        common.len(),
+        geomean_data.cases.len(),
+    );
+    // Sum the logarithms of the ratios per runtime, so that exponentiating
+    // their mean yields the geometric mean of the ratios themselves.
+    let mut sum_of_logs: BTreeMap<VmAndConfig, f64> =
+        runtimes.iter().map(|&vm| (vm, 0.0)).collect();
+    for times in common.iter() {
+        let optimal = times
+            .values()
+            .copied()
+            .min_by(f64::total_cmp)
+            .expect("test case ran by all runtimes has at least one time");
+        for (vm, sum) in sum_of_logs.iter_mut() {
+            *sum += (times[vm] / optimal).ln();
+        }
+    }
+    let count = common.len() as f64;
+    let data: Vec<_> = sum_of_logs
+        .into_iter()
+        .map(|(vm, sum)| BenchEntry {
+            vm,
+            time: (sum / count).exp(),
+        })
+        .collect();
+    render_plot(
+        &plot_title(ext_title, &format!("{category}/geomean")),
+        &format!("target/wasmi-benchmarks/geomean-{category}.svg"),
+        scale,
+        Time::Relative,
+        "Relative Time vs. optimal runtime",
+        1.0,
+        data,
+    )
 }
 
 fn decode_stdin(
@@ -593,6 +756,9 @@ fn decode_stdin(
     let handle = stdin.lock();
 
     let mut bench_group: Option<BenchGroup> = None;
+    // The results of all groups seen so far, needed to plot the per-category
+    // geomeans once the entire input has been decoded.
+    let mut geomean_data: BTreeMap<BenchCategory, GeomeanData> = BTreeMap::new();
 
     // Iterate over lines from stdin and collect data:
     for line in handle.lines() {
@@ -660,10 +826,17 @@ fn decode_stdin(
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
                     plot_for_data(ext_title, scale, time, filter, &bench_group)?;
+                    geomean_data
+                        .entry(bench_group.category)
+                        .or_default()
+                        .push_group(filter, &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
         };
+    }
+    for (category, geomean_data) in &geomean_data {
+        plot_geomean(ext_title, scale, *category, geomean_data)?;
     }
     Ok(())
 }

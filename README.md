@@ -175,6 +175,10 @@ cargo criterion --bench criterion --message-format=json | cargo run --bin plot
 This generates plots in the `target/wasmi-benchmarks` folder for all the benchmark groups.
 In order to use this you may need to install `cargo-criterion` via `cargo install cargo-criterion`.
 
+Next to the per test case folders, a `geomean-execute.svg` and a `geomean-startup.svg` plot
+summarize each category: every runtime as the geometric mean of its per test case ratios
+against a theoretical optimal runtime that is the fastest one for each test case.
+
 In case you want to collect data first and plot later you can also instead store
 the benchmark results into a file and use the file to plot the data later:
 
