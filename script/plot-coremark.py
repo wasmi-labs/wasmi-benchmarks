@@ -3,8 +3,8 @@
 # - Reads the <input.csv> file which has two columns and a row per Wasm runtime.
 #   The first column represents the Wasm runtime's name, the second column its associated Coremark score.
 #   Scores may be fractional and are rounded to the nearest integer.
-# - Outputs a bar diagram in <output.png> for all the Coremark scores,
-#   sorted from the highest score to the lowest score.
+# - Outputs a horizontal bar diagram in <output.png> for all the Coremark scores,
+#   with the highest score at the top and the lowest score at the bottom.
 #   Defaults to <input-stem>.png in the current working directory.
 #
 # Example <input.csv> file:
@@ -28,6 +28,13 @@ HIGHLIGHT_RUNTIME = "wasmi v2"
 HIGHLIGHT_COLOR = "tab:orange"
 DEFAULT_COLOR = "tab:blue"
 
+# Layout: the figure height scales with the number of runtimes so that the bar
+# thickness stays constant whether the CSV has 6 rows or 22.
+FIG_WIDTH = 9.0
+ROW_HEIGHT = 0.34   # inches of figure height per runtime
+FIG_PADDING = 1.3   # inches for the title, x-axis label and ticks
+BAR_HEIGHT = 0.68   # fraction of a row slot occupied by the bar
+
 def normalize_runtime(runtime: str) -> str:
     """Normalizes a runtime name so that e.g. `wasmi-v2` and `Wasmi v2` compare equal."""
     return runtime.strip().lower().replace("-", " ").replace("_", " ")
@@ -46,30 +53,33 @@ def plot_coremark(csv_path: str, out_path: str, title: str):
     if not rows:
         raise ValueError("CSV contains no data rows")
 
-    rows.sort(key=lambda row: row[1], reverse=True)
+    # Sorted ascending so that the highest score ends up at the top of the plot.
+    rows.sort(key=lambda row: row[1])
     runtimes = [runtime for runtime, _ in rows]
     scores = [score for _, score in rows]
 
-    plt.figure(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_PADDING + ROW_HEIGHT * len(rows)))
 
     colors = [
         HIGHLIGHT_COLOR if normalize_runtime(runtime) == HIGHLIGHT_RUNTIME else DEFAULT_COLOR
         for runtime in runtimes
     ]
-    plt.bar(runtimes, scores, color=colors)
+    bars = ax.barh(runtimes, scores, height=BAR_HEIGHT, color=colors)
 
-    plt.title(title)
-    plt.xlabel("Wasm Runtimes")
-    plt.ylabel("Score (higher is better)")
-    # plt.ylim(bottom=0)
-    plt.ylim(0, max(scores) * 1.1)
+    ax.set_title(title)
+    ax.set_xlabel("Score (higher is better)")
+    # Leaves room for the value labels rendered past the end of the longest bar.
+    ax.set_xlim(0, max(scores) * 1.08)
+    ax.bar_label(bars, padding=3)
 
-    for idx, val in enumerate(scores):
-        plt.text(idx, val, str(val), ha="center", va="bottom")
+    ax.grid(axis="x", color="0.9")
+    ax.set_axisbelow(True)
+    ax.spines[["top", "right", "left"]].set_visible(False)
+    ax.tick_params(axis="y", length=0)
 
-    plt.xticks(rotation=45, ha="right")
-    plt.tight_layout()
-    plt.savefig(out_path)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
