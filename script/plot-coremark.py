@@ -1,11 +1,12 @@
-# USAGE: python3 plot-coremark.py <input.csv> <output.png>
+# USAGE: python3 plot-coremark.py <input.csv> [-o <output.png>] [--title <title>]
 #
 # - Reads the <input.csv> file which has two columns and a row per Wasm runtime.
 #   The first column represents the Wasm runtime's name, the second column its associated Coremark score.
 # - Outputs a bar diagram in <output.png> for all the Coremark scores.
+#   Defaults to <input-stem>.png in the current working directory.
 #
 # Example <input.csv> file:
-# 
+#
 # ```
 # runtime,score
 # Wasmi v0.31,880
@@ -13,11 +14,14 @@
 # Wasmi 1.0,1763
 # ```
 
-import sys
+import argparse
 import csv
+from pathlib import Path
 import matplotlib.pyplot as plt
 
-def plot_coremark(csv_path: str, out_path: str):
+DEFAULT_TITLE = "Coremark"
+
+def plot_coremark(csv_path: str, out_path: str, title: str):
     runtimes = []
     scores = []
 
@@ -36,7 +40,7 @@ def plot_coremark(csv_path: str, out_path: str):
     # plt.bar(runtimes, scores, color=colors[:len(runtimes)])
     plt.bar(runtimes, scores)
 
-    plt.title("Coremark - Apple M2 Pro - rustc 1.97.0 (2d8144b78 2026-07-07)")
+    plt.title(title)
     plt.xlabel("Wasm Runtimes")
     plt.ylabel("Score (higher is better)")
     # plt.ylim(bottom=0)
@@ -50,11 +54,24 @@ def plot_coremark(csv_path: str, out_path: str):
     plt.savefig(out_path)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python3 plot-coremark.py <input.csv> <output.png>")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Plot Coremark scores from a CSV file as a bar diagram."
+    )
+    parser.add_argument("input", help="input CSV file with 'runtime' and 'score' columns")
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="output PNG file (default: <input-stem>.png in the current working directory)",
+    )
+    parser.add_argument(
+        "--title",
+        default=DEFAULT_TITLE,
+        help=f"plot title (default: {DEFAULT_TITLE!r})",
+    )
+    args = parser.parse_args()
 
-    input_csv = sys.argv[1]
-    output_img = sys.argv[2]
+    output = args.output
+    if output is None:
+        output = str(Path.cwd() / f"{Path(args.input).stem}.png")
 
-    plot_coremark(input_csv, output_img)
+    plot_coremark(args.input, output, args.title)
