@@ -139,7 +139,30 @@ Tests the startup performance of the Wasm runtime, prefixed by `startup/`.
 [`bulk-memory-operations`]: https://github.com/WebAssembly/bulk-memory-operations
 [`sort_unstable`]: https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable
 
-## Plots: Geomean
+## Running Benchmarks & Rendering Plots
+
+In order to run the benchmarks and simultaneously plot diagrams of their results use the following command:
+
+```
+cargo criterion --bench criterion --message-format=json | cargo run --bin plot
+```
+
+This generates plots in the `target/wasmi-benchmarks` folder for all the benchmark groups.
+In order to use this you may need to install `cargo-criterion` via `cargo install cargo-criterion`.
+
+Next to the per test case folders, a `geomean-execute.svg` and a `geomean-startup.svg` plot
+summarize each category: every runtime as the geometric mean of its per test case ratios
+against a theoretical optimal runtime that is the fastest one for each test case.
+
+In case you want to collect data first and plot later you can also instead store
+the benchmark results into a file and use the file to plot the data later:
+
+```
+cargo criterion --bench criterion --message-format=json > results.json
+cat results.json | cargo run --bin plot
+```
+
+### Plots: Geomean
 
 The following rendered plots show the geomean across all `execute` and `startup` benchmarks 
 for all Wasm runtimes supported by `wasmi-benchmarks` respectively.
@@ -167,29 +190,6 @@ This will run Coremark using all available Wasm VMs and print their Coremark sco
     <img src="res/images/apple-m2-pro/coremark.svg" alt="CoreMark - Apple M2 Pro" width="66%">
   </a>
 </p>
-
-## Plotting
-
-In order to run the benchmarks and simultaneously plot diagrams of their results use the following command:
-
-```
-cargo criterion --bench criterion --message-format=json | cargo run --bin plot
-```
-
-This generates plots in the `target/wasmi-benchmarks` folder for all the benchmark groups.
-In order to use this you may need to install `cargo-criterion` via `cargo install cargo-criterion`.
-
-Next to the per test case folders, a `geomean-execute.svg` and a `geomean-startup.svg` plot
-summarize each category: every runtime as the geometric mean of its per test case ratios
-against a theoretical optimal runtime that is the fastest one for each test case.
-
-In case you want to collect data first and plot later you can also instead store
-the benchmark results into a file and use the file to plot the data later:
-
-```
-cargo criterion --bench criterion --message-format=json > results.json
-cat results.json | cargo run --bin plot
-```
 
 ## Runtime & Benchmark Support
 
