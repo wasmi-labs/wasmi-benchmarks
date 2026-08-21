@@ -13,7 +13,7 @@
   "wasmi-v0.31": 775.3031005859375,
   "wasmi-v0.32": 1431.3319091796875,
   "wasmi-v1.eager.checked": 1733.002197265625,
-  "wasmi-v2.eager.checked": 4171.01123046875,
+  "wasmi-v2.eager.checked": 4277.77001953125,
   "wasmtime.pulley": 1595.6597900390625,
   "wasmz": 2755.0107421875
 }
