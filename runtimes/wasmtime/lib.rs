@@ -53,11 +53,7 @@ impl Runtime for Wasmtime {
 impl Wasmtime {
     fn can_run(&self, id: TestId) -> bool {
         match self.strategy {
-            Strategy::Cranelift => match id {
-                // Note: ffmpeg takes too long to compile for Cranelift
-                TestId::Startup(StartupTestId::Ffmpeg) => false,
-                _ => true,
-            },
+            Strategy::Cranelift => true,
             Strategy::Winch => match id {
                 // Note: winch does not support the Wasm `tail-call` proposal.
                 TestId::Execute(ExecuteTestId::FibonacciTail) => false,
@@ -66,11 +62,7 @@ impl Wasmtime {
                     cfg!(target_arch = "x86_64") || cfg!(target_arch = "aarch64")
                 }
             },
-            Strategy::Pulley => match id {
-                // Note: ffmpeg takes too long to compile for Pulley
-                TestId::Startup(StartupTestId::Ffmpeg) => false,
-                _ => true,
-            },
+            Strategy::Pulley => true,
         }
     }
 }
