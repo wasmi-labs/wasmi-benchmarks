@@ -139,14 +139,17 @@ Tests the startup performance of the Wasm runtime, prefixed by `startup/`.
 [`bulk-memory-operations`]: https://github.com/WebAssembly/bulk-memory-operations
 [`sort_unstable`]: https://doc.rust-lang.org/std/primitive.slice.html#method.sort_unstable
 
-## Geomean Plots
+## Plots: Geomean
+
+The following rendered plots show the geomean across all `execute` and `startup` benchmarks 
+for all Wasm runtimes supported by `wasmi-benchmarks` respectively.
 
 <p align="center">
-<img src="res/images/apple-m2-pro/geomean-execute.svg" alt="CoreMark - Apple M2 Pro" width="48%">
+<img src="res/images/apple-m2-pro/geomean-execute.svg" alt="CoreMark - Apple M2 Pro" width="66%">
 </p>
 
 <p align="center">
-<img src="res/images/apple-m2-pro/geomean-startup.svg" alt="CoreMark - Apple M2 Pro" width="48%">
+<img src="res/images/apple-m2-pro/geomean-startup.svg" alt="CoreMark - Apple M2 Pro" width="66%">
 </p>
 
 ## Coremark
@@ -161,7 +164,7 @@ This will run Coremark using all available Wasm VMs and print their Coremark sco
 
 <p align="center">
   <a href="./data/apple-m2-pro/coremark.csv">
-    <img src="res/images/apple-m2-pro/coremark.svg" alt="CoreMark - Apple M2 Pro" width="48%">
+    <img src="res/images/apple-m2-pro/coremark.svg" alt="CoreMark - Apple M2 Pro" width="66%">
   </a>
 </p>
 
