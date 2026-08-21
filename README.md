@@ -28,7 +28,7 @@ The following Wasm runtimes and configurations are included.
 | [`fizzy`][Fizzy] | Interpreter | | A fast, deterministic, and pedantic WebAssembly interpreter. |
 | [`dlr-wasm-interpreter`][DLR-wasm-interpreter] | Interpreter | | An in-place Wasm interpreter by the DLR-FT for use in aviation. |
 | [`silverfir-nano.jit`][Silverfir-nano] | Optimizing JIT | | The optimizing JIT of the compact WebAssembly 3.0 Silverfir-nano runtime. |
-| [`silverfir-nano.interpreter`][Silverfir-nano] | Interpreter | | Silverfir-nano's folded stack machine interpreter. |
+| [`silverfir-nano.interpreter`][Silverfir-nano] | Template Interpreter | | Silverfir-nano's folded stack machine interpreter. |
 | [`wasmz`][Wasmz] | Interpreter | | A fast WebAssembly interpreter written in Zig. |
 
 **Missing Wasm runtimes:** [Wain]
