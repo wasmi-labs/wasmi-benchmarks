@@ -23,8 +23,9 @@ import matplotlib.pyplot as plt
 
 DEFAULT_TITLE = "Coremark"
 
-# The runtime that is highlighted in the plot, and the colors used for it and all others.
-HIGHLIGHT_RUNTIME = "wasmi v2"
+# Runtimes whose name contains this substring are highlighted in the plot,
+# and the colors used for them and all others.
+HIGHLIGHT_SUBSTRING = "wasmi v2"
 HIGHLIGHT_COLOR = "tab:orange"
 DEFAULT_COLOR = "tab:blue"
 
@@ -61,7 +62,7 @@ def plot_coremark(csv_path: str, out_path: str, title: str):
     fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_PADDING + ROW_HEIGHT * len(rows)))
 
     colors = [
-        HIGHLIGHT_COLOR if normalize_runtime(runtime) == HIGHLIGHT_RUNTIME else DEFAULT_COLOR
+        HIGHLIGHT_COLOR if HIGHLIGHT_SUBSTRING in normalize_runtime(runtime) else DEFAULT_COLOR
         for runtime in runtimes
     ]
     bars = ax.barh(runtimes, scores, height=BAR_HEIGHT, color=colors)
