@@ -3,6 +3,11 @@ description: 'Installs necessary dependencies like fontconfig and ninja.'
 runs:
   using: 'composite' # Allows for multiple `steps`
   steps:
+    - name: Install Zig
+      # Required to build wasmz-sys (libwasmz static library).
+      uses: goto-bus-stop/setup-zig@v2
+      with:
+        version: 0.16.0
     - name: Install Dependencies (Linux)
       if: runner.os == 'Linux'
       # - libfontconfig1-dev: required for plotters

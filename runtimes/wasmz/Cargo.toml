@@ -1,0 +1,12 @@
+[package]
+name = "rt-wasmz"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+wasmz = { git = "https://github.com/Ray-D-Song/wasmz", tag = "v0.1.4" }

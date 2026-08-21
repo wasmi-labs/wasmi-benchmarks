@@ -69,6 +69,8 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_v8::V8);
     #[cfg(feature = "fizzy")]
     rts.push(rt_fizzy::Fizzy);
+    #[cfg(feature = "wasmz")]
+    rts.push(rt_wasmz::Wasmz);
     rts.into_vec()
 }
 

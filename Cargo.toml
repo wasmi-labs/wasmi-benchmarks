@@ -38,6 +38,7 @@ rt-dlr-wasm-interpreter = { path = "runtimes/dlr-wasm-interpreter", optional = t
 rt-wasmedge = { path = "runtimes/wasmedge", optional = true }
 rt-v8 = { path = "runtimes/v8", optional = true }
 rt-fizzy = { path = "runtimes/fizzy", optional = true }
+rt-wasmz = { path = "runtimes/wasmz", optional = true }
 
 criterion = { workspace = true }
 wat = { workspace = true }
@@ -119,6 +120,7 @@ wasmi-v2 = ["dep:rt-wasmi-v2"]
 wasmedge = ["dep:rt-wasmedge"]
 v8 = ["dep:rt-v8"]
 fizzy = ["dep:rt-fizzy"]
+wasmz = ["dep:rt-wasmz"]
 
 # Enable all interpreter Wasm runtimes.
 interpreters = [
@@ -134,6 +136,7 @@ interpreters = [
     "spacewasm",
     "toywasm",
     "submilli-wasm",
+    "wasmz",
 ]
 # Enable all JIT Wasm runtimes.
 jits = [
@@ -162,4 +165,5 @@ windows = [
     "v8",
     "silverfir-nano-jit",
     "silverfir-nano-interp",
+    "wasmz",
 ]

@@ -3182,6 +3182,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-wasmz"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "wasmz",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4533,6 +4542,7 @@ dependencies = [
  "rt-wasmi-v1",
  "rt-wasmi-v2",
  "rt-wasmtime",
+ "rt-wasmz",
  "serde_json",
  "wat",
 ]
@@ -4900,6 +4910,19 @@ dependencies = [
  "wasmtime-internal-cranelift",
  "winch-codegen",
 ]
+
+[[package]]
+name = "wasmz"
+version = "0.1.3"
+source = "git+https://github.com/Ray-D-Song/wasmz?tag=v0.1.4#0796998b118b957d4434a0b543e5e8a1d90e9ba2"
+dependencies = [
+ "wasmz-sys",
+]
+
+[[package]]
+name = "wasmz-sys"
+version = "0.1.3"
+source = "git+https://github.com/Ray-D-Song/wasmz?tag=v0.1.4#0796998b118b957d4434a0b543e5e8a1d90e9ba2"
 
 [[package]]
 name = "wast"
