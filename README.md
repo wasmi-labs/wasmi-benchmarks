@@ -31,14 +31,11 @@ The following Wasm runtimes and configurations are included.
 | [`silverfir-nano.interpreter`][Silverfir-nano] | Template Interpreter | | Silverfir-nano's folded stack machine interpreter. |
 | [`wasmz`][Wasmz] | Interpreter | | A fast WebAssembly interpreter written in Zig. |
 
-**Missing Wasm runtimes:** [Wain]
-
 [Wasmi v0.31]: https://github.com/wasmi-labs/wasmi/tree/v0.31.2
 [Wasmi v1]: https://github.com/wasmi-labs/wasmi/tree/v1.0.9
 [Wasmi v2]: https://github.com/wasmi-labs/wasmi/tree/v2.0.0-beta.7
 [WAMR]: https://github.com/bytecodealliance/wasm-micro-runtime
 [Toywasm]: https://github.com/yamt/toywasm
-[Wain]: https://github.com/rhysd/wain
 [Tinywasm]: https://github.com/explodingcamera/tinywasm
 [Wasm3]: https://github.com/wasm3/wasm3
 [Wasmtime]: https://github.com/bytecodealliance/wasmtime
