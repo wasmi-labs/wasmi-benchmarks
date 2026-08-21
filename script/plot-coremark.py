@@ -1,11 +1,11 @@
-# USAGE: python3 plot-coremark.py <input.csv> [-o <output.png>] [--title <title>]
+# USAGE: python3 plot-coremark.py <input.csv> [-o <output.svg>] [--title <title>]
 #
 # - Reads the <input.csv> file which has two columns and a row per Wasm runtime.
 #   The first column represents the Wasm runtime's name, the second column its associated Coremark score.
 #   Scores may be fractional and are rounded to the nearest integer.
-# - Outputs a horizontal bar diagram in <output.png> for all the Coremark scores,
+# - Outputs a horizontal bar diagram in <output.svg> for all the Coremark scores,
 #   with the highest score at the top and the lowest score at the bottom.
-#   Defaults to <input-stem>.png in the current working directory.
+#   Defaults to <input-stem>.svg in the current working directory.
 #
 # Example <input.csv> file:
 #
@@ -78,7 +78,9 @@ def plot_coremark(csv_path: str, out_path: str, title: str):
     ax.tick_params(axis="y", length=0)
 
     fig.tight_layout()
-    fig.savefig(out_path, dpi=150)
+    # The format is inferred from the `out_path` extension, so an explicit
+    # `-o <file>.png` still renders a raster image.
+    fig.savefig(out_path)
     plt.close(fig)
 
 if __name__ == "__main__":
@@ -89,7 +91,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output",
-        help="output PNG file (default: <input-stem>.png in the current working directory)",
+        help="output SVG file (default: <input-stem>.svg in the current working directory)",
     )
     parser.add_argument(
         "--title",
@@ -100,6 +102,6 @@ if __name__ == "__main__":
 
     output = args.output
     if output is None:
-        output = str(Path.cwd() / f"{Path(args.input).stem}.png")
+        output = str(Path.cwd() / f"{Path(args.input).stem}.svg")
 
     plot_coremark(args.input, output, args.title)
