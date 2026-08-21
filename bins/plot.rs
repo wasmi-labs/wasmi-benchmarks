@@ -98,6 +98,7 @@ pub enum VmAndConfig {
     Wasmer(WasmerConfig),
     DlrWasmInterpreter,
     SilverfirNano(SilverfirNanoConfig),
+    Wasmz,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -169,6 +170,7 @@ impl VmAndConfig {
             Self::DlrWasmInterpreter => "DLR-wasm-interpreter",
             Self::SilverfirNano(SilverfirNanoConfig::Jit) => "Silverfir-nano (JIT)",
             Self::SilverfirNano(SilverfirNanoConfig::Interpreter) => "Silverfir-nano (interpreter)",
+            Self::Wasmz => "Wasmz",
         }
     }
 
@@ -241,6 +243,7 @@ impl FromStr for VmAndConfig {
             "dlr-wasm-interpreter" => Self::DlrWasmInterpreter,
             "silverfir-nano.jit" => Self::SilverfirNano(SilverfirNanoConfig::Jit),
             "silverfir-nano.interpreter" => Self::SilverfirNano(SilverfirNanoConfig::Interpreter),
+            "wasmz" => Self::Wasmz,
             _ => return Err(FromStrError::from(format!("invalid VmAndConfig: {input}"))),
         };
         Ok(vm_and_config)
