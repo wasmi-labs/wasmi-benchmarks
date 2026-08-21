@@ -4914,7 +4914,7 @@ dependencies = [
 [[package]]
 name = "wasmz"
 version = "0.1.3"
-source = "git+https://github.com/Ray-D-Song/wasmz?rev=ff347b8893f322a6a51332c719df29e7c9886194#ff347b8893f322a6a51332c719df29e7c9886194"
+source = "git+https://github.com/Ray-D-Song/wasmz?tag=v0.1.4#0796998b118b957d4434a0b543e5e8a1d90e9ba2"
 dependencies = [
  "wasmz-sys",
 ]
@@ -4922,7 +4922,7 @@ dependencies = [
 [[package]]
 name = "wasmz-sys"
 version = "0.1.3"
-source = "git+https://github.com/Ray-D-Song/wasmz?rev=ff347b8893f322a6a51332c719df29e7c9886194#ff347b8893f322a6a51332c719df29e7c9886194"
+source = "git+https://github.com/Ray-D-Song/wasmz?tag=v0.1.4#0796998b118b957d4434a0b543e5e8a1d90e9ba2"
 
 [[package]]
 name = "wast"
