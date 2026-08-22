@@ -77,6 +77,97 @@ enum RuntimeKind {
     Interpreter,
 }
 
+/// The Wasm runtime whose results are highlighted in the rendered plots.
+///
+/// Highlighting applies to an entire Wasm runtime, not to a single one of its
+/// configurations: `wasmi-v2` highlights all of `wasmi-v2.eager.checked`,
+/// `wasmi-v2.lazy.checked` and so on.
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default, clap::ValueEnum)]
+enum Highlight {
+    /// Highlight the Wasmi v2 interpreter.
+    #[default]
+    #[value(name = "wasmi-v2")]
+    WasmiV2,
+    /// Do not highlight any Wasm runtime.
+    #[value(name = "none")]
+    None,
+    #[value(name = "fizzy")]
+    Fizzy,
+    #[value(name = "spacewasm")]
+    SpaceWasm,
+    #[value(name = "stitch")]
+    Stitch,
+    #[value(name = "submilli-wasm")]
+    SubmilliWasm,
+    #[value(name = "tinywasm")]
+    Tinywasm,
+    #[value(name = "toywasm")]
+    Toywasm,
+    #[value(name = "v8")]
+    V8,
+    #[value(name = "wamr")]
+    Wamr,
+    #[value(name = "wasm3")]
+    Wasm3,
+    #[value(name = "wasmedge")]
+    WasmEdge,
+    #[value(name = "wasmer")]
+    Wasmer,
+    #[value(name = "wasmi-v0.31")]
+    Wasmi031,
+    #[value(name = "wasmi-v0.32")]
+    Wasmi032,
+    #[value(name = "wasmi-v1")]
+    WasmiV1,
+    #[value(name = "wasmtime")]
+    Wasmtime,
+    #[value(name = "dlr-wasm-interpreter")]
+    DlrWasmInterpreter,
+    #[value(name = "silverfir-nano")]
+    SilverfirNano,
+    #[value(name = "wasmz")]
+    Wasmz,
+}
+
+impl Highlight {
+    /// Returns `true` if the given `vm` is highlighted.
+    fn matches(self, vm: VmAndConfig) -> bool {
+        match self {
+            Highlight::None => false,
+            Highlight::Fizzy => matches!(vm, VmAndConfig::Fizzy),
+            Highlight::SpaceWasm => matches!(vm, VmAndConfig::SpaceWasm),
+            Highlight::Stitch => matches!(vm, VmAndConfig::Stitch),
+            Highlight::SubmilliWasm => matches!(vm, VmAndConfig::SubmilliWasm),
+            Highlight::Tinywasm => matches!(vm, VmAndConfig::Tinywasm),
+            Highlight::Toywasm => matches!(vm, VmAndConfig::Toywasm),
+            Highlight::V8 => matches!(vm, VmAndConfig::V8),
+            Highlight::Wamr => matches!(vm, VmAndConfig::Wamr),
+            Highlight::Wasm3 => matches!(vm, VmAndConfig::Wasm3(_)),
+            Highlight::WasmEdge => matches!(vm, VmAndConfig::WasmEdge),
+            Highlight::Wasmer => matches!(vm, VmAndConfig::Wasmer(_)),
+            Highlight::Wasmi031 => matches!(vm, VmAndConfig::Wasmi031),
+            Highlight::Wasmi032 => matches!(vm, VmAndConfig::Wasmi032),
+            Highlight::WasmiV1 => matches!(vm, VmAndConfig::WasmiV1(_)),
+            Highlight::WasmiV2 => matches!(vm, VmAndConfig::WasmiV2(_)),
+            Highlight::Wasmtime => matches!(vm, VmAndConfig::Wasmtime(_)),
+            Highlight::DlrWasmInterpreter => matches!(vm, VmAndConfig::DlrWasmInterpreter),
+            Highlight::SilverfirNano => matches!(vm, VmAndConfig::SilverfirNano(_)),
+            Highlight::Wasmz => matches!(vm, VmAndConfig::Wasmz),
+        }
+    }
+}
+
+/// The rendering options shared by all plots.
+#[derive(Debug, Copy, Clone)]
+struct Style {
+    /// Scaling of the relative-time axis.
+    scale: Scale,
+    /// Whether to plot relative or absolute times.
+    time: Time,
+    /// The Wasm runtime to highlight.
+    highlight: Highlight,
+}
+
 /// Renders Criterion benchmark results (read as JSON from stdin) into SVG plots.
 #[derive(Debug, Parser)]
 struct Args {
@@ -93,6 +184,11 @@ struct Args {
     /// May be given repeatedly or as a comma separated list.
     #[arg(long = "filter", value_enum, value_delimiter = ',')]
     filters: Vec<Filter>,
+    /// Highlights the results of the given Wasm runtime.
+    ///
+    /// Use `none` to disable highlighting.
+    #[arg(long, value_enum, default_value_t = Highlight::WasmiV2)]
+    highlight: Highlight,
 }
 
 /// VM under test and its configuration.
@@ -196,31 +292,33 @@ impl VmAndConfig {
     const BLUE: RGBColor = RGBColor(52, 119, 186);
     /// The color of most interpreter-based Wasm runtimes.
     const TEAL: RGBColor = RGBColor(76, 161, 143);
-    /// The color of the Wasmi v2 interpreter.
+    /// The color of the highlighted Wasm runtime.
     const ORANGE: RGBColor = RGBColor(227, 146, 63);
 
-    /// Returns the color associated to the Wasm runtime kind.
-    fn color(&self) -> RGBColor {
-        match self {
-            VmAndConfig::WasmiV2(_) => Self::ORANGE,
-            VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => Self::TEAL,
-            VmAndConfig::V8
-            | VmAndConfig::Wasmer(_)
-            | VmAndConfig::Wasmtime(_)
-            | VmAndConfig::SilverfirNano(SilverfirNanoConfig::Jit) => Self::BLUE,
-            _ => Self::TEAL,
+    /// Returns the color associated to the Wasm runtime.
+    ///
+    /// The runtime chosen by `highlight` is orange, all others are colored by
+    /// their [`RuntimeKind`]: JITs are blue and interpreters are teal.
+    fn color(&self, highlight: Highlight) -> RGBColor {
+        if highlight.matches(*self) {
+            return Self::ORANGE;
+        }
+        match self.kind() {
+            RuntimeKind::Jit => Self::BLUE,
+            RuntimeKind::Interpreter => Self::TEAL,
         }
     }
 
     /// Returns the execution kind of the Wasm runtime.
-    ///
-    /// Derived from [`Self::color`] so it stays consistent with the plotted
-    /// colors: JITs are blue, interpreters are teal or orange.
     fn kind(&self) -> RuntimeKind {
-        if self.color() == Self::BLUE {
-            RuntimeKind::Jit
-        } else {
-            RuntimeKind::Interpreter
+        match self {
+            // Pulley is Wasmtime's interpreter, not one of its JITs.
+            VmAndConfig::Wasmtime(WasmtimeConfig::Pulley) => RuntimeKind::Interpreter,
+            VmAndConfig::V8
+            | VmAndConfig::Wasmer(_)
+            | VmAndConfig::Wasmtime(_)
+            | VmAndConfig::SilverfirNano(SilverfirNanoConfig::Jit) => RuntimeKind::Jit,
+            _ => RuntimeKind::Interpreter,
         }
     }
 
@@ -339,8 +437,7 @@ fn format_duration_ns(ns: f64) -> String {
 
 fn plot_for_data(
     ext_title: Option<&str>,
-    scale: Scale,
-    time: Time,
+    style: Style,
     filters: &Filters,
     bench_group: &BenchGroup,
 ) -> Result<(), Box<dyn Error>> {
@@ -355,7 +452,7 @@ fn plot_for_data(
         .map(|entry| entry.time)
         .min_by(f64::total_cmp)
         .unwrap_or(1.0);
-    let kind = match time {
+    let kind = match style.time {
         Time::Relative => "Relative Time",
         Time::Absolute => "Time",
     };
@@ -364,8 +461,7 @@ fn plot_for_data(
     render_plot(
         &plot_title(ext_title, &format!("{category}/{name}")),
         &format!("target/wasmi-benchmarks/{category}/{name}.svg"),
-        scale,
-        time,
+        style,
         kind,
         min,
         data,
@@ -389,8 +485,7 @@ fn plot_title(ext_title: Option<&str>, test_id: &str) -> String {
 fn render_plot(
     title: &str,
     path: &str,
-    scale: Scale,
-    time: Time,
+    style: Style,
     kind: &str,
     min: f64,
     mut data: Vec<BenchEntry>,
@@ -402,7 +497,7 @@ fn render_plot(
         .unwrap_or(1.0);
     // The longest bar reaches the slowest runtime's plotted value: its relative
     // time (`max / min`) in relative mode or its absolute time in absolute mode.
-    let max_value = match time {
+    let max_value = match style.time {
         Time::Relative => max / min,
         Time::Absolute => max,
     };
@@ -430,7 +525,7 @@ fn render_plot(
     // In log scaling the bars start at a lower bound below the fastest value so
     // the fastest bar stays visible: `0.5` (below a relative min of `1.0`) in
     // relative mode, or `min * 0.5` (below the absolute min) in absolute mode.
-    let log_baseline = match time {
+    let log_baseline = match style.time {
         Time::Relative => 0.5,
         Time::Absolute => min * 0.5,
     };
@@ -443,9 +538,9 @@ fn render_plot(
     // the data (plus a small headroom) so the bars are not squeezed into a
     // fraction of the plot. Linear scaling also starts the axis (and the bar
     // baseline) at `0.0` instead of the log baseline.
-    match scale {
+    match style.scale {
         Scale::Log => {
-            let axis_max = match time {
+            let axis_max = match style.time {
                 Time::Relative => core::cmp::max_by(10.0, max_value, f64::total_cmp),
                 Time::Absolute => max_value,
             };
@@ -456,7 +551,7 @@ fn render_plot(
                 &mut chart,
                 data,
                 min,
-                time,
+                style,
                 log_baseline,
                 &format!("{kind} (lower is better, logarithmic scale)"),
             )?;
@@ -468,7 +563,7 @@ fn render_plot(
                 &mut chart,
                 data,
                 min,
-                time,
+                style,
                 0.0,
                 &format!("{kind} (lower is better, linear scale)"),
             )?;
@@ -486,7 +581,7 @@ fn draw_chart<DB, X>(
     chart: &mut ChartContext<'_, DB, Cartesian2d<X, SegmentedCoord<RangedCoordusize>>>,
     data: &[BenchEntry],
     min: f64,
-    time: Time,
+    style: Style,
     baseline: f64,
     x_desc: &str,
 ) -> Result<(), Box<dyn Error>>
@@ -517,7 +612,7 @@ where
         .axis_desc_style(("sans-serif", 35))
         .x_labels(3)
         .y_labels(data.len());
-    if let Time::Absolute = time {
+    if let Time::Absolute = style.time {
         mesh.x_label_formatter(&x_label_formatter);
     }
     mesh.draw()?;
@@ -525,7 +620,7 @@ where
     chart.draw_series(
         Histogram::horizontal(chart)
             .style_func(|x, _bar_height| match x {
-                SegmentValue::Exact(n) => data[*n].vm.color().filled(),
+                SegmentValue::Exact(n) => data[*n].vm.color(style.highlight).filled(),
                 SegmentValue::CenterOf(_n) => unreachable!(),
                 SegmentValue::Last => unreachable!(),
             })
@@ -534,12 +629,12 @@ where
             .data(
                 data.iter()
                     .enumerate()
-                    .map(|(index, entry)| (index, entry.value(min, time))),
+                    .map(|(index, entry)| (index, entry.value(min, style.time))),
             ),
     )?;
 
     chart.draw_series(data.iter().enumerate().map(|(index, &entry)| {
-        let value = entry.value(min, time);
+        let value = entry.value(min, style.time);
         // Anchor the label at the bar's end and offset it by a fixed pixel
         // amount so the gap between bar and label is identical for every bar,
         // regardless of the runtime's value, the axis range or the scaling.
@@ -554,7 +649,7 @@ where
         // vertical center.
         EmptyElement::at((value, SegmentValue::CenterOf(index)))
             + Text::new(
-                entry.label(min, time),
+                entry.label(min, style.time),
                 (10, 2),
                 TextStyle::from(("monospace", 22)).pos(Pos::new(HPos::Left, VPos::Center)),
             )
@@ -706,7 +801,7 @@ impl GeomeanData {
 /// times across differently sized test cases is meaningless.
 fn plot_geomean(
     ext_title: Option<&str>,
-    scale: Scale,
+    style: Style,
     category: BenchCategory,
     geomean_data: &GeomeanData,
 ) -> Result<(), Box<dyn Error>> {
@@ -767,8 +862,11 @@ fn plot_geomean(
     render_plot(
         &plot_title(ext_title, &format!("{category}/geomean")),
         &format!("target/wasmi-benchmarks/geomean-{category}.svg"),
-        scale,
-        Time::Relative,
+        // The geomean is always plotted as a relative time.
+        Style {
+            time: Time::Relative,
+            ..style
+        },
         "Relative Time vs. optimal runtime",
         1.0,
         data,
@@ -777,8 +875,7 @@ fn plot_geomean(
 
 fn decode_stdin(
     ext_title: Option<&str>,
-    scale: Scale,
-    time: Time,
+    style: Style,
     filters: &Filters,
 ) -> Result<(), Box<dyn Error>> {
     use serde_json as json;
@@ -858,7 +955,7 @@ fn decode_stdin(
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(ext_title, scale, time, filters, &bench_group)?;
+                    plot_for_data(ext_title, style, filters, &bench_group)?;
                     geomean_data
                         .entry(bench_group.category)
                         .or_default()
@@ -869,7 +966,7 @@ fn decode_stdin(
         };
     }
     for (category, geomean_data) in &geomean_data {
-        plot_geomean(ext_title, scale, *category, geomean_data)?;
+        plot_geomean(ext_title, style, *category, geomean_data)?;
     }
     Ok(())
 }
@@ -879,5 +976,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let filters = Filters {
         filters: args.filters,
     };
-    decode_stdin(args.title.as_deref(), args.scale, args.time, &filters)
+    let style = Style {
+        scale: args.scale,
+        time: args.time,
+        highlight: args.highlight,
+    };
+    decode_stdin(args.title.as_deref(), style, &filters)
 }
