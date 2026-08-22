@@ -39,6 +39,8 @@ enum Filter {
     Jit,
     /// Exclude all interpreter-based Wasm runtimes.
     Interpreter,
+    /// Exclude all Wasm runtimes that a newer supported version supersedes.
+    Outdated,
 }
 
 impl Filter {
@@ -48,7 +50,21 @@ impl Filter {
             Filter::None => true,
             Filter::Jit => vm.kind() != RuntimeKind::Jit,
             Filter::Interpreter => vm.kind() != RuntimeKind::Interpreter,
+            Filter::Outdated => !vm.is_outdated(),
         }
+    }
+}
+
+/// The [`Filter`]s to apply, combined conjunctively.
+#[derive(Debug, Default, Clone)]
+struct Filters {
+    filters: Vec<Filter>,
+}
+
+impl Filters {
+    /// Returns `true` if the given `vm` passes all of the filters.
+    fn keeps(&self, vm: VmAndConfig) -> bool {
+        self.filters.iter().all(|filter| filter.keeps(vm))
     }
 }
 
@@ -72,9 +88,11 @@ struct Args {
     /// Whether to plot relative or absolute times.
     #[arg(long, value_enum, default_value_t = Time::Relative)]
     time: Time,
-    /// Excludes a kind of Wasm runtime from the plots.
-    #[arg(long, value_enum, default_value_t = Filter::None)]
-    filter: Filter,
+    /// Excludes kinds of Wasm runtimes from the plots.
+    ///
+    /// May be given repeatedly or as a comma separated list.
+    #[arg(long = "filter", value_enum, value_delimiter = ',')]
+    filters: Vec<Filter>,
 }
 
 /// VM under test and its configuration.
@@ -205,6 +223,18 @@ impl VmAndConfig {
             RuntimeKind::Interpreter
         }
     }
+
+    /// Returns `true` if a newer version of this Wasm runtime is supported.
+    ///
+    /// Configurations of the same version are never considered newer than one
+    /// another, only entire runtime versions are.
+    fn is_outdated(&self) -> bool {
+        matches!(
+            self,
+            // All superseded by `Self::WasmiV2`.
+            Self::Wasmi031 | Self::Wasmi032 | Self::WasmiV1(_)
+        )
+    }
 }
 
 impl FromStr for VmAndConfig {
@@ -311,10 +341,10 @@ fn plot_for_data(
     ext_title: Option<&str>,
     scale: Scale,
     time: Time,
-    filter: Filter,
+    filters: &Filters,
     bench_group: &BenchGroup,
 ) -> Result<(), Box<dyn Error>> {
-    let data = bench_group.entries(filter)?;
+    let data = bench_group.entries(filters)?;
     if data.is_empty() {
         // No runtime of the selected kind ran in this group: nothing to plot.
         return Ok(());
@@ -597,11 +627,11 @@ pub struct BenchGroup {
 }
 
 impl BenchGroup {
-    /// Returns the measured times of all runtimes of this group that pass `filter`.
-    fn entries(&self, filter: Filter) -> Result<Vec<BenchEntry>, Box<dyn Error>> {
+    /// Returns the measured times of all runtimes of this group that pass `filters`.
+    fn entries(&self, filters: &Filters) -> Result<Vec<BenchEntry>, Box<dyn Error>> {
         self.results
             .iter()
-            .filter(|&(&vm, _)| filter.keeps(vm))
+            .filter(|&(&vm, _)| filters.keeps(vm))
             .map(|(&vm, BenchResult { estimate, unit })| {
                 Ok(BenchEntry {
                     vm,
@@ -625,7 +655,7 @@ pub struct BenchResult {
 #[derive(Debug, Default)]
 struct GeomeanData {
     /// One entry per test case: its name and the times of the runtimes that
-    /// passed the [`Filter`], in nanoseconds.
+    /// passed the [`Filters`], in nanoseconds.
     cases: Vec<(String, BTreeMap<VmAndConfig, f64>)>,
 }
 
@@ -633,11 +663,11 @@ impl GeomeanData {
     /// Records the filtered results of `bench_group` as another test case.
     fn push_group(
         &mut self,
-        filter: Filter,
+        filters: &Filters,
         bench_group: &BenchGroup,
     ) -> Result<(), Box<dyn Error>> {
         let times = bench_group
-            .entries(filter)?
+            .entries(filters)?
             .into_iter()
             .map(|entry| (entry.vm, entry.time))
             .collect();
@@ -749,7 +779,7 @@ fn decode_stdin(
     ext_title: Option<&str>,
     scale: Scale,
     time: Time,
-    filter: Filter,
+    filters: &Filters,
 ) -> Result<(), Box<dyn Error>> {
     use serde_json as json;
     use std::io::{self, BufRead};
@@ -828,11 +858,11 @@ fn decode_stdin(
                 // reason: group-complete
                 //     - group_name: "{exec-or-compile} / {test-case}"
                 if let Some(bench_group) = bench_group.take() {
-                    plot_for_data(ext_title, scale, time, filter, &bench_group)?;
+                    plot_for_data(ext_title, scale, time, filters, &bench_group)?;
                     geomean_data
                         .entry(bench_group.category)
                         .or_default()
-                        .push_group(filter, &bench_group)?;
+                        .push_group(filters, &bench_group)?;
                 }
             }
             _ => panic!("malformed JSON input: {json:?}"),
@@ -846,5 +876,8 @@ fn decode_stdin(
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
-    decode_stdin(args.title.as_deref(), args.scale, args.time, args.filter)
+    let filters = Filters {
+        filters: args.filters,
+    };
+    decode_stdin(args.title.as_deref(), args.scale, args.time, &filters)
 }
