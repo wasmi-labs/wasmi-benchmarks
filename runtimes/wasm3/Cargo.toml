@@ -9,4 +9,4 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-wasm3 = { package = "wasm3x", version = "0.1" }
+wasm3 = { package = "wasm3x", version = "0.2" }

@@ -1,7 +1,7 @@
 #![crate_type = "dylib"]
 
 use anyhow::bail;
-use benchmark_utils::{self as utils, ExecuteTestId};
+use benchmark_utils as utils;
 use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasm3::CompilationMode;
 use wasm3::{Func, Val};
@@ -43,10 +43,7 @@ impl Runtime for Wasm3 {
 impl Wasm3 {
     fn can_run(&self, id: TestId) -> bool {
         match id {
-            TestId::Execute(_) => {
-                !matches!(id, TestId::Execute(ExecuteTestId::FibonacciTail))
-                    && matches!(self.compilation_mode, CompilationMode::Eager)
-            }
+            TestId::Execute(_) => matches!(self.compilation_mode, CompilationMode::Eager),
             _ => true,
         }
     }
@@ -175,17 +172,18 @@ impl Wasm3Module {
     fn prepare_results(&mut self, func: &Func) -> anyhow::Result<()> {
         self.results.clear();
         for ty in func.ty(&self.store)?.results() {
-            self.results.push(Val::default_for_ty(*ty))
+            let Some(val) = Val::default_for_ty(*ty) else {
+                bail!("unsupported result type: {ty:?}")
+            };
+            self.results.push(val);
         }
         Ok(())
     }
 
-    fn write_back_results(&mut self, results: &mut [utils::Val]) {
+    fn write_back_results(&self, results: &mut [utils::Val]) {
         assert_eq!(results.len(), self.results.len());
-        for (i, result) in results.iter_mut().enumerate() {
-            let ty = self.results[i].ty();
-            let src = core::mem::replace(&mut self.results[i], Val::default_for_ty(ty));
-            *result = into_utils_val(src);
+        for (dst, src) in results.iter_mut().zip(self.results.iter().copied()) {
+            *dst = into_utils_val(src);
         }
     }
 }
@@ -214,5 +212,6 @@ fn into_utils_val(val: Val) -> utils::Val {
         Val::I64(val) => utils::Val::I64(val),
         Val::F32(val) => utils::Val::F32(val),
         Val::F64(val) => utils::Val::F64(val),
+        Val::FuncRef(_) => panic!("unsupported value type: funcref"),
     }
 }

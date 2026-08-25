@@ -4211,18 +4211,18 @@ dependencies = [
 
 [[package]]
 name = "wasm3x"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21120cf0f5243543e494afff9478516f7605c620f8c3385c07f12e1a5dc65450"
+checksum = "b3657817b767279fb1f572590fc31bb3b06290ab031e02a273e8f6f7281998e7"
 dependencies = [
  "wasm3x-sys",
 ]
 
 [[package]]
 name = "wasm3x-sys"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b68d3e9dd1795a6295d15147c90211a1d4088654c1dc98720b9b84e3ace9f12f"
+checksum = "7841271ca25c5d36d4b0fc8d9fe4d6c67a73362eec24d7ca88bc2f891cebce58"
 dependencies = [
  "bindgen 0.71.1",
  "cc",
