@@ -229,7 +229,7 @@ dependencies = [
  "bitflags 2.13.1",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -249,7 +249,7 @@ dependencies = [
  "bitflags 2.13.1",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.12.1",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -1393,18 +1393,18 @@ checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
 
 [[package]]
 name = "fizzyx"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aed4ace76d9bec7bbcce7f38e5f38c30e385453db9fdd4a8ac0d2321deba7e1e"
+checksum = "ea54c194819b9ea8f5f2dbc45c0d9887f19960b84d70e12e096e388384a05d04"
 dependencies = [
  "fizzyx-sys",
 ]
 
 [[package]]
 name = "fizzyx-sys"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b765c5977ba34e1617c3f2ceade9b2975ea59ffe15479b9dce694c05188a69db"
+checksum = "2fd84c3787905de8a798f53086a249e2a030f64e714744997102af32ba959224"
 dependencies = [
  "bindgen 0.72.1",
  "cmake",

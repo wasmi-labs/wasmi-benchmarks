@@ -9,4 +9,4 @@ path = "lib.rs"
 [dependencies]
 benchmark-utils = { workspace = true }
 anyhow = { workspace = true }
-fizzy = { package = "fizzyx", version = "0.1.0" }
+fizzy = { package = "fizzyx", version = "0.1.1" }
