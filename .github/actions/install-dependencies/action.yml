@@ -18,6 +18,19 @@ runs:
       run: |
         sudo apt-get update
         sudo apt-get install -y libfontconfig1-dev ninja-build cmake clang libclang-dev
+    # A C compiler with `musttail` support is required for Wasm3's own Wasm tail-call support.
+    - name: Install GCC 15 (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        if ! sudo apt-get install -y gcc-15 g++-15; then
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install -y gcc-15 g++-15
+        fi
+        gcc-15 --version
+        echo "CC=gcc-15" >> "$GITHUB_ENV"
+        echo "CXX=g++-15" >> "$GITHUB_ENV"
     - name: Install Dependencies (macOS)
       if: runner.os == 'macOS'
       # ninja: required for Wasmer's WAMR backend; cmake: required to build rt-wamr.
