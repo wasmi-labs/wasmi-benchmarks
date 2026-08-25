@@ -68,7 +68,12 @@ fn execute_benchmark_with_val(
             b.iter(|| {
                 instance
                     .call("run", slice::from_ref(&input), slice::from_mut(&mut result))
-                    .unwrap();
+                    .unwrap_or_else(|error| {
+                        panic!(
+                            "execute/{id}: `run({input})` failed for {}: {error}",
+                            vm.id()
+                        )
+                    });
             });
         });
     }
