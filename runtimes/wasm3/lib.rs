@@ -2,7 +2,7 @@
 
 use anyhow::bail;
 use benchmark_utils as utils;
-use benchmark_utils::{ModuleInstance, Runtime, RuntimeInstance, TestId};
+use benchmark_utils::{ExecuteTestId, ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use wasm3::CompilationMode;
 use wasm3::{Func, Val};
 
@@ -42,8 +42,18 @@ impl Runtime for Wasm3 {
 
 impl Wasm3 {
     fn can_run(&self, id: TestId) -> bool {
+        if matches!(id, TestId::Execute(_))
+            && !matches!(self.compilation_mode, CompilationMode::Eager)
+        {
+            // Run `execute` only with `eager` mode.
+            return false;
+        }
         match id {
-            TestId::Execute(_) => matches!(self.compilation_mode, CompilationMode::Eager),
+            TestId::Execute(ExecuteTestId::FibonacciTail) => {
+                // Wasm3 requires the default C compiler to support `musttail` when compiling
+                // the Wasm3 sources in order to properly support Wasm tail-calls.
+                wasm3::has_guaranteed_tail_calls()
+            }
             _ => true,
         }
     }
