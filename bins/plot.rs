@@ -27,6 +27,8 @@ enum Time {
     Relative,
     /// Absolute measured durations (e.g. `5.23 ms`).
     Absolute,
+    /// Absolute durations with the relative value in parenthesis (e.g. `5.23 ms (x2.35)`).
+    Both,
 }
 
 /// Excludes a kind of Wasm runtime from the rendered plots.
@@ -162,7 +164,7 @@ impl Highlight {
 struct Style {
     /// Scaling of the relative-time axis.
     scale: Scale,
-    /// Whether to plot relative or absolute times.
+    /// Whether to plot relative, absolute or both times.
     time: Time,
     /// The Wasm runtime to highlight.
     highlight: Highlight,
@@ -176,7 +178,7 @@ struct Args {
     /// Scaling of the relative-time axis.
     #[arg(long, value_enum, default_value_t = Scale::Log)]
     scale: Scale,
-    /// Whether to plot relative or absolute times.
+    /// Whether to plot relative, absolute or both times.
     #[arg(long, value_enum, default_value_t = Time::Relative)]
     time: Time,
     /// Excludes kinds of Wasm runtimes from the plots.
@@ -389,19 +391,27 @@ impl BenchEntry {
     /// Returns the value plotted for this entry given the fastest time `min` (nanoseconds).
     ///
     /// In [`Time::Relative`] mode this is the ratio to the fastest runtime, in
-    /// [`Time::Absolute`] mode it is the raw time in nanoseconds.
+    /// [`Time::Absolute`] and [`Time::Both`] mode it is the raw time in nanoseconds.
     fn value(&self, min: f64, time: Time) -> f64 {
         match time {
             Time::Relative => self.time / min,
-            Time::Absolute => self.time,
+            Time::Absolute | Time::Both => self.time,
         }
     }
 
     /// Returns the label drawn at the end of this entry's bar.
+    ///
+    /// [`Time::Both`] mode appends the ratio to the fastest runtime in
+    /// parenthesis after the absolute duration.
     fn label(&self, min: f64, time: Time) -> String {
         match time {
             Time::Relative => format!("x{:.02}", self.value(min, time)),
             Time::Absolute => format_duration_ns(self.time),
+            Time::Both => format!(
+                "{} (x{:.02})",
+                format_duration_ns(self.time),
+                self.time / min
+            ),
         }
     }
 }
@@ -454,7 +464,7 @@ fn plot_for_data(
         .unwrap_or(1.0);
     let kind = match style.time {
         Time::Relative => "Relative Time",
-        Time::Absolute => "Time",
+        Time::Absolute | Time::Both => "Time",
     };
     let category = bench_group.category;
     let name = &bench_group.name;
@@ -499,7 +509,7 @@ fn render_plot(
     // time (`max / min`) in relative mode or its absolute time in absolute mode.
     let max_value = match style.time {
         Time::Relative => max / min,
-        Time::Absolute => max,
+        Time::Absolute | Time::Both => max,
     };
     // Slowest runtime first so the bars form a descending staircase.
     data.sort_by(|lhs, rhs| rhs.time.total_cmp(&lhs.time));
@@ -515,10 +525,17 @@ fn render_plot(
         TextStyle::from(("monospace", 45)).pos(Pos::new(HPos::Center, VPos::Center)),
     )?;
     let mut builder = ChartBuilder::on(&root);
+    // The bar labels are drawn to the right of the bars into this margin, so it
+    // has to fit the longest label: `Time::Both` labels carry the relative value
+    // in addition to the absolute duration and thus need more room.
+    let margin_right = match style.time {
+        Time::Relative | Time::Absolute => 200,
+        Time::Both => 320,
+    };
     builder
         .x_label_area_size(75)
         .y_label_area_size(400)
-        .margin_right(200)
+        .margin_right(margin_right)
         .margin_top(25);
     let y_axis = (0usize..data.len() - 1).into_segmented();
 
@@ -527,7 +544,7 @@ fn render_plot(
     // relative mode, or `min * 0.5` (below the absolute min) in absolute mode.
     let log_baseline = match style.time {
         Time::Relative => 0.5,
-        Time::Absolute => min * 0.5,
+        Time::Absolute | Time::Both => min * 0.5,
     };
 
     // Log and linear scaling produce different chart coordinate types, so the
@@ -542,7 +559,7 @@ fn render_plot(
         Scale::Log => {
             let axis_max = match style.time {
                 Time::Relative => core::cmp::max_by(10.0, max_value, f64::total_cmp),
-                Time::Absolute => max_value,
+                Time::Absolute | Time::Both => max_value,
             };
             let mut chart =
                 builder.build_cartesian_2d((log_baseline..axis_max * 1.05).log_scale(), y_axis)?;
@@ -612,7 +629,7 @@ where
         .axis_desc_style(("sans-serif", 35))
         .x_labels(3)
         .y_labels(data.len());
-    if let Time::Absolute = style.time {
+    if matches!(style.time, Time::Absolute | Time::Both) {
         mesh.x_label_formatter(&x_label_formatter);
     }
     mesh.draw()?;
