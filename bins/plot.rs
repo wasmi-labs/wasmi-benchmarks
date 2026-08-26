@@ -293,7 +293,7 @@ impl VmAndConfig {
     /// The color of JIT-compiling Wasm runtimes.
     const BLUE: RGBColor = RGBColor(52, 119, 186);
     /// The color of most interpreter-based Wasm runtimes.
-    const TEAL: RGBColor = RGBColor(76, 161, 143);
+    const TEAL: RGBColor = RGBColor(85, 175, 160);
     /// The color of the highlighted Wasm runtime.
     const ORANGE: RGBColor = RGBColor(227, 146, 63);
 
