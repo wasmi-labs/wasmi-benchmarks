@@ -1,0 +1,26 @@
+{
+  "dlr-wasm-interpreter": 196.82456970214844,
+  "fizzy": 832.324462890625,
+  "silverfir-nano.interpreter": 3860.01025390625,
+  "silverfir-nano.jit": 19998.666015625,
+  "spacewasm": 342.17279052734375,
+  "stitch": 2947.027099609375,
+  "submilli-wasm": 346.7206115722656,
+  "tinywasm": 666.141845703125,
+  "toywasm": 88.31794738769531,
+  "v8": 19470.404296875,
+  "wamr": 2089.8642578125,
+  "wasm3.eager": 2608.241943359375,
+  "wasmedge": 176.17005920410156,
+  "wasmer.cranelift": 23453.990234375,
+  "wasmer.singlepass": 8930.74609375,
+  "wasmi-v0.31": 1001.2515869140625,
+  "wasmi-v0.32": 1394.408447265625,
+  "wasmi-v1.eager.checked": 1504.4381103515625,
+  "wasmi-v2.eager.checked": 3426.221923828125,
+  "wasmtime.cranelift": 23230.6015625,
+  "wasmtime.pulley": 1273.074462890625,
+  "wasmtime.winch": 10340.7265625,
+  "wasmz": 2048.760498046875
+}
+
