@@ -6,6 +6,9 @@
 # - Outputs a horizontal bar diagram in <output.svg> for all the Coremark scores,
 #   with the highest score at the top and the lowest score at the bottom.
 #   Defaults to <input-stem>.svg in the current working directory.
+# - Bars are colored like those of the `plot` binary: the highlighted Wasmi 2.0
+#   runtime is orange, other JIT-compiling runtimes are blue and other
+#   interpreter-based runtimes are teal.
 #
 # Example <input.json> file:
 #
@@ -24,17 +27,20 @@ import matplotlib.pyplot as plt
 
 DEFAULT_TITLE = "Coremark"
 
-# Runtimes whose ID starts with this prefix are highlighted in the plot,
-# and the colors used for them and all others.
+# Runtimes whose ID starts with this prefix are highlighted in the plot.
 HIGHLIGHT_ID_PREFIX = "wasmi-v2"
-HIGHLIGHT_COLOR = "tab:orange"
-DEFAULT_COLOR = "tab:blue"
+
+# Bar colors, kept in sync with `VmAndConfig::{BLUE,TEAL,ORANGE}` in `bins/plot.rs`:
+# the highlighted runtime is orange, all others are colored by their kind.
+JIT_COLOR = "#3477ba"          # RGBColor(52, 119, 186)
+INTERPRETER_COLOR = "#55afa0"  # RGBColor(85, 175, 160)
+HIGHLIGHT_COLOR = "#e3923f"    # RGBColor(227, 146, 63)
 
 # Maps a runtime ID, as emitted by the `coremark` binary, to its display label.
 #
 # The source of truth for both the IDs and the labels is `bins/plot.rs`
 # (`VmAndConfig::from_str` and `VmAndConfig::label`); adding a runtime there
-# requires adding it here as well.
+# requires adding it here as well, and to `JIT_RUNTIME_IDS` below if it is a JIT.
 RUNTIME_LABELS = {
     "dlr-wasm-interpreter": "DLR-wasm-interpreter",
     "fizzy": "Fizzy",
@@ -70,6 +76,25 @@ RUNTIME_LABELS = {
     "wasmz": "Wasmz",
 }
 
+# Runtime IDs of JIT-compiling runtimes; everything else is an interpreter.
+# Mirrors `VmAndConfig::kind` in `bins/plot.rs`. Note that `wasmtime.pulley` is
+# absent on purpose: Pulley is Wasmtime's interpreter, not one of its JITs.
+JIT_RUNTIME_IDS = {
+    "silverfir-nano.jit",
+    "v8",
+    "wasmer.cranelift",
+    "wasmer.singlepass",
+    "wasmtime.cranelift",
+    "wasmtime.winch",
+}
+
+def bar_color(runtime_id: str) -> str:
+    if runtime_id.startswith(HIGHLIGHT_ID_PREFIX):
+        return HIGHLIGHT_COLOR
+    if runtime_id in JIT_RUNTIME_IDS:
+        return JIT_COLOR
+    return INTERPRETER_COLOR
+
 # Layout: the figure height scales with the number of runtimes so that the bar
 # thickness stays constant whether the input has 6 entries or 22.
 FIG_WIDTH = 9.0
@@ -103,10 +128,7 @@ def plot_coremark(json_path: str, out_path: str, title: str):
 
     fig, ax = plt.subplots(figsize=(FIG_WIDTH, FIG_PADDING + ROW_HEIGHT * len(rows)))
 
-    colors = [
-        HIGHLIGHT_COLOR if runtime_id.startswith(HIGHLIGHT_ID_PREFIX) else DEFAULT_COLOR
-        for runtime_id, _, _ in rows
-    ]
+    colors = [bar_color(runtime_id) for runtime_id, _, _ in rows]
     bars = ax.barh(labels, scores, height=BAR_HEIGHT, color=colors)
 
     ax.set_title(title)
