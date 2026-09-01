@@ -167,14 +167,6 @@ cat results.json | cargo run --bin plot
 The following rendered plots show the geomean across all `execute` and `startup` benchmarks 
 for all Wasm runtimes supported by `wasmi-benchmarks` respectively.
 
-<p align="center">
-<img src="res/images/apple-m2-pro/geomean-execute.svg" alt="CoreMark - Apple M2 Pro" width="66%">
-</p>
-
-<p align="center">
-<img src="res/images/apple-m2-pro/geomean-startup.svg" alt="CoreMark - Apple M2 Pro" width="66%">
-</p>
-
 ## Coremark
 
 This benchmark suite also contains a Coremark test which can be run via
@@ -184,12 +176,6 @@ cargo run --profile bench
 ```
 
 This will run Coremark using all available Wasm VMs and print their Coremark scores to the console.
-
-<p align="center">
-  <a href="./data/apple-m2-pro/coremark.csv">
-    <img src="res/images/apple-m2-pro/coremark.svg" alt="CoreMark - Apple M2 Pro" width="66%">
-  </a>
-</p>
 
 ## Runtime & Benchmark Support
 
