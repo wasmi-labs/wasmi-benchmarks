@@ -162,6 +162,10 @@ cargo criterion --bench criterion --message-format=json > results.json
 cat results.json | cargo run --bin plot
 ```
 
+Rendered plots are hosted at [wasmi-benchmarks-plots].
+
+[wasmi-benchmarks-plots]: https://github.com/wasmi-labs/wasmi-benchmarks-plots
+
 ### Plots: Geomean
 
 The following rendered plots show the geomean across all `execute` and `startup` benchmarks 
