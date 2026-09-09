@@ -3419,17 +3419,18 @@ dependencies = [
 
 [[package]]
 name = "sf-nano-core"
-version = "0.1.0"
-source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.5#6d26e34c9ede64c66b8f45308fe7cea9489156b5"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef6f18765f98cb164a24e26579805c5dd9e5cfe8c0b0b0e23fe53e69e9ecbd5b"
 dependencies = [
- "paste",
  "sf-nano-tracked-alloc",
 ]
 
 [[package]]
 name = "sf-nano-tracked-alloc"
-version = "0.1.0"
-source = "git+https://github.com/mbbill/Silverfir-nano?tag=0.5#6d26e34c9ede64c66b8f45308fe7cea9489156b5"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e98ce29893260ea7748c50bf3b241e50bda267e4748be31d2570fec7c4090743"
 
 [[package]]
 name = "sha2"

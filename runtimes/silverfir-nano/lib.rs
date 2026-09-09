@@ -4,7 +4,8 @@
 use anyhow::{anyhow, bail};
 use benchmark_utils::{self as utils, ModuleInstance, Runtime, RuntimeInstance, TestId};
 pub use sf_nano_core::Tier;
-use sf_nano_core::{Caller, Config, Engine, Import, Instance, Value, WasmError};
+use sf_nano_core::value_type::ValueType;
+use sf_nano_core::{Caller, Config, Engine, FunctionType, Import, Instance, Value, WasmError};
 
 /// The Silverfir-nano Wasm runtime.
 ///
@@ -29,6 +30,7 @@ struct SilverfirNanoInstance {
 struct SilverfirNanoModule {
     instance: Instance,
     params: Vec<Value>,
+    results: Vec<Value>,
 }
 
 impl Runtime for SilverfirNano {
@@ -71,29 +73,28 @@ impl RuntimeInstance for SilverfirNanoInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        // Recorded here and replayed as a real Silverfir-nano import in `instantiate`, where each
-        // call is dispatched to `func`. In practice the benchmarks never call these (execute cases
-        // import nothing; startup cases only link imports to satisfy instantiation, which is all
-        // that is timed), but the wiring is faithful rather than an inert stub.
+        // Capture each host function and its signature for instantiation.
         self.linker.define(module, name, ty, func);
     }
 
     fn instantiate(&self, wasm: &[u8]) -> Box<dyn ModuleInstance> {
-        // Replay every recorded host function as a real import. Silverfir-nano now accepts `Fn`
-        // closures for host functions, so each import captures the recorded `func` and dispatches
-        // to it across the runtime-neutral value boundary instead of being a no-op stub.
         let imports: Vec<Import> = self
             .linker
             .funcs()
             .map(|(module, name, ty, func)| {
                 // Owned so the `'static` host closure can seed its result slots on every call.
                 let result_types = ty.results().to_vec();
-                Import::func(
+                let func_type = FunctionType::new(
+                    ty.params().iter().copied().map(from_utils_type).collect(),
+                    ty.results().iter().copied().map(from_utils_type).collect(),
+                );
+                Import::func_typed(
                     module,
                     name,
                     move |_caller: &mut Caller, params: &[Value], results: &mut [Value]| {
                         dispatch_host_func(func, &result_types, params, results)
                     },
+                    func_type,
                 )
             })
             .collect();
@@ -102,6 +103,7 @@ impl RuntimeInstance for SilverfirNanoInstance {
         Box::new(SilverfirNanoModule {
             instance,
             params: Vec::new(),
+            results: Vec::new(),
         })
     }
 }
@@ -116,18 +118,15 @@ impl ModuleInstance for SilverfirNanoModule {
         self.params.clear();
         self.params
             .extend(params.iter().copied().map(from_utils_val));
-        let call_results = self
+        let func = self
             .instance
-            .invoke(name, &self.params)
+            .get_func(name)
+            .ok_or_else(|| anyhow!("silverfir-nano: function `{name}` not found"))?;
+        self.results.resize(results.len(), Value::I32(0));
+        self.instance
+            .call(&func, &self.params, &mut self.results)
             .map_err(|err| anyhow!("silverfir-nano: call to `{name}` failed: {err}"))?;
-        if call_results.len() != results.len() {
-            bail!(
-                "silverfir-nano: `{name}` returned {} results but {} were expected",
-                call_results.len(),
-                results.len(),
-            );
-        }
-        for (dst, src) in results.iter_mut().zip(call_results) {
+        for (dst, src) in results.iter_mut().zip(self.results.iter().copied()) {
             *dst = into_utils_val(src)?;
         }
         Ok(())
@@ -137,17 +136,17 @@ impl ModuleInstance for SilverfirNanoModule {
         let memory = self
             .instance
             .memory()
-            .ok_or_else(|| anyhow!("silverfir-nano: module has no memory"))?;
-        let slice = mem_slice(memory, ptr, buffer.len())?;
+            .map_err(|err| anyhow!("silverfir-nano: memory access failed: {err}"))?;
+        let slice = mem_slice(&memory, ptr, buffer.len())?;
         buffer.copy_from_slice(slice);
         Ok(())
     }
 
     fn write_memory(&mut self, _name: &str, ptr: u32, buffer: &[u8]) -> anyhow::Result<()> {
-        let memory = self
+        let mut memory = self
             .instance
             .memory_mut()
-            .ok_or_else(|| anyhow!("silverfir-nano: module has no memory"))?;
+            .map_err(|err| anyhow!("silverfir-nano: memory access failed: {err}"))?;
         let len = memory.len();
         let start = ptr as usize;
         let end = start
@@ -197,7 +196,7 @@ fn host_value_to_utils(val: Value) -> Result<utils::Val, WasmError> {
         Value::F32(val) => utils::Val::F32(val),
         Value::F64(val) => utils::Val::F64(val),
         _ => {
-            return Err(WasmError::Trap(
+            return Err(WasmError::trap(
                 "silverfir-nano: unsupported host function argument type",
             ));
         }
@@ -231,4 +230,13 @@ fn into_utils_val(val: Value) -> anyhow::Result<utils::Val> {
         Value::F64(val) => utils::Val::F64(val),
         other => bail!("silverfir-nano: unsupported result value: {other:?}"),
     })
+}
+
+fn from_utils_type(ty: utils::ValType) -> ValueType {
+    match ty {
+        utils::ValType::I32 => ValueType::I32,
+        utils::ValType::I64 => ValueType::I64,
+        utils::ValType::F32 => ValueType::F32,
+        utils::ValType::F64 => ValueType::F64,
+    }
 }
