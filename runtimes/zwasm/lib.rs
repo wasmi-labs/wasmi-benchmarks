@@ -41,14 +41,7 @@ pub struct Zwasm {
 struct ZwasmInstance {
     tier: Tier,
     engine: Engine,
-    linked: Vec<Linked>,
-}
-
-struct Linked {
-    module: String,
-    name: String,
-    ty: utils::FuncType,
-    func: fn(params: &[utils::Val], results: &mut [utils::Val]),
+    linker: utils::Linker,
 }
 
 /// `Instance` is a `Copy` handle into the store, which owns every C object and frees them on drop.
@@ -70,7 +63,7 @@ impl Runtime for Zwasm {
         Some(Box::new(ZwasmInstance {
             tier: self.tier,
             engine,
-            linked: Vec::new(),
+            linker: utils::Linker::new(),
         }))
     }
 }
@@ -82,7 +75,10 @@ impl Zwasm {
                 // Note: zwasm's JIT aborts while compiling ffmpeg: register allocator overflow,
                 // zwasm/zwasm#487.
                 TestId::Startup(StartupTestId::Ffmpeg) => false,
-                _ => true,
+                _ => {
+                    // Note: zwasm's JIT only targets `x86_64` and `aarch64`.
+                    cfg!(target_arch = "x86_64") || cfg!(target_arch = "aarch64")
+                }
             },
             Tier::Interp => match id {
                 // Note: zwasm's interpreter traps on a `loop` with block parameters
@@ -109,12 +105,7 @@ impl RuntimeInstance for ZwasmInstance {
         ty: utils::FuncType,
         func: fn(params: &[utils::Val], results: &mut [utils::Val]),
     ) {
-        self.linked.push(Linked {
-            module: module.into(),
-            name: name.into(),
-            ty,
-            func,
-        });
+        self.linker.define(module, name, ty, func);
     }
 
     // Host functions belong to a store and every instantiation gets a fresh one, so they are
@@ -129,27 +120,16 @@ impl RuntimeInstance for ZwasmInstance {
                 matches!(import.kind(), ExternKind::Func),
                 "unsupported non-function import {module_name}::{name}"
             );
-            let linked = self
-                .linked
-                .iter()
-                .find(|linked| linked.module == module_name && linked.name == name)
+            let (ty, func) = self
+                .linker
+                .funcs()
+                .find(|(module, name_, _, _)| *module == module_name && *name_ == name)
+                .map(|(_, _, ty, func)| (ty, func))
                 .unwrap_or_else(|| panic!("unlinked import {module_name}::{name}"));
-            let params: Vec<ValType> = linked
-                .ty
-                .params()
-                .iter()
-                .copied()
-                .map(to_zwasm_valtype)
-                .collect();
-            let results: Vec<ValType> = linked
-                .ty
-                .results()
-                .iter()
-                .copied()
-                .map(to_zwasm_valtype)
-                .collect();
-            let result_tys: Vec<utils::ValType> = linked.ty.results().to_vec();
-            let func = linked.func;
+            let params: Vec<ValType> = ty.params().iter().copied().map(to_zwasm_valtype).collect();
+            let results: Vec<ValType> =
+                ty.results().iter().copied().map(to_zwasm_valtype).collect();
+            let result_tys: Vec<utils::ValType> = ty.results().to_vec();
             let host = Func::new(&mut store, &params, &results, move |params, results| {
                 let in_params: Vec<utils::Val> =
                     params.iter().copied().map(into_utils_val).collect();

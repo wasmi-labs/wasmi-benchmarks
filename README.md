@@ -233,7 +233,7 @@ These are derived directly from each runtime's `can_run` implementation (under
 | `argon2`         | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `erc20`          | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-- **Note:** `wasmtime.winch` only runs on `x86_64` and `aarch64`; this matrix assumes such a host. On other architectures it supports no test cases.
+- **Note:** `wasmtime.winch` and `zwasm.jit` only run on `x86_64` and `aarch64`; this matrix assumes such a host. On other architectures they support no test cases.
 - **Note:** Cells marked with ⚠️ may take very long to complete.
 
 ## License
