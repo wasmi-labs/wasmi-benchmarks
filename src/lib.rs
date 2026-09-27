@@ -71,6 +71,14 @@ pub fn vms_under_test() -> Vec<Box<dyn Runtime>> {
     rts.push(rt_fizzy::Fizzy);
     #[cfg(feature = "wasmz")]
     rts.push(rt_wasmz::Wasmz);
+    #[cfg(feature = "zwasm-jit")]
+    rts.push(rt_zwasm::Zwasm {
+        tier: rt_zwasm::Tier::Jit,
+    });
+    #[cfg(feature = "zwasm-interp")]
+    rts.push(rt_zwasm::Zwasm {
+        tier: rt_zwasm::Tier::Interp,
+    });
     rts.into_vec()
 }
 

@@ -1,0 +1,16 @@
+[package]
+name = "rt-zwasm"
+edition = "2024"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+benchmark-utils = { workspace = true }
+anyhow = { workspace = true }
+zwasm-sdk = "0.3.0"
+
+[features]
+jit = []
+interp = []
