@@ -3191,6 +3191,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rt-zwasm"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "benchmark-utils",
+ "zwasm-sdk",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4543,6 +4552,7 @@ dependencies = [
  "rt-wasmi-v2",
  "rt-wasmtime",
  "rt-wasmz",
+ "rt-zwasm",
  "serde_json",
  "wat",
 ]
@@ -5423,4 +5433,23 @@ dependencies = [
  "potential_utf",
  "resb",
  "serde",
+]
+
+[[package]]
+name = "zwasm-sdk"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "418398d1d4cad0bddb4563ebf6a6b4fafaa8a597820f957f918f295cc6a68fe1"
+dependencies = [
+ "thiserror 2.0.20",
+ "zwasm-sys",
+]
+
+[[package]]
+name = "zwasm-sys"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97a4fe75be8dfc0855e8c5fa51e8bf3c6ddc28f6261ed9e7a0e30d31aa535ff3"
+dependencies = [
+ "bindgen 0.72.1",
 ]
